@@ -8,6 +8,12 @@ export default {
     tint: tintColorLight,
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorLight,
+    // Additional colors
+    customColor1: '#C9CEBE',    
+    customColor2: '#567944',
+    customColor3: '#323232',
+    customColor4: '#CD7B66',
+    customColor5: '#552222',
   },
   dark: {
     text: '#fff',
@@ -15,5 +21,11 @@ export default {
     tint: tintColorDark,
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorDark,
+    // Additional colors
+    customColor1: '#C9CEBE',    
+    customColor2: '#567944',
+    customColor3: '#323232',
+    customColor4: '#CD7B66',
+    customColor5: '#552222',
   },
 };

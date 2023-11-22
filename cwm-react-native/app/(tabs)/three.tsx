@@ -2,21 +2,13 @@ import { StyleSheet } from 'react-native';
 
 import EditScreenInfo from '../../components/EditScreenInfo';
 import { Text, View } from '../../components/Themed';
-import SearchBar from '../../components/SearchBar';
 
-
-export default function TabOneScreen() {
-  
-  function handleSearch(query: string): void {
-    throw new Error('Function not implemented.');
-}
-  
+export default function TabTwoScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Let's Climb!</Text>
+      <Text style={styles.title}>Tab Three</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <Text>Find Climbers in your Area</Text>
-      <SearchBar onSearch={handleSearch} /> 
+      <EditScreenInfo path="app/(tabs)/two.tsx" />
     </View>
   );
 }
@@ -30,7 +22,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#567944'
   },
   separator: {
     marginVertical: 30,
