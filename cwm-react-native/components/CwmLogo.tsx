@@ -1,24 +1,16 @@
-import Svg, { Path } from 'react-native-svg'
+import Svg, { SvgProps, Path } from 'react-native-svg'
 
-interface CwmLogoProps {
-    fill?: string,
-    width?: string,
-    opacity?: string
-}
-
-export function CwmLogo({fill, width, opacity}: CwmLogoProps) {
-    if(!fill){
-        fill = "#000000"
-    }
-    if(!width) {
-        width = "100%"
-    }
-    if(!opacity) {
-        opacity = "1.000000"
+export function CwmLogo(props: SvgProps) {
+    if(!props.opacity) {
+        props.opacity = "1.0"
     }
     return (
-        <Svg width={width} viewBox="0 0 821 915">
-            <Path fill={fill} opacity={opacity} stroke="none" 
+        <Svg
+            viewBox="0 0 821 915"
+            width={props.width}
+            height={props.height}
+            {...props}>
+            <Path fill={props.fill} opacity={props.opacity} stroke="none" 
             d="
             M638.000305,357.833344 
             C639.985596,363.141449 642.467773,368.322723 643.860962,373.781921 
