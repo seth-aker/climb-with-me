@@ -18,7 +18,7 @@ export function CwmLogo({fill, width, opacity}: CwmLogoProps) {
     }
     return (
         <Svg width={width} viewBox="0 0 821 915">
-        <Path fill={fill} opacity={opacity} stroke="none" 
+            <Path fill={fill} opacity={opacity} stroke="none" 
             d="
             M638.000305,357.833344 
             C639.985596,363.141449 642.467773,368.322723 643.860962,373.781921 
