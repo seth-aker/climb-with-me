@@ -13,7 +13,11 @@ export default function TabOneScreen() {
   
   return (
     <View style={styles.container}>
+<<<<<<< Updated upstream
       <CwmLogo width='75px' height='75px' fill='#567944'/>
+=======
+        <CwmLogo width='75%' fill='#567944'/>
+>>>>>>> Stashed changes
       <Text style={styles.title}>Let's Climb!</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       <Text>Find Climbers in your Area</Text>
