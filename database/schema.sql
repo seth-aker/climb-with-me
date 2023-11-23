@@ -23,8 +23,9 @@ CREATE TABLE user_address (
     address_line_1 varChar(100),
     address_line_2 varChar(50),
     city varChar(50),
-    country varChar(50),
+    state_province varChar(50)
     postal_code int,
+    country varChar(50),
     is_default boolean,
     CONSTRAINT PK_address_id PRIMARY KEY (address_id),
     CONSTRAINT FK_user_id FOREIGN KEY (user_id) REFERENCES users(user_id)

@@ -1,6 +1,7 @@
 package dev.sethaker.climbwithme.dao;
 
 import dev.sethaker.climbwithme.exception.DaoException;
+import dev.sethaker.climbwithme.model.Address;
 import dev.sethaker.climbwithme.model.User;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -13,11 +14,12 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Component
 @Slf4j
 public class JdbcUserDao implements UserDao {
@@ -80,6 +82,7 @@ public class JdbcUserDao implements UserDao {
             throw new DaoException("Error connecting to database. Error message: " + e.getMessage());
         }
     }
+
 
     private User mapRowSetToUser(SqlRowSet rowSet) {
         String userId = rowSet.getString("user_id");

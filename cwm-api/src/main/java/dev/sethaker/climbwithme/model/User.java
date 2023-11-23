@@ -48,7 +48,8 @@ public class User {
     @JsonAlias(value = "gender_code")
     private Character genderCode;
     //from frontEnd
-    private Boolean activated;
+    @JsonAlias(value = "is_active")
+    private Boolean isActive;
     //from Auth0
     private String picture;
 

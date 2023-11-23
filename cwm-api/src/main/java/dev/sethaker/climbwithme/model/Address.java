@@ -11,11 +11,10 @@ import lombok.Setter;
 @Setter
 @Getter
 public class Address {
-    @JsonAlias(value = "location_id")
-    int locationId;
-    @JsonAlias(value = "location_name")
-    String locationName;
-    String address;
+    @JsonAlias(value = "address_id")
+    int addressId;
+    @JsonAlias(value = "address_line_1")
+    String addressLine1;
     @JsonAlias(value = "address_line_2")
     String addressLine2;
     String city;
