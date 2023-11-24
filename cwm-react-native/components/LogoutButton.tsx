@@ -1,20 +1,20 @@
 import { useAuth0 } from 'react-native-auth0';
-import { Pressable, StyleSheet } from 'react-native';
-import { Text } from './Themed'
-export function LoginButton() {
-    const { authorize } = useAuth0();
+import { Pressable, Text, StyleSheet } from 'react-native';
 
-    const onLogin = async () => {
+export function LogoutButton() {
+    const { clearSession } = useAuth0();
+
+    const logout = async () => {
         try {
-            authorize();
+            await clearSession();
         } catch (e) {
             console.log(e);
         }
-    };
+    }
 
     return (
-        <Pressable style={styles.button} onPress={onLogin}>
-            <Text>Login</Text>
+        <Pressable onPress={logout} style={styles.button}>
+            <Text>Logout</Text>
         </Pressable>
     )
 }

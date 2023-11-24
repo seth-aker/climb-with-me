@@ -46,18 +46,18 @@ export default function TabLayout() {
             </Link>
           ),
           headerRight: () => (
-            <Link href="/settings" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <AntDesign
+              <Link href="/settings" asChild>
+                <Pressable>
+                  {({ pressed }) => (
+                    <AntDesign
                     name="setting"
                     size={25}
                     color={Colors[colorScheme ?? 'light'].text}
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
+                    />
+                    )}
+                </Pressable>
+              </Link>
           ),
         }}
       />
