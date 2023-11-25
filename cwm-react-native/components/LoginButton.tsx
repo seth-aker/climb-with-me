@@ -4,7 +4,7 @@ import { Text } from './Themed'
 export function LoginButton() {
     const { authorize } = useAuth0();
 
-    const onLogin = async () => {
+    const handleLogin = async () => {
         try {
             authorize();
         } catch (e) {
@@ -13,7 +13,7 @@ export function LoginButton() {
     };
 
     return (
-        <Pressable style={styles.button} onPress={onLogin}>
+        <Pressable style={styles.button} onPress={handleLogin}>
             <Text>Login</Text>
         </Pressable>
     )

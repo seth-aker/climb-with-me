@@ -4,7 +4,7 @@ import { Pressable, Text, StyleSheet } from 'react-native';
 export function LogoutButton() {
     const { clearSession } = useAuth0();
 
-    const logout = async () => {
+    const handleLogout = async () => {
         try {
             await clearSession();
         } catch (e) {
@@ -13,7 +13,7 @@ export function LogoutButton() {
     }
 
     return (
-        <Pressable onPress={logout} style={styles.button}>
+        <Pressable onPress={handleLogout} style={styles.button}>
             <Text>Logout</Text>
         </Pressable>
     )
