@@ -1,10 +1,11 @@
-import { StyleSheet } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 import { Text, View } from '../../components/Themed';
 import SearchBar from '../../components/SearchBar';
 import { CwmLogo } from '../../components/CwmLogo';
 import { LoginButton } from '../../components/LoginButton';
 import { LogoutButton } from '../../components/LogoutButton';
 import { useAuth0 } from 'react-native-auth0';
+import { Link } from 'expo-router';
 
 
 
@@ -20,15 +21,20 @@ export default function TabOneScreen() {
 
       <View style={styles.contentContainer}>
         {!user && <View style={styles.buttons}>
-        <LoginButton />
-      </View>}
-      {user && <View style={styles.buttons}>
-        <LogoutButton />
-      </View>}
+          <LoginButton />
+        </View>}
+        {user && <View style={styles.buttons}>
+          <LogoutButton />
+        </View>}
       <CwmLogo width='75px' height='75px' fill='#567944' />
         <Text style={styles.title}>Let's Climb!</Text>
         <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
         <Text>Find Climbers in your Area</Text>
+        <Link href="/register" asChild>
+          <Pressable>
+            <Text>Register</Text>
+          </Pressable>
+        </Link>
       </View>
     </View>
   );
