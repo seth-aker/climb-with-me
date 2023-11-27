@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { TextInput, View, StyleSheet } from 'react-native';
+import { Text, TextInput, View, Pressable, StyleSheet } from 'react-native';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import PhoneInput from 'react-native-phone-number-input';
 import validator from 'validator'
+import { Link } from 'expo-router';
 
 
 // default necessary for expo router to find route
@@ -15,14 +15,9 @@ export default function RegisterUserInfo() {
     const [dateOfBirth, setDateOfBirth] = useState(new Date());
     const [dateOfBirthString, setDateOfBirthString] = useState("");
     const [showCalendar, setShowCalendar] = useState(false);
-    const [primaryPhone, setPrimaryPhone] = useState('');
-    const [formattedPrimaryPhone, setFormattedPrimaryPhone] = useState("")
-    const [gender, setGender] = useState('');
     const [errors, setErrors] = useState(new Set<string>);
 
-    const handleEmailChange = (input: string) => {
-        input = validator.trim(input)
-        setEmail(input);
+    useEffect(() => {
         if(!validator.isEmail(email)) {
             setErrors(errors => errors.add("Not a valid email address"))
         } else {
@@ -31,12 +26,8 @@ export default function RegisterUserInfo() {
                 return errors;
             })
         }
-    }
-
-    const handleFirstNameChange = (input: string) => {
-        input = validator.trim(input)
-        setFirstName(input);
-        if(!input) {
+        
+        if(!firstName) {
             setErrors(errors => errors.add("First name cannot be empty"))
         } else {
             setErrors(errors => {
@@ -44,6 +35,48 @@ export default function RegisterUserInfo() {
                 return errors;
             })
         }
+
+        if(!lastName) {
+            setErrors(errors => errors.add("Last name cannot be empty"))
+        } else {
+            setErrors(errors => {
+                errors.delete("Last name cannot be empty")
+                return errors;
+            })
+        }
+        
+        if(new Date().getTime() - dateOfBirth.getTime() < (18 * 1000 * 3600 * 24 * 365)) {
+                setErrors(errors => errors.add("Must be over 18 to use this app"))
+            } else {
+                setErrors(errors => {
+                    errors.delete("Must be over 18 to use this app");
+                    return errors;
+                })
+            }
+            
+        if(!validator.isDate(dateOfBirthString)) {
+            setErrors(errors => errors.add("Date of birth must be a valid date"))
+        } else {
+            setErrors(errors => {
+                errors.delete("Date of birth must be a valid date")
+                return errors;
+            })
+            setDateOfBirth(new Date(dateOfBirthString));
+
+        }
+
+    }, [email, firstName, lastName, dateOfBirth, dateOfBirthString]) 
+
+
+    const handleEmailChange = (input: string) => {
+        input = validator.trim(input)
+        setEmail(input);
+    }
+
+    const handleFirstNameChange = (input: string) => {
+        input = validator.trim(input)
+        setFirstName(input);
+        
     }
 
     const handleMiddleNameChange = (input: string) => {
@@ -54,39 +87,20 @@ export default function RegisterUserInfo() {
     const handleLastNameChange = (input: string) => {
         input = validator.trim(input)
         setLastName(input);
-        if(!input) {
-            setErrors(errors => errors.add("Last name cannot be empty"))
-        } else {
-            setErrors(errors => {
-                errors.delete("Last name cannot be empty")
-                return errors;
-            })
-        }
+        
     }
 
     const handleDateOfBirthChange = (event: DateTimePickerEvent, date?: Date) => {
-        if(date) {
+        if(date && event.type === 'set') {
             setDateOfBirth(date);
-            setDateOfBirthString(date.toDateString())
-            if(new Date().getTime() - dateOfBirth.getTime() < (18 * 1000 * 3600 * 24 * 365)) {
-                setErrors(errors => errors.add("Must be over 18 to use this app"))
-            } else {
-                setErrors(errors => {
-                    errors.delete("Must be over 18 to use this app");
-                    return errors;
-                })
-            }
+            setDateOfBirthString(date.toLocaleDateString())
         }
+        setShowCalendar(false);
     };
 
-    // const handlePhoneNumberChange = (value: string) => {
-    //     setPrimaryPhone(value);
-    //     patternFormatter(value, {
-    //         format: 
-    //     })
-    // }
-
-
+    const handleDateOfBirthChangeText = (input: string) => {
+        setDateOfBirthString(input);
+    }
 
     return (
         <View>
@@ -114,30 +128,26 @@ export default function RegisterUserInfo() {
                 value={dateOfBirthString}
                 onFocus={() => setShowCalendar(true)}
                 placeholder='Birthday:'
+                onChangeText={handleDateOfBirthChangeText}
                 />
 
-            {showCalendar && <DateTimePicker
-                mode='date' 
-                maximumDate={maxDate}
-                value={dateOfBirth}
-                onChange={handleDateOfBirthChange}
+            {showCalendar && 
+                <DateTimePicker
+                    mode='date' 
+                    maximumDate={maxDate}
+                    value={dateOfBirth}
+                    onChange={handleDateOfBirthChange}
+                    
+                />
+                }
+            {errors.size === 0 && 
+                <Link href="/register/two" asChild>
+                    <Pressable>
+                        <Text>Continue</Text>
+                    </Pressable>
+                </Link>
                 
-            />}
-            {/* <PhoneInput 
-                defaultValue={primaryPhone}
-                defaultCode='US'
-                layout='first'
-                onChangeText={handlePhoneNumberChange}
-
-                /> */}
-            {/* <PatternFormat 
-                type='tel'
-                format='(###)-###-####'
-                mask="_"
-                value={primaryPhone}
-                onValueChange={handlePhoneNumberChange}
-                required
-            /> */}
+            }
         </View>
         
     )
