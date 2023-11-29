@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Text, TextInput, View, Pressable, StyleSheet } from 'react-native';
+import { Text, TextInput, View, Pressable, StyleSheet, Button } from 'react-native';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import validator from 'validator'
+import validator from 'validator';
 import { Link } from 'expo-router';
 
 
@@ -18,6 +18,7 @@ export default function RegisterUserInfo() {
     const [errors, setErrors] = useState(new Set<string>);
 
     useEffect(() => {
+
         if(!validator.isEmail(email)) {
             setErrors(errors => errors.add("Not a valid email address"))
         } else {
@@ -27,7 +28,7 @@ export default function RegisterUserInfo() {
             })
         }
         
-        if(!firstName) {
+        if(!firstName || firstName.length === 0) {
             setErrors(errors => errors.add("First name cannot be empty"))
         } else {
             setErrors(errors => {
@@ -36,7 +37,7 @@ export default function RegisterUserInfo() {
             })
         }
 
-        if(!lastName) {
+        if(!lastName || lastName.length === 0) {
             setErrors(errors => errors.add("Last name cannot be empty"))
         } else {
             setErrors(errors => {
@@ -61,7 +62,6 @@ export default function RegisterUserInfo() {
                 errors.delete("Date of birth must be a valid date")
                 return errors;
             })
-            setDateOfBirth(new Date(dateOfBirthString));
 
         }
 
@@ -99,7 +99,8 @@ export default function RegisterUserInfo() {
     };
 
     const handleDateOfBirthChangeText = (input: string) => {
-        setDateOfBirthString(input);
+        setDateOfBirthString(input)
+        setDateOfBirth(new Date(dateOfBirthString))
     }
 
     return (
@@ -148,6 +149,10 @@ export default function RegisterUserInfo() {
                 </Link>
                 
             }
+            <Button title='Show errors'
+                onPress={() => {
+                    console.log(dateOfBirthString)
+                    errors.forEach(error => console.log(error))}}></Button>
         </View>
         
     )
