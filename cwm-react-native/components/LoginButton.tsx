@@ -1,7 +1,11 @@
 import { useAuth0 } from 'react-native-auth0';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, PressableProps, StyleSheet } from 'react-native';
 import { Text } from './Themed'
-export function LoginButton() {
+
+interface ButtonProps extends PressableProps {
+    text: string
+}
+export function LoginButton({text, ...props}: ButtonProps) {
     const { authorize } = useAuth0();
 
     const handleLogin = async () => {
@@ -14,7 +18,7 @@ export function LoginButton() {
 
     return (
         <Pressable style={styles.button} onPress={handleLogin}>
-            <Text>Login</Text>
+            <Text>{text}</Text>
         </Pressable>
     )
 }

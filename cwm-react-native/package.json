@@ -39,7 +39,6 @@
     "react-native-screens": "~3.22.0",
     "react-native-svg": "13.9.0",
     "react-native-web": "~0.19.6",
-    "react-phone-number-input": "^3.3.7",
     "validator": "13.9.0"
   },
   "devDependencies": {

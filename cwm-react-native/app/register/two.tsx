@@ -1,26 +1,40 @@
 import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
-import { E164Number } from 'libphonenumber-js/types.cjs';
+import { Pressable, Text, View , StyleSheet, TextInput} from 'react-native';
 import { CountryPicker} from 'react-native-country-codes-picker'
 import ListHeaderComponent from '../../components/CCListHeaderComponent';
+import { formatPhoneNumber } from '../../utils/formatPhoneNumber';
+
 export default function RegisterUserInfoPage2() {
     const [showModal, setShowModal] = useState(false);
     const [countryCode, setCountryCode] = useState("+1")
-    const [formattedPrimaryPhone, setFormattedPrimaryPhone] = useState("")
+    const [primaryPhone, setPrimaryPhone] = useState("")
     const [gender, setGender] = useState('');
     const [errors, setErrors] = useState(new Set<string>);
 
+    const handlePhoneChange = (input: string) => {
+        const formattedNumber = formatPhoneNumber(input, primaryPhone)
+        setPrimaryPhone(formattedNumber);
+    }
+    
     return (
         <View>
-            <Pressable
-                onPress={() => {
-                    setCountryCode("")
-                    setShowModal(true)
-                }}
-            >
-                <Text>{countryCode}</Text>
-                
-            </Pressable>
+            <View style={styles.phoneInput}>
+                <Pressable
+                    style={styles.ccButton}
+                    onPress={() => {
+                        setCountryCode("")
+                        setShowModal(true)
+                    }}>
+                    <Text>{countryCode}</Text>
+                </Pressable>
+                <TextInput style={styles.phoneText}
+                    onChangeText={handlePhoneChange}
+                    value={primaryPhone}
+                    placeholder='Primary Phone'
+                    inputMode='numeric'
+                    
+                />
+            </View>
             <CountryPicker lang="en" 
                 show={showModal}
                 pickerButtonOnPress={(item) => {
@@ -29,8 +43,39 @@ export default function RegisterUserInfoPage2() {
                 }}
                 ListHeaderComponent={ListHeaderComponent}
                 popularCountries={["us", "ca"]}
-                
             />
         </View>
     )
 }
+
+const styles = StyleSheet.create({
+    phoneInput: {
+        display: 'flex',
+        flexDirection: 'row',
+        width: '100%',
+    },
+    ccButton: {
+        width: '15%',
+        backgroundColor: "grey",
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderTopLeftRadius: 5,
+        borderBottomLeftRadius: 5,
+        margin: 10,
+        marginRight: 0,
+        padding: 5
+    },
+    phoneText: {
+        width: '80%',
+        backgroundColor: 'lightgrey',
+        display: 'flex',
+        alignItems: 'center',
+        borderBottomRightRadius: 5,
+        borderTopRightRadius: 5,
+        margin: 10,
+        marginLeft: 0,
+        padding: 5
+    },
+
+})

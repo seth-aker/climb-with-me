@@ -81,7 +81,7 @@ export default function isDate(date: string, format: string) {
     if (dateObj.d.length === 1) {
       day = `0${dateObj.d}`;
     }
-
+    
     return new Date(`${fullYear}-${month}-${day}T00:00:00.000Z`).getUTCDate() === +dateObj.d;
   }
 

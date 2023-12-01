@@ -115,7 +115,7 @@ export default function RegisterUserInfo() {
     const handleDateOfBirthChange = (event: DateTimePickerEvent, date?: Date) => {
         if(date && event.type === 'set') {
             setDateOfBirth(date);
-            setDateOfBirthString(date.toLocaleDateString())
+            setDateOfBirthString(date.toLocaleDateString(undefined, {month: '2-digit', day: "2-digit", year: "numeric"}))
         }
         setShowCalendar(false);
     };
@@ -148,39 +148,80 @@ export default function RegisterUserInfo() {
     }
 
     return (
-        <View>
-            <TextInput 
-                value={email} 
-                placeholder='something@email.com'
-                onChangeText={handleEmailChange}  
-            />
-            {errorsVisible && errors.email && <Text>{`*${errors.email}`}</Text>}
-            
-            <TextInput 
-                value={firstName}
-                placeholder='First Name'
-                onChangeText={handleFirstNameChange}
-            />
-            {errorsVisible && errors.firstName && <Text>{`*${errors.firstName}`}</Text>}
-            <TextInput 
-                value={middleName}
-                placeholder='Middle Name'
-                onChangeText={handleMiddleNameChange}
-            />
-            <TextInput 
-                value={lastName}
-                placeholder='Last Name'
-                onChangeText={handleLastNameChange}
-            />
-            {errorsVisible && errors.lastName && <Text>{`*${errors.lastName}`}</Text>}
-            <TextInput 
-                value={dateOfBirthString}
-                onFocus={() => setShowCalendar(true)}
-                placeholder='Birthday:'
-                onChangeText={handleDateOfBirthChangeText}
+        <View style={styles.form}>
+            <View style={styles.inputLine}>
+                <View style={styles.inputTitle}>
+                    <Text>Email: </Text> 
+                    {errorsVisible && errors.email && <Text style={styles.error}>{`*${errors.email}`}</Text>}
+                </View>
+                
+                <TextInput 
+                    style={[styles.input, errorsVisible && errors.email ? styles.inputErrorState: null]}
+                    value={email} 
+                    placeholder='something@email.com'
+                    onChangeText={handleEmailChange} 
+                    inputMode='email' 
                 />
-            {errorsVisible && errors.validDateOfBirth && <Text>{`*${errors.validDateOfBirth}`}</Text>}
-            {errorsVisible && errors.validAge && <Text>{`*${errors.validAge}`}</Text>}
+               
+            </View>
+            <View style={styles.inputLine}>
+                <View style={styles.inputTitle}>
+                    <Text>First name:</Text>
+                    {errorsVisible && errors.firstName && <Text style={styles.error}>{`*${errors.firstName}`}</Text>}
+                </View>
+                <TextInput 
+                    style={[styles.input, errorsVisible && errors.firstName ? styles.inputErrorState: null]}
+                    value={firstName}
+                    placeholder='First Name'
+                    onChangeText={handleFirstNameChange}
+                    />
+            </View>
+            <View style={styles.inputLine}>
+                <Text>Middle Name: (optional)</Text>
+                <TextInput 
+                    style={styles.input}
+                    value={middleName}
+                    placeholder='Middle Name'
+                    onChangeText={handleMiddleNameChange}
+                />
+            </View>
+
+            <View style={styles.inputLine}>
+                <View style={styles.inputTitle}>
+                    <Text>Last Name: </Text>
+                    {errorsVisible && errors.lastName && <Text style={styles.error}>{`*${errors.lastName}`}</Text>}
+                </View>
+                
+                <TextInput 
+                    style={[styles.input, errorsVisible && errors.lastName ? styles.inputErrorState: null]}
+                    value={lastName}
+                    placeholder='Last Name'
+                    onChangeText={handleLastNameChange}
+                    />
+                
+            </View>
+
+            <View style={styles.inputLine}>
+                <View style={styles.inputTitle}>
+                    <Text>Date of Birth:</Text> 
+                    {errorsVisible && 
+                     errors.validDateOfBirth && 
+                     <Text style={styles.error}>{`*${errors.validDateOfBirth}`}</Text>}
+                    
+                    {errorsVisible && 
+                     errors.validAge && 
+                     !errors.validDateOfBirth &&
+                     <Text style={styles.error}>{`*${errors.validAge}`}</Text>}
+                </View>
+                
+                <TextInput 
+                    style={[styles.input, errorsVisible && (errors.validDateOfBirth || errors.validAge) ? styles.inputErrorState: null]}
+                    value={dateOfBirthString}
+                    onFocus={() => setShowCalendar(true)}
+                    placeholder='Birthday:'
+                    onChangeText={handleDateOfBirthChangeText}
+                    />
+            </View>
 
             {showCalendar && 
                 <DateTimePicker
@@ -198,3 +239,37 @@ export default function RegisterUserInfo() {
         
     )
 }
+
+const styles = StyleSheet.create({
+    form: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 0,
+        marginTop: 10,
+    },
+    inputLine: {
+        width: '90%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-start'
+    },
+    inputTitle: {
+        display: 'flex',
+        flexDirection: 'row'
+    },
+    input: {
+        marginBottom: 5,
+        padding: 5,
+        borderColor: 'grey',
+        borderWidth: 1,
+        borderRadius: 5
+    },
+    error: {
+        color: 'red'
+    },
+    inputErrorState: {
+        borderColor: 'red'
+    }
+})
