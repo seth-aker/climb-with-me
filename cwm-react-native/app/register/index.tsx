@@ -3,7 +3,7 @@ import { Text, TextInput, View, Pressable, StyleSheet } from 'react-native';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import validator from 'validator';
 import isDate from '../../utils/isDate';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 
 type Errors = {
     email?: string,
@@ -13,7 +13,7 @@ type Errors = {
     validAge?: string
 
 }
-export default function RegisterserInfo() {
+export default function RegisterUserInfo() {
     const maxDate = new Date();
     const [email, setEmail] = useState('');
     const [firstName, setFirstName] = useState('');
