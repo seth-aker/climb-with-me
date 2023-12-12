@@ -4,31 +4,42 @@ import SearchBar from '../../components/SearchBar';
 import { CwmLogo } from '../../components/CwmLogo';
 import Button from '../../components/Button'
 import { useAuth0 } from 'react-native-auth0';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
+import { useToken } from '../../hooks/useToken';
 
+
+//These login components are probably in the wrong spot but they are here for now.
 
 
 export default function TabOneScreen() {
-  const { user, authorize, clearSession } = useAuth0();
+  const { user, authorize, clearSession} = useAuth0();
+  const { setAccessToken, getToken } = useToken();
+  
   function handleSearch(query: string): void {
     throw new Error('Function not implemented.');
   }
+
   const handleLogin = async () => {
       try {
           authorize();
+          const token = await getToken();
+          setAccessToken(token)
       } catch (e) {
           console.log(e);
       }
   };
+
   const handleLogout = async () => {
       try {
           await clearSession();
+          setAccessToken(undefined)
       } catch (e) {
           console.log(e);
       }
   }
   
   const handleRegister = () => {
+    
     router.push("/register/")
   }
   return (

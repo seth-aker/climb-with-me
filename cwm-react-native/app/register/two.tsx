@@ -6,8 +6,8 @@ import { formatPhoneNumber } from '../../utils/formatPhoneNumber';
 
 export default function RegisterUserInfoPage2() {
     const [showModal, setShowModal] = useState(false);
-    const [countryCode, setCountryCode] = useState("+1")
-    const [primaryPhone, setPrimaryPhone] = useState("")
+    const [countryCode, setCountryCode] = useState("+1");
+    const [primaryPhone, setPrimaryPhone] = useState("");
     const [gender, setGender] = useState('');
     const [errors, setErrors] = useState(new Set<string>);
 
@@ -22,8 +22,8 @@ export default function RegisterUserInfoPage2() {
                 <Pressable
                     style={styles.ccButton}
                     onPress={() => {
-                        setCountryCode("")
                         setShowModal(true)
+                        setCountryCode("")
                     }}>
                     <Text>{countryCode}</Text>
                 </Pressable>

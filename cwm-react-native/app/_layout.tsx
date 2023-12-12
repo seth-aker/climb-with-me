@@ -5,6 +5,7 @@ import { SplashScreen, Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import { Auth0Provider } from 'react-native-auth0';
+import { TokenContextProvider } from '../context/TokenContext';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -48,6 +49,7 @@ function RootLayoutNav() {
 
   return (
     <Auth0Provider domain='dev-sethaker.us.auth0.com' clientId='UP5YOoqMze966nBzDgTwbOLqaWr6MWpO'>
+    <TokenContextProvider>
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -55,6 +57,7 @@ function RootLayoutNav() {
         <Stack.Screen name="register/index" options={{ title: "Register"}} />
       </Stack>
     </ThemeProvider>
+    </TokenContextProvider>
     </Auth0Provider>
   );
 }

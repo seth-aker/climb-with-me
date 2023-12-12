@@ -4,6 +4,7 @@ import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/dat
 import validator from 'validator';
 import isDate from '../../utils/isDate';
 import { router } from 'expo-router';
+import { registerUser } from '../../service/RegisterService';
 
 type Errors = {
     email?: string,
@@ -17,7 +18,6 @@ export default function RegisterUserInfo() {
     const maxDate = new Date();
     const [email, setEmail] = useState('');
     const [firstName, setFirstName] = useState('');
-    const [middleName, setMiddleName] = useState('');
     const [lastName, setLastName] = useState('');
     const [dateOfBirth, setDateOfBirth] = useState(new Date());
     const [dateOfBirthString, setDateOfBirthString] = useState("");
@@ -90,28 +90,6 @@ export default function RegisterUserInfo() {
 
     useEffect(validateInput, [email, firstName, lastName, dateOfBirth, dateOfBirthString])
 
-    const handleEmailChange = (input: string) => {
-        input = validator.trim(input)
-        setEmail(input);
-    }
-
-    const handleFirstNameChange = (input: string) => {
-        input = validator.trim(input)
-        setFirstName(input);
-        
-    }
-
-    const handleMiddleNameChange = (input: string) => {
-        input = validator.trim(input)
-        setMiddleName(input);
-    }
-
-    const handleLastNameChange = (input: string) => {
-        input = validator.trim(input)
-        setLastName(input);
-        
-    }
-
     const handleDateOfBirthChange = (event: DateTimePickerEvent, date?: Date) => {
         if(date && event.type === 'set') {
             setDateOfBirth(date);
@@ -120,11 +98,6 @@ export default function RegisterUserInfo() {
         setShowCalendar(false);
     };
 
-    const handleDateOfBirthChangeText = (input: string) => {
-        input = input.trim();
-        setDateOfBirthString(input)
-        setDateOfBirth(new Date(dateOfBirthString))
-    }
 
     const handleSubmitInfo = async () => {
         validateInput();
@@ -135,16 +108,20 @@ export default function RegisterUserInfo() {
            !errors.validAge ) {
             const userInfo = {
                 email,
-                firstName,
-                middleName,
-                lastName,
-                dateOfBirth
+                first_name: firstName,
+                last_name: lastName,
+                date_of_birth: dateOfBirth
             };
-            
-        router.push("/register/two" )
-        } else {
-            setErrorsVisible(true)
-        }
+        //     try {
+        //         registerUser(, userInfo)    
+        //         router.push("/register/two" )
+        //     } catch (e) {
+        //         console.log(e)
+        //         setErrorsVisible(true)
+        //     }
+        // } else {
+        //     setErrorsVisible(true)
+        // }
     }
 
     return (
@@ -159,7 +136,7 @@ export default function RegisterUserInfo() {
                     style={[styles.input, errorsVisible && errors.email ? styles.inputErrorState: null]}
                     value={email} 
                     placeholder='something@email.com'
-                    onChangeText={handleEmailChange} 
+                    onChangeText={(input) => setEmail(input)} 
                     inputMode='email' 
                 />
                
@@ -173,17 +150,8 @@ export default function RegisterUserInfo() {
                     style={[styles.input, errorsVisible && errors.firstName ? styles.inputErrorState: null]}
                     value={firstName}
                     placeholder='First Name'
-                    onChangeText={handleFirstNameChange}
+                    onChangeText={(input) => setFirstName(input)}
                     />
-            </View>
-            <View style={styles.inputLine}>
-                <Text>Middle Name: (optional)</Text>
-                <TextInput 
-                    style={styles.input}
-                    value={middleName}
-                    placeholder='Middle Name'
-                    onChangeText={handleMiddleNameChange}
-                />
             </View>
 
             <View style={styles.inputLine}>
@@ -196,7 +164,7 @@ export default function RegisterUserInfo() {
                     style={[styles.input, errorsVisible && errors.lastName ? styles.inputErrorState: null]}
                     value={lastName}
                     placeholder='Last Name'
-                    onChangeText={handleLastNameChange}
+                    onChangeText={(input) => setLastName(input)}
                     />
                 
             </View>
@@ -219,7 +187,7 @@ export default function RegisterUserInfo() {
                     value={dateOfBirthString}
                     onFocus={() => setShowCalendar(true)}
                     placeholder='Birthday:'
-                    onChangeText={handleDateOfBirthChangeText}
+                    onChangeText={(input) => setDateOfBirthString(input)}
                     />
             </View>
 
@@ -272,4 +240,4 @@ const styles = StyleSheet.create({
     inputErrorState: {
         borderColor: 'red'
     }
-})
+})}
