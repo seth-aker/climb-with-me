@@ -3,17 +3,22 @@ import { Pressable, Text, View , StyleSheet, TextInput} from 'react-native';
 import { CountryPicker} from 'react-native-country-codes-picker'
 import ListHeaderComponent from '../../components/CCListHeaderComponent';
 import { formatPhoneNumber } from '../../utils/formatPhoneNumber';
+import { Picker } from '@react-native-picker/picker';
+import useRegistrationContext from '../../hooks/useRegistrationContext';
+import validator from 'validator';
 
 export default function RegisterUserInfoPage2() {
+    const { gender, setGender, primaryPhone, setPrimaryPhone} = useRegistrationContext();
     const [showModal, setShowModal] = useState(false);
     const [countryCode, setCountryCode] = useState("+1");
-    const [primaryPhone, setPrimaryPhone] = useState("");
-    const [gender, setGender] = useState('');
+    const [primaryPhoneString, setPrimaryPhoneString] = useState("");
     const [errors, setErrors] = useState(new Set<string>);
 
     const handlePhoneChange = (input: string) => {
-        const formattedNumber = formatPhoneNumber(input, primaryPhone)
-        setPrimaryPhone(formattedNumber);
+        const formattedNumber = formatPhoneNumber(input, primaryPhoneString)
+        setPrimaryPhoneString(formattedNumber);
+        const parsedPhoneNumber = parseInt(validator.whitelist(`${countryCode}${primaryPhoneString}`, '0123456789'));
+        setPrimaryPhone(parsedPhoneNumber);
     }
     
     return (
@@ -29,12 +34,26 @@ export default function RegisterUserInfoPage2() {
                 </Pressable>
                 <TextInput style={styles.phoneText}
                     onChangeText={handlePhoneChange}
-                    value={primaryPhone}
+                    value={primaryPhoneString}
                     placeholder='Primary Phone'
                     inputMode='numeric'
                     
                 />
             </View>
+
+            <Picker 
+                selectedValue={gender}
+                onValueChange={(value, index) => {
+                    setGender(value)
+                }}
+            >
+                <Picker.Item label="Male" value={"m"}/>
+                <Picker.Item label="Female" value={"f"}/>
+                <Picker.Item label="Non-binary" value={"n"}/>
+                <Picker.Item label="I'd rather not say" value={"d"}/>
+                <Picker.Item label="Other" value={"o"}/>
+            </Picker>
+
             <CountryPicker lang="en" 
                 show={showModal}
                 pickerButtonOnPress={(item) => {
