@@ -42,7 +42,7 @@ export function RegistrationContextProvider({ children }: RegistrationContextPro
     const [gender, setGender] = useState<Gender>()
     const [address, setAddress] = useState<Address>();
 
-    return <RegistrationContext.Provider 
+    return (<RegistrationContext.Provider 
                 value={{
                     email,
                     setEmail,
@@ -61,5 +61,5 @@ export function RegistrationContextProvider({ children }: RegistrationContextPro
                 }}>
                     { children }
                 </RegistrationContext.Provider>
-
+    )
 }

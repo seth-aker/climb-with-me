@@ -3,8 +3,13 @@ import { Text, TextInput, View, Pressable, StyleSheet } from 'react-native';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import validator from 'validator';
 import isDate from '../../utils/isDate';
+import { styles as baseStyles } from '../../styles/base';
+
+import useRegistrationContext from '../../hooks/useRegistrationContext';
+import Button from '../../components/Button';
+import { useAuth0 } from 'react-native-auth0';
+import { useToken } from '../../hooks/useToken';
 import { router } from 'expo-router';
-import { registerUser } from '../../service/RegisterService';
 
 type Errors = {
     email?: string,
@@ -15,16 +20,30 @@ type Errors = {
 
 }
 export default function RegisterUserInfo() {
+    const { user, authorize } = useAuth0();
+    const {email, setEmail, 
+            firstName, setFirstName, 
+            lastName, setLastName, 
+            dateOfBirth, setDateOfBirth } = useRegistrationContext();
+            
     const maxDate = new Date();
-    const [email, setEmail] = useState('');
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [dateOfBirth, setDateOfBirth] = useState(new Date());
     const [dateOfBirthString, setDateOfBirthString] = useState("");
     const [showCalendar, setShowCalendar] = useState(false);
     const [errors, setErrors] = useState({} as Errors);
     const [errorsVisible, setErrorsVisible] = useState(false);
 
+    useEffect(() => {
+        if(user) {
+            setEmail(user.email ? user.email : "")
+            setFirstName(user.givenName ? user.givenName : "")
+            setLastName(user.familyName ? user.familyName : "")
+            setDateOfBirth(user.birthdate ? new Date(user.birthdate) : new Date())
+            setDateOfBirthString(user.birthdate ? user.birthdate : dateOfBirthString)
+        } else {
+            authorize();
+        }
+    }, [user])
+    //TODO: Refactor this code to be more readable/less bulky, possibly in a separate file.
     function validateInput() {
         if(!validator.isEmail(email)) {
             setErrors(errors => {
@@ -106,6 +125,7 @@ export default function RegisterUserInfo() {
            !errors.lastName &&
            !errors.validDateOfBirth &&
            !errors.validAge ) {
+        router.push("/register/two")
             const userInfo = {
                 email,
                 first_name: firstName,
@@ -119,17 +139,17 @@ export default function RegisterUserInfo() {
         //         console.log(e)
         //         setErrorsVisible(true)
         //     }
-        // } else {
-        //     setErrorsVisible(true)
-        // }
+        } else {
+            setErrorsVisible(true)
+        }
     }
 
     return (
         <View style={styles.form}>
             <View style={styles.inputLine}>
                 <View style={styles.inputTitle}>
-                    <Text>Email: </Text> 
-                    {errorsVisible && errors.email && <Text style={styles.error}>{`*${errors.email}`}</Text>}
+                    <Text style={errorsVisible && errors.email ? styles.error : undefined}>Email: </Text> 
+                    {errorsVisible && errors.email && <Text style={styles.error}>{` *${errors.email}`}</Text>}
                 </View>
                 
                 <TextInput 
@@ -143,8 +163,8 @@ export default function RegisterUserInfo() {
             </View>
             <View style={styles.inputLine}>
                 <View style={styles.inputTitle}>
-                    <Text>First name:</Text>
-                    {errorsVisible && errors.firstName && <Text style={styles.error}>{`*${errors.firstName}`}</Text>}
+                    <Text style={errorsVisible && errors.firstName ? styles.error : undefined}>First name:</Text>
+                    {errorsVisible && errors.firstName && <Text style={styles.error}>{` *${errors.firstName}`}</Text>}
                 </View>
                 <TextInput 
                     style={[styles.input, errorsVisible && errors.firstName ? styles.inputErrorState: null]}
@@ -156,8 +176,8 @@ export default function RegisterUserInfo() {
 
             <View style={styles.inputLine}>
                 <View style={styles.inputTitle}>
-                    <Text>Last Name: </Text>
-                    {errorsVisible && errors.lastName && <Text style={styles.error}>{`*${errors.lastName}`}</Text>}
+                    <Text style={errorsVisible && errors.lastName ? styles.error : undefined}>Last Name: </Text>
+                    {errorsVisible && errors.lastName && <Text style={styles.error}>{` *${errors.lastName}`}</Text>}
                 </View>
                 
                 <TextInput 
@@ -171,15 +191,15 @@ export default function RegisterUserInfo() {
 
             <View style={styles.inputLine}>
                 <View style={styles.inputTitle}>
-                    <Text>Date of Birth:</Text> 
+                    <Text style={errorsVisible && (errors.validDateOfBirth || errors.validAge) ? styles.error : undefined}>Date of Birth:</Text> 
                     {errorsVisible && 
                      errors.validDateOfBirth && 
-                     <Text style={styles.error}>{`*${errors.validDateOfBirth}`}</Text>}
+                     <Text style={styles.error}>{` *${errors.validDateOfBirth}`}</Text>}
                     
                     {errorsVisible && 
                      errors.validAge && 
                      !errors.validDateOfBirth &&
-                     <Text style={styles.error}>{`*${errors.validAge}`}</Text>}
+                     <Text style={styles.error}>{` *${errors.validAge}`}</Text>}
                 </View>
                 
                 <TextInput 
@@ -187,7 +207,13 @@ export default function RegisterUserInfo() {
                     value={dateOfBirthString}
                     onFocus={() => setShowCalendar(true)}
                     placeholder='Birthday:'
-                    onChangeText={(input) => setDateOfBirthString(input)}
+                    onChangeText={(input) => {
+                        setDateOfBirthString(input)
+                        if(isDate(dateOfBirthString, "mm/dd/yyyy")) {
+                            setDateOfBirth(new Date(dateOfBirthString))
+                        }
+                    }}
+
                     />
             </View>
 
@@ -199,10 +225,7 @@ export default function RegisterUserInfo() {
                     onChange={handleDateOfBirthChange}
                 />
             }
-            <Pressable onPress={handleSubmitInfo} >
-                <Text>Continue</Text>
-            </Pressable>
-
+            <Button style={baseStyles.button} text='Continue' onPress={handleSubmitInfo}/>
         </View>
         
     )
@@ -240,4 +263,4 @@ const styles = StyleSheet.create({
     inputErrorState: {
         borderColor: 'red'
     }
-})}
+})

@@ -6,7 +6,8 @@ import Button from '../../components/Button'
 import { useAuth0 } from 'react-native-auth0';
 import { router } from 'expo-router';
 import { useToken } from '../../hooks/useToken';
-
+import { useEffect } from 'react';
+import {styles as baseStyles } from '../../styles/base'
 
 //These login components are probably in the wrong spot but they are here for now.
 
@@ -15,6 +16,16 @@ export default function TabOneScreen() {
   const { user, authorize, clearSession} = useAuth0();
   const { setAccessToken, getToken } = useToken();
   
+  useEffect(() => {
+    if(user) {
+      console.log("user exists")
+      getToken().then((response) => {
+        console.log("getToken response: " + response);
+        setAccessToken(response);
+      });
+    }
+  }, [])
+
   function handleSearch(query: string): void {
     throw new Error('Function not implemented.');
   }
@@ -38,9 +49,9 @@ export default function TabOneScreen() {
       }
   }
   
-  const handleRegister = () => {
+  const handleRegister = async () => {
     
-    router.push("/register/")
+    router.push("/register")
   }
   return (
     <View style={styles.container}>
@@ -51,15 +62,10 @@ export default function TabOneScreen() {
         <Text style={styles.title}>Let's Climb!</Text>
         <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
         <Text>Find Climbers in your Area</Text>
-        {!user && <View style={styles.buttons}>
-          <Button text='Login' onPress={handleLogin} style={styles.button}/>
-        </View>}
-        {user && <View style={styles.buttons}>
-          <Button text="Logout" onPress={handleLogout} style={styles.button} />
-        </View>}       
-        <View style={[styles.buttons, {width: '20%'}]}>
-          <Button text="Register" style={styles.button} onPress={handleRegister}></Button>
-        </View>
+        
+        {!user &&<Button text='Login' onPress={handleLogin} style={baseStyles.button}/>}
+        {user && <Button text="Logout" onPress={handleLogout} style={baseStyles.button} />}       
+        <Button text="Register" style={baseStyles.button} onPress={handleRegister}></Button>
         
       </View>
     </View>
@@ -86,22 +92,5 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     height: 1,
     width: '80%',
-  },
-  buttons: {
-    margin: 5,
-    borderRadius: 5,
-    width: '15%',
-    height: 25,
-    backgroundColor: '#567944',
-  },
-  button: {
-    paddingLeft: 5,
-    paddingRight: 5,
-    height: '100%',
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 3,
-  
-    }
+  }
 });

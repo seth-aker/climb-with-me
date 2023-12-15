@@ -1,6 +1,5 @@
 import {createContext, ReactNode, useState} from 'react'
 import { useAuth0 } from 'react-native-auth0'
-import { Credentials } from 'react-native-auth0/lib/typescript/src/types'
 type TokenContextProviderProps = {
     children: ReactNode
 }
@@ -14,7 +13,7 @@ export type TokenContext = {
 export const TokenContext = createContext({} as TokenContext)
 
 export function TokenContextProvider({ children }: TokenContextProviderProps ) {
-    const { getCredentials, authorize } = useAuth0()
+    const { getCredentials } = useAuth0()
     const [accessToken, setAccessToken] = useState<string | undefined>("");
     
     const getToken = async () => {
