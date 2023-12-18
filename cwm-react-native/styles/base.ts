@@ -13,8 +13,15 @@ export const styles = StyleSheet.create({
     },
     textLight: {
         color: "#F5F5F5"
-    }
-    
+    },
+    registerForm: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 0,
+        marginTop: 10,
+    }, 
 })
 
 

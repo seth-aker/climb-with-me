@@ -145,7 +145,7 @@ export default function RegisterUserInfo() {
     }
 
     return (
-        <View style={styles.form}>
+        <View style={baseStyles.registerForm}>
             <View style={styles.inputLine}>
                 <View style={styles.inputTitle}>
                     <Text style={errorsVisible && errors.email ? styles.error : undefined}>Email: </Text> 
@@ -158,6 +158,8 @@ export default function RegisterUserInfo() {
                     placeholder='something@email.com'
                     onChangeText={(input) => setEmail(input)} 
                     inputMode='email' 
+                    autoCapitalize='none'
+                    autoComplete='email'
                 />
                
             </View>
@@ -171,6 +173,8 @@ export default function RegisterUserInfo() {
                     value={firstName}
                     placeholder='First Name'
                     onChangeText={(input) => setFirstName(input)}
+                    autoCapitalize='sentences'
+                    autoComplete='given-name'
                     />
             </View>
 
@@ -185,6 +189,8 @@ export default function RegisterUserInfo() {
                     value={lastName}
                     placeholder='Last Name'
                     onChangeText={(input) => setLastName(input)}
+                    autoCapitalize='sentences'
+                    autoComplete='family-name'
                     />
                 
             </View>
@@ -232,14 +238,6 @@ export default function RegisterUserInfo() {
 }
 
 const styles = StyleSheet.create({
-    form: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 0,
-        marginTop: 10,
-    },
     inputLine: {
         width: '90%',
         display: 'flex',

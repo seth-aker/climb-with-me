@@ -16,7 +16,7 @@ export type Address = {
     addressLine2?: string,
     city: string,
     stateProvince: string,
-    postalCode: number,
+    postalCode: string,
     country: string,
     isDefault: boolean
 }

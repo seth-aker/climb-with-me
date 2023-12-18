@@ -6,8 +6,9 @@ export default function RegistrationLayout() {
     return (
         <RegistrationContextProvider>
             <Stack>
-                <Stack.Screen name="index" options={{headerShown: false}}/>
-                <Stack.Screen name="two" options={{headerShown: false}}/>
+                <Stack.Screen name="index" options={{title: "Register"}} />
+                <Stack.Screen name="two" options={{title: "Register"}}/>
+                <Stack.Screen name="three"  options={{title: "Register"}}/>
             </Stack>
         </RegistrationContextProvider>
     )
