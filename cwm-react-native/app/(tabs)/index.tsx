@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 import { Text, View } from '../../components/Themed';
 import SearchBar from '../../components/SearchBar';
 import { CwmLogo } from '../../components/CwmLogo';
-import Button from '../../components/Button'
+import Button from '../../components/CustomButton'
 import { useAuth0 } from 'react-native-auth0';
 import { router } from 'expo-router';
 import { useToken } from '../../hooks/useToken';

@@ -6,7 +6,7 @@ import isDate from '../../utils/isDate';
 import { styles as baseStyles } from '../../styles/base';
 
 import useRegistrationContext from '../../hooks/useRegistrationContext';
-import Button from '../../components/Button';
+import Button from '../../components/CustomButton';
 import { useAuth0 } from 'react-native-auth0';
 import { useToken } from '../../hooks/useToken';
 import { router } from 'expo-router';

@@ -5,7 +5,7 @@ import { formatPhoneNumber } from '../../utils/formatPhoneNumber';
 import { Picker } from '@react-native-picker/picker';
 import useRegistrationContext from '../../hooks/useRegistrationContext';
 import validator from 'validator';
-import Button from '../../components/Button';
+import Button from '../../components/CustomButton';
 import { router } from 'expo-router';
 import { styles as baseStyles } from '../../styles/base';
 import { CountryCode, Country } from "react-native-country-picker-modal"
