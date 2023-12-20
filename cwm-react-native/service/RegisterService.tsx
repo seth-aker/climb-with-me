@@ -19,7 +19,8 @@ export async function registerUser(token: string, user: {}, ) {
     return response.body;
 };
 
-export async function getUserProfile(token: string, userId: string) {
+export function getUserProfile(token: string | undefined, userId: string) {
+    
     const config: AxiosRequestConfig = {
         baseURL: baseUrl,
         headers: {
@@ -27,8 +28,7 @@ export async function getUserProfile(token: string, userId: string) {
             Authorization: `Bearer ${token}`,
         }
     }; 
-    const response = await axios.get(`/profile/${userId}`, config)
-    if(response.status === 200) {
-        return response.data
-    }
+    return axios.get(`/profile/${userId}`, config)
+    
+    
 }
