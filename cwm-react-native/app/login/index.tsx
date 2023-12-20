@@ -8,13 +8,16 @@ import { router } from "expo-router";
 
 export default function Login() {
     const { authorize, user } = useAuth0();
-    const { getToken, setAccessToken } = useToken();
+    const { setAccessToken } = useToken();
+
 
     const onLogin = async () => {
         try {  
-            await authorize({audience: 'http://localhost:8080'}); //may need to include: {scope: "openid profile offline_access"}
-            const token = await getToken();
-            setAccessToken(token)
+            const credentials = await authorize({audience: 'http://localhost:8080'}); //may need to include: {scope: "openid profile offline_access"}
+            if(credentials) {
+                setAccessToken(credentials.accessToken);
+                router.push("/")
+            }
         } catch (e) {
             console.log(e);
         }
@@ -23,11 +26,11 @@ export default function Login() {
     const handleRegister = async () => {
         try {
             const credentials = await authorize({audience: 'http://localhost:8080'})
-            if(credentials) {
+            if(credentials && user) {
                 setAccessToken(credentials.accessToken)
-                
-            }
-            
+                const userId = user.sub?.substring(user.sub.indexOf("|"));
+                router.push(`/profile/${userId}`)
+            }           
         } catch (e) {
             console.log(e);
         }
