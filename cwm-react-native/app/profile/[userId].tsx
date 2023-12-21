@@ -5,7 +5,7 @@ import { useToken } from "../../hooks/useToken";
 import { getUserProfile } from "../../service/RegisterService";
 import { useEffect, useState } from "react";
 import ProfilePage from "../../components/ProfileComponents/ProfilePage";
-import { CWMUser } from "../../assets/types/profiledata";
+import { CWMUser } from "../../assets/types/profileData";
 
 export type ProfileProps = {
     userId: string,

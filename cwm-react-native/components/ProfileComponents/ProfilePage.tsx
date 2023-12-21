@@ -9,9 +9,9 @@ export type ProfileProps = {
 export default function ProfilePage({profileData}: ProfileProps) {
     switch (profileData.state) {
         case "private":
-            return <PrivateProfile {...profileData.user}  />
+            return <PrivateProfile user={profileData.user}   />
     
         default:
-            return <PublicProfile {...profileData.user} />
+            return <PublicProfile user={profileData.user} />
     }
 }

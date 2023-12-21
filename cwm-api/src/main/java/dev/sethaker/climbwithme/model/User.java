@@ -1,6 +1,7 @@
 package dev.sethaker.climbwithme.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,18 +16,14 @@ import java.util.List;
 @Setter
 @Getter
 public class User {
-
+    @JsonIgnore
+    private int userId;
     //from Auth0
-    @JsonAlias(value = "user_id")
-    private String userId;
-    //from frontEnd
-    private String username;
+    @JsonAlias(value = {"auth_id", "user_id"})
+    private String authId;
     //from Auth0
     @JsonAlias(value = "first_name")
     private String firstName;
-    //from frontEnd
-    @JsonAlias(value = "middle_name")
-    private String middleName;
     //from Auth0
     @JsonAlias(value = "last_name")
     private String lastName;
@@ -40,7 +37,7 @@ public class User {
     private LocalDate dateOfBirth;
     //from frontEnd
     @JsonAlias(value = "primary_phone")
-    private Integer primaryPhone;
+    private Long primaryPhone;
     //from Auth0
     @JsonAlias(value = "created_on")
     private LocalDateTime createdOn;
@@ -55,4 +52,7 @@ public class User {
 
     @JsonAlias(value = "user_address")
     private List<Address> userAddresses;
+
+    @JsonAlias(value = "climbing_styles")
+    private List<ClimbingStyle> climbingStyles;
 }

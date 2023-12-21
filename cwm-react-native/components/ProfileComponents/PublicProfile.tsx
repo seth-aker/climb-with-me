@@ -1,7 +1,11 @@
-import { CWMUser } from "../../assets/types/profiledata";
+import { CWMUser } from "../../assets/types/profileData";
 import { View, Text } from "../Themed";
 
-export default function PublicProfile(user: CWMUser) {
+type PublicProfileProps = {
+    user: CWMUser
+}
+
+export default function PublicProfile({user}: PublicProfileProps) {
     return ( 
         <View>
             <Text>{JSON.stringify(user)}</Text>

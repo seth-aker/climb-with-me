@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 
 @AllArgsConstructor
@@ -27,7 +28,7 @@ public class JdbcUserDao implements UserDao {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public User getUserById(String userId) {
+    public User getUserById(int userId) {
         String sql = "SELECT * FROM users WHERE user_id = ?";
 
         try {
@@ -45,13 +46,13 @@ public class JdbcUserDao implements UserDao {
     }
     @Override
     public boolean createNewUser(User user) {
-        String sql = "INSERT INTO users (user_id, username, first_name, middle_name, last_name, email, " +
-                "email_verified, date_of_birth, primary_phone, gender_code, picture) " +
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO users (auth_id, first_name, last_name, email, " +
+                "email_verified, date_of_birth, primary_phone, created_on, gender_code, is_active, picture) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try {
-            int rowsReturned = jdbcTemplate.update(sql, user.getUserId(), user.getUsername(), user.getFirstName(), user.getMiddleName(),
+            int rowsReturned = jdbcTemplate.update(sql, user.getAuthId(), user.getFirstName(),
                     user.getLastName(), user.getEmail(), user.getEmailVerified(), user.getDateOfBirth(),
-                    user.getPrimaryPhone(), user.getGenderCode(), user.getPicture());
+                    user.getPrimaryPhone(), user.getGenderCode(), user.getIsActive(), user.getPicture());
             if(rowsReturned != 1) {
                 throw new DaoException("Insert did not return 1 row affected, returned: " + rowsReturned);
             }
@@ -63,16 +64,16 @@ public class JdbcUserDao implements UserDao {
     }
     @Override
     public boolean updateUser(User user) {
-        String sql = "UPDATE username = ?, first_name = ?, middle_name = ?, last_name = ?, email = ?, " +
+        String sql = "UPDATE auth_id = ?, first_name = ?, last_name = ?, email = ?, " +
                 "email_verified = ?, date_of_birth = ?, primary_phone = ?, created_on = ?, " +
-                "gender_code = ?, activated = ?, picture = ? " +
+                "gender_code = ?, is_active = ?, picture = ? " +
                 "FROM users " +
                 "WHERE user_id = ?";
         try {
-            int rowsReturned = jdbcTemplate.update(sql, user.getUsername(), user.getFirstName(), user.getMiddleName(),
+            int rowsReturned = jdbcTemplate.update(sql, user.getAuthId(), user.getFirstName(),
                     user.getLastName(), user.getEmail(), user.getEmailVerified(), user.getDateOfBirth(),
                     user.getPrimaryPhone(), user.getCreatedOn(), user.getGenderCode(),
-                    user.getEmailVerified(), user.getPicture(), user.getUserId());
+                    user.getIsActive(), user.getPicture(), user.getUserId());
             if(rowsReturned != 1) {
                 throw new DaoException("Insert did not return 1 row affected, returned: " + rowsReturned);
             }
@@ -83,13 +84,29 @@ public class JdbcUserDao implements UserDao {
         }
     }
 
+    @Override
+    public int getUserIdByAuthId(String authId) {
+        String sql = "SELECT user_id FROM users WHERE authId = ?";
+
+        try {
+            Integer userId = jdbcTemplate.queryForObject(sql, Integer.class, authId);
+            return Objects.requireNonNullElse(userId, 0);
+        } catch (CannotGetJdbcConnectionException e) {
+            log.debug("Error connecting to database. Error message: " + e.getMessage() + " "  + Arrays.toString(e.getStackTrace()));
+            throw new DaoException("Error connecting to database. Error message: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public User getPublicInfoById(int userId) {
+        return null;
+    }
+
 
     private User mapRowSetToUser(SqlRowSet rowSet) {
-        String userId = rowSet.getString("user_id");
-        String username = rowSet.getString("username");
-        String picture = rowSet.getString("picture");
+        int userId = rowSet.getInt("user_id");
+        String authId = rowSet.getString("auth_id");
         String firstName = rowSet.getString("first_name");
-        String middleName = rowSet.getString("middle_name");
         String lastName = rowSet.getString("last_name");
         String email = rowSet.getString("email");
         boolean emailVerified = rowSet.getBoolean("email_verified");
@@ -101,7 +118,7 @@ public class JdbcUserDao implements UserDao {
             dateOfBirth = null;
         }
 
-        int primaryPhone = rowSet.getInt("primaryPhone");
+        long primaryPhone = rowSet.getLong("primary_phone");
         LocalDateTime createdOn = rowSet.getTimestamp("created_on").toLocalDateTime(); // will never be null;
         Character genderCode;
 
@@ -110,8 +127,9 @@ public class JdbcUserDao implements UserDao {
         } catch (NullPointerException e){
             genderCode = null;
         }
-        boolean activated = rowSet.getBoolean("activated");
+        boolean activated = rowSet.getBoolean("is_active");
+        String picture = rowSet.getString("picture");
 
-        return new User(userId, username, firstName, middleName, lastName, email, emailVerified, dateOfBirth, primaryPhone, createdOn, genderCode, activated, picture, null);
+        return new User(userId, authId, firstName, lastName, email, emailVerified, dateOfBirth, primaryPhone, createdOn, genderCode, activated, picture, null, null);
     }
 }

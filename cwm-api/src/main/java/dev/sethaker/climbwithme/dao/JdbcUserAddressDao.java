@@ -18,7 +18,7 @@ import java.util.List;
 public class JdbcUserAddressDao implements UserAddressDao{
     private JdbcTemplate jdbcTemplate;
     @Override
-    public List<Address> getUserAddresses(String userId) {
+    public List<Address> getUserAddresses(int userId) {
         String sql = "SELECT address_id, address_line_1, address_line_2, city, state_province, postal_code, country, is_default " +
                 "FROM user_address " +
                 "WHERE user_id = ? ";
@@ -36,7 +36,7 @@ public class JdbcUserAddressDao implements UserAddressDao{
     }
 
     @Override
-    public Address getDefaultUserAddress(String userId) {
+    public Address getDefaultUserAddress(int userId) {
         return null;
     }
 

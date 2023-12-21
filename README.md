@@ -38,7 +38,7 @@ exports.onExecutePostUserRegistration = async (event, api) => {
         headers: {'content-type': 'application/json', authorization: `Bearer ${token}`}
     }
 
-    await axios.post("http://localhost:8080/new_user", userInfo, config)
+    await axios.post("http://localhost:8080/api/register/new_user", userInfo, config)
 };
 
 ```
@@ -57,5 +57,4 @@ _There are more properties but these are the ones we care about_
 | given_name     | string    | No        |
 | phone_number   | string    | No        |
 | picture        | string    | No        |
-| username       | string    | No        |
 | updated_at     | string    | Yes       |
