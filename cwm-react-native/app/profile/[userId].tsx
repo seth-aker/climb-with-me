@@ -1,16 +1,11 @@
 import { useLocalSearchParams } from "expo-router";
-import { User, useAuth0 } from "react-native-auth0";
-import { Text, View } from "../../components/Themed";
 import { useToken } from "../../hooks/useToken";
 import { getUserProfile } from "../../service/RegisterService";
 import { useEffect, useState } from "react";
-import ProfilePage from "../../components/ProfileComponents/ProfilePage";
 import { CWMUser } from "../../assets/types/profileData";
-
-export type ProfileProps = {
-    userId: string,
-    profileData: ProfileData
-}
+import PrivateProfile from "../../components/ProfileComponents/PrivateProfile";
+import PublicProfile from "../../components/ProfileComponents/PublicProfile";
+import NotFoundScreen from "../[...missing]";
 
 export type PrivateProfileData = {
     state: "private",
@@ -23,9 +18,15 @@ export type PublicProfileData = {
     user: CWMUser
 }
 
+export type ErrorMessage = {
+    state: "error"
+    message: string
+}
+
 export type ProfileData = 
     | PrivateProfileData 
     | PublicProfileData
+    | ErrorMessage
 
 
 
@@ -41,17 +42,21 @@ export default function UserProfile() {
             const response = await getUserProfile(accessToken, userId)
             if(response.status === 200) {
                 setProfileData(response.data);
-                setIsLoaded(true)
-            } else {
-                
-            }
+            } 
+            setIsLoaded(true)
         }
         getProfile();
     }, [])
 
-    return (
-        isLoaded && <ProfilePage profileData={profileData} />
-    )
+    switch (profileData.state) {
+        case "private":
+            return isLoaded && <PrivateProfile user={profileData.user}   />
+        case "error":
+            return isLoaded && <NotFoundScreen></NotFoundScreen>
+        default:
+            return isLoaded && <PublicProfile user={profileData.user} />
+    }
+       
 
 }
 
