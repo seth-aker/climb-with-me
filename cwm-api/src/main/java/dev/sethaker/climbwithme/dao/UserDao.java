@@ -5,7 +5,7 @@ import dev.sethaker.climbwithme.model.User;
 public interface UserDao {
     User getUserById(int userId);
     boolean createNewUser(User user);
-    boolean updateUser(User user);
+    User updateUser(User user);
     int getUserIdByAuthId(String authId);
 
     User getPublicInfoById(int userId);

@@ -4,12 +4,10 @@ import dev.sethaker.climbwithme.dao.ClimbingStyleDao;
 import dev.sethaker.climbwithme.dao.UserAddressDao;
 import dev.sethaker.climbwithme.dao.UserDao;
 import dev.sethaker.climbwithme.model.User;
-import dev.sethaker.climbwithme.model.dto.ProfileDto;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 
@@ -22,20 +20,29 @@ public class ProfileController {
     private ClimbingStyleDao climbingStyleDao;
 
     @GetMapping("/{publicUserId}")
-    public ProfileDto getUserProfile(@RequestParam String publicUserId, Principal principal) {
+    public User getUserProfile(@RequestParam String publicUserId, Principal principal) {
         String authId = principal.getName().substring(principal.getName().indexOf("|"));
-        ProfileDto profileDTO = new ProfileDto();
+        User user;
         int userId = userDao.getUserIdByAuthId(authId);
         if(!publicUserId.equals(authId)) {
-            profileDTO.setState("public");
-            profileDTO.setUser(userDao.getPublicInfoById(userId));
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to access this resource");
         } else {
-            profileDTO.setState("private");
-            User user = userDao.getUserById(userId);
+            user = userDao.getUserById(userId);
             user.setUserAddresses(userAddressDao.getUserAddresses(userId));
             user.setClimbingStyles(climbingStyleDao.getUserClimbingStyles(userId));
-            profileDTO.setUser(user);
+
         }
-        return profileDTO;
+        return user;
+    }
+
+    @PostMapping("/{publicUserId}")
+    public User updateUserProfile(@RequestParam String publicUserId, Principal principal, @RequestBody User updatedUser) {
+        String authId = principal.getName().substring(principal.getName().indexOf("|"));
+        if (!publicUserId.equals(authId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to access this resource");
+        } else {
+            updatedUser.setUserId(userDao.getUserIdByAuthId(authId));
+            return userDao.updateUser(updatedUser);
+        }
     }
 }

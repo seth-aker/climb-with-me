@@ -63,7 +63,7 @@ public class JdbcUserDao implements UserDao {
         }
     }
     @Override
-    public boolean updateUser(User user) {
+    public User updateUser(User user) {
         String sql = "UPDATE auth_id = ?, first_name = ?, last_name = ?, email = ?, " +
                 "email_verified = ?, date_of_birth = ?, primary_phone = ?, created_on = ?, " +
                 "gender_code = ?, is_active = ?, picture = ? " +
@@ -77,7 +77,7 @@ public class JdbcUserDao implements UserDao {
             if(rowsReturned != 1) {
                 throw new DaoException("Insert did not return 1 row affected, returned: " + rowsReturned);
             }
-            return true;
+            return getUserById(user.getUserId());
         } catch (CannotGetJdbcConnectionException e) {
             log.debug("Error connecting to database. Error message: " + e.getMessage() + " "  + Arrays.toString(e.getStackTrace()));
             throw new DaoException("Error connecting to database. Error message: " + e.getMessage());

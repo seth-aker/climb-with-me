@@ -5,13 +5,14 @@ import { Modal } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 
 type EditableProfileInfoProps = {
-    displayText: string,
+    infoKey: string
+    infoValue: string,
     // onPress: () => void
 
 }
-export default function EditableProfileInfo({displayText}: EditableProfileInfoProps) {
+export default function EditableProfileInfo({infoKey, infoValue}: EditableProfileInfoProps) {
     const [showModal, setShowModal] = useState(false);
-    const [modalText, setModalText] = useState(displayText);
+    const [modalText, setModalText] = useState(infoValue);
 
     const onPress = () => {
         setShowModal(true)
@@ -21,7 +22,8 @@ export default function EditableProfileInfo({displayText}: EditableProfileInfoPr
     
     return (
         <View style={{display: "flex", flexDirection: 'row', backgroundColor: "lightGrey"}}>
-            <Text>{displayText}</Text>
+            <Text>{infoKey}:</Text>
+            <Text>{infoValue}</Text>
             <CustomButton text="Edit" onPress={onPress}></CustomButton>
             
             <Modal 
@@ -31,7 +33,10 @@ export default function EditableProfileInfo({displayText}: EditableProfileInfoPr
                 onRequestClose={() => setShowModal(false)}>
                 <View>
                     <TextInput 
+                        value={modalText}
                         onChangeText={(input) => setModalText(input)} />
+                    
+                    <CustomButton text="Save" />
                 </View>
 
             </Modal>
