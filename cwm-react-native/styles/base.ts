@@ -22,6 +22,29 @@ export const styles = StyleSheet.create({
         padding: 0,
         marginTop: 10,
     }, 
+    inputLine: {
+        width: '90%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-start'
+    },
+    inputTitle: {
+        display: 'flex',
+        flexDirection: 'row'
+    },
+    input: {
+        marginBottom: 5,
+        padding: 5,
+        borderColor: 'grey',
+        borderWidth: 1,
+        borderRadius: 5
+    },
+    error: {
+        color: 'red'
+    },
+    inputErrorState: {
+        borderColor: 'red'
+    }
 })
 
 

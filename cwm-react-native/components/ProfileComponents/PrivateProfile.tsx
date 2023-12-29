@@ -10,28 +10,43 @@ import genderCodeToString from "../../utils/genderCodeToString";
 import CountryPicker from 'react-native-country-picker-modal'
 import { CountryCode, Country } from "react-native-country-picker-modal"
 import { formatPhoneNumber } from "../../utils/formatPhoneNumber";
-import validator from "validator";
-import isDate from "../../utils/isDate";
+import validateProfiles from "../../utils/validateProfiles";
+
 
 type PrivateProfileProps = {
     user: CWMUser,
-    onSaveChanges: (updatedUser: CWMUser) => void
+    handleProfileUpdate: (updatedUser: CWMUser) => void
 }
 
+const {
+    inputNotEmpty, 
+    isEmail, 
+    isDate, 
+    isOver18, 
+    isPhoneNumber} = validateProfiles
 
 //TODO: Split this into manageable components
-export default function PrivateProfile({ user, onSaveChanges }: PrivateProfileProps) {
+export default function PrivateProfile({ user, handleProfileUpdate }: PrivateProfileProps) {
     const maxDate = new Date();
     const [editable, setEditable] = useState(false);
     const [showCalendar, setShowCalendar] = useState(false);
 
     const [firstName, setFirstName] = useState(user.first_name);
+    const [firstNameError, setFirstNameError] = useState(false);
+
     const [lastName, setLastName] = useState(user.last_name);
+    const [lastNameError, setLastNameError] = useState(false);
+
     const [dateOfBirth, setDateOfBirth] = useState(new Date(user.date_of_birth))
+    const [dateOfBirthError, setDateOfBirthError] = useState(false);
+
     const [dateOfBirthString, setDateOfBirthString] = useState(user.date_of_birth)
     const [email, setEmail] = useState(user.email)
+    const [emailError, setEmailError] = useState(false);
 
     const [primaryPhone, setPrimaryPhone] = useState(user.primary_phone)
+    const [phoneError, setPhoneError] = useState(false);
+
     const [genderCode, setGenderCode] = useState(user.gender_code)
     const [pictureString, setPictureString] = useState(user.picture_uri)
     const [addresses, setAddresses] = useState(user.addresses)
@@ -65,7 +80,8 @@ export default function PrivateProfile({ user, onSaveChanges }: PrivateProfilePr
     const toggleEdit = () => {
         setEditable(!editable)
     }
-    const onSave = () => {
+    const onSaveChanges = () => {
+        
         const updatedUser: CWMUser = {
             auth_id: user.auth_id,
             first_name: firstName,
@@ -81,8 +97,10 @@ export default function PrivateProfile({ user, onSaveChanges }: PrivateProfilePr
             addresses: addresses,
             climbing_styles: climbingStyles
         } 
-        onSaveChanges(updatedUser);
+        handleProfileUpdate(updatedUser);
     }
+
+    
 
     return (
         <View style={baseStyles.registerForm}>
@@ -90,24 +108,32 @@ export default function PrivateProfile({ user, onSaveChanges }: PrivateProfilePr
                 <CustomButton 
                     text="Edit" 
                     onPress={toggleEdit} 
-                    disabled={!editable}/>
+                    disabled={editable}/>
                 <View>
-                    <Text>First Name: </Text>
-                    <TextInput 
+                    <Text style={[baseStyles.inputTitle, firstNameError && baseStyles.error]}>First Name: </Text>
+                    <TextInput
+                        style={[baseStyles.input, firstNameError && baseStyles.inputErrorState]} 
                         value={firstName} 
-                        onChangeText={(input) => setFirstName(input)}
+                        onChangeText={(input) => {
+                            setFirstName(input)
+                            if(!inputNotEmpty(input))
+                                setFirstNameError(true)
+                            }
+                        }
                         editable={editable}
                     />
-                    <Text>Last Name: </Text>
+                    <Text style={[baseStyles.inputTitle, lastNameError && baseStyles.error]}>Last Name: </Text>
                     <TextInput 
+                        style={[baseStyles.input, lastNameError && baseStyles.inputErrorState]} 
                         value={lastName}
                         onChangeText={(input) => setLastName(input)}
                         editable={editable}
                     />
                 </View>
                 <View>
-                    <Text>Email: </Text>
+                    <Text style={[baseStyles.inputTitle, emailError && baseStyles.error]}>Email: </Text>
                     <TextInput 
+                        style={[baseStyles.input, emailError && baseStyles.inputErrorState]}
                         value={email}
                         onChangeText={(input) => setEmail(input)}
                         inputMode='email' 
@@ -117,8 +143,9 @@ export default function PrivateProfile({ user, onSaveChanges }: PrivateProfilePr
                     />
                 </View>
                 <View>
-                    <Text>Birthday: </Text>
+                    <Text style={[baseStyles.inputTitle, dateOfBirthError && baseStyles.error]}>Birthday: </Text>
                     <TextInput 
+                        style={[baseStyles.input, dateOfBirthError && baseStyles.inputErrorState]}
                         value={dateOfBirthString}
                         onFocus={() => setShowCalendar(true)}
                         placeholder='Birthday:'
@@ -130,7 +157,7 @@ export default function PrivateProfile({ user, onSaveChanges }: PrivateProfilePr
                 </View>
                 
                 <View style={styles.phoneInput}>
-                    <Text>Primary Phone: </Text>
+                    <Text style={[baseStyles.inputTitle, phoneError && baseStyles.error]}>Primary Phone: </Text>
                     <CountryPicker 
                         containerButtonStyle={styles.countryPickerButton}
                         countryCode={countryCode}
@@ -139,7 +166,7 @@ export default function PrivateProfile({ user, onSaveChanges }: PrivateProfilePr
                         withCallingCode
                         withFilter
                     />
-                    <TextInput style={styles.phoneText}
+                    <TextInput style={[styles.phoneText, phoneError && baseStyles.inputErrorState]}
                         onChangeText={handlePhoneChange}
                         value={primaryPhone}
                         placeholder='Primary Phone'
@@ -167,6 +194,8 @@ export default function PrivateProfile({ user, onSaveChanges }: PrivateProfilePr
                     <Picker.Item label="I'd rather not say" value={"d"}/>
                     <Picker.Item label="Other" value={"o"}/>
                 </Picker>}
+
+                <CustomButton text="Save Changes" onPress={onSaveChanges} disabled={!editable} />
             </View>
 
 
