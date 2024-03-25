@@ -23,7 +23,7 @@ const {
     isEmail, 
     isDate, 
     isOver18, 
-    isPhoneNumber} = validateProfiles
+    isPhoneNumber} = validateProfiles;
 
 //TODO: Split this into manageable components
 export default function PrivateProfile({ user, handleProfileUpdate }: PrivateProfileProps) {
