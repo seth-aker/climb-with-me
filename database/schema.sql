@@ -14,17 +14,9 @@ CREATE TABLE users (
     last_modified timestamptz DEFAULT now(),
     gender_code varChar(1), 
     is_active boolean DEFAULT TRUE,
-    picture varChar,
-    user_zip varchar(5), --denormalized for faster lookup
+    picture varChar, --link
+    weight_range varchar, --eg: <100lbs, 100-120lbs, 120-140lbs, etc)
     CONSTRAINT PK_user PRIMARY KEY (user_id)
-);
-
-CREATE TABLE gym_account (
-    gym_id SERIAL NOT NULL,
-    name varchar(),
-    created_on timestamptz DEFAULT now(),
-    picture varchar,
-    CONSTRAINT PK_gym_id PRIMARY KEY (gym_id)
 );
 
 CREATE TABLE addresses (
@@ -48,41 +40,15 @@ CREATE TABLE user_addresses (
     CONSTRAINT FK_address_id FOREIGN KEY (address_id) REFERENCES addresses(address_id)
 );
 
-CREATE TABLE gym_address (
-    address_id INT NOT NULL,
-    gym_id INT NOT NULL,
-    CONSTRAINT PK_gym_address PRIMARY KEY (gym_id, address_id),
-    CONSTRAINT FK_address_id FOREIGN KEY (address_id) REFERENCES addresses(address_id),
-    CONSTRAINT FK_gym_id FOREIGN KEY (gym_id) REFERENCES gym_account(gym_id)
-);
-
-CREATE TABLE climbing_styles (
-    style_code varChar(1) NOT NULL, --STYLE CODES: s: sport climbing, b: bouldering, t: trad climbing, r: top rope
-    name varChar NOT NULL,
-    CONSTRAINT PK_style_code PRIMARY KEY (style_code)
-);
-
 CREATE TABLE user_styles (
-    style_code varChar(1) NOT NULL, 
+    style_code varChar(1) NOT NULL, --STYLE CODES: s: sport climbing, b: bouldering, t: trad climbing, r: top rope
     user_id int NOT NULL,
-    experience_level varChar NOT NULL,
-    preferred boolean DEFAULT FALSE,
+    max_grade varChar,
+    indoor_only boolean,
+    is_preferred boolean DEFAULT FALSE,
+    years_experience varchar,
     CONSTRAINT PK_user_style PRIMARY KEY (style_code, user_id),
-    CONSTRAINT FK_style_code FOREIGN KEY (style_code) REFERENCES climbing_styles(style_code),
     CONSTRAINT FK_user_id FOREIGN KEY (user_id) REFERENCES users(user_id)
-);
-CREATE TABLE weight_range ( --eg: <100lbs, 100-120lbs, 120-140lbs, etc)
-    weight_range_id SERIAL NOT NULL,
-    range varchar,
-    CONSTRAINT PK_weight_range_id PRIMARY KEY (weight_range_id)
-);
-
-CREATE TABLE user_weight_range (
-    user_id INT NOT NULL,
-    weight_range_id INT NOT NULL,
-    CONSTRAINT PK_user_weight_range PRIMARY KEY (user_id, weight_range_id),
-    CONSTRAINT FK_user_id FOREIGN KEY (user_id) REFERENCES users(user_id),
-    CONSTRAINT FK_weight_range_id FOREIGN (weight_range_id) REFERENCES weight_range(weight_range_id)
 );
 
 CREATE TABLE friendship (
@@ -94,22 +60,15 @@ CREATE TABLE friendship (
     CONSTRAINT FK_addressee_id FOREIGN KEY (addressee_id) REFERENCES users(user_id)
 );
 
-CREATE TABLE status_code (
-    code_id varChar(1) NOT NULL, --CODES: p: pending, a: accepted, b: blocked, u: unfriended, d: denied
-    status_name varChar NOT NULL,
-    CONSTRAINT PK_status_code PRIMARY KEY (code_id) 
-);
-
 CREATE TABLE friendship_status (
     requester_id int NOT NULL,
     addressee_id int NOT NULL,
     specified_on timestamptz DEFAULT now(),
-    status_code varChar(1) NOT NULL,
+    status_code varChar(1) NOT NULL, --CODES: p: pending, a: accepted, b: blocked, u: unfriended, d: denied
     specifier_id int NOT NULL,
     CONSTRAINT PK_friendship_status PRIMARY KEY (requester_id, addressee_id, specified_on),
     CONSTRAINT FK_requester_id_addressee_id FOREIGN KEY (requester_id, addressee_id) REFERENCES friendship(requester_id, addressee_id),
     CONSTRAINT FK_specifier_id FOREIGN KEY (specifier_id) REFERENCES users(user_id),
-    CONSTRAINT FK_status_code FOREIGN KEY (status_code) REFERENCES status_code(code_id),
     CONSTRAINT CHK_friends_are_different CHECK (requester_id != addressee_id)
 );
 
@@ -142,8 +101,41 @@ CREATE TABLE chat_users (
 
 CREATE TABLE communities (
     community_id SERIAL NOT NULL,
-    community_name varChar NOT NULL,
+    community_name varChar UNIQUE,
+    created_on timestamptz DEFAULT now(),
+    description varchar,
+    banner_img varchar,
     CONSTRAINT PK_community_id PRIMARY KEY (community_id)
+);
+
+CREATE TABLE community_owner (
+    community_id int NOT NULL,
+    user_id int NOT NULL,
+    CONSTRAINT PK_community_owner PRIMARY KEY (community_id, user_id),
+    CONSTRAINT FK_community_id FOREIGN KEY (community_id) REFERENCES communities(community_id),
+    CONSTRAINT FK_user_id FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE community_threads (
+    thread_id SERIAL NOT NULL,
+    author_id int NOT NULL,
+    community_id int NOT NULL,
+    created_on timestamptz DEFAULT now(),
+    topic varchar,
+    CONSTRAINT PK_community_threads PRIMARY KEY (thread_id),
+    CONSTRAINT FK_author_id FOREIGN KEY (author_id) REFERENCES users(user_id),
+    CONSTRAINT FK_community_id FOREIGN KEY (community_id) REFERENCES communities(community_id)
+);
+CREATE TABLE thread_post (
+    post_id SERIAL NOT NULL,
+    thread_id int NOT NULL,
+    author_id int NOT NULL,
+    post_text varchar NOT NULL,
+    created_on timestamptz DEFAULT now(),
+    last_edited timestamptz, --TODO: create a trigger to update this anytime a row is updated.
+    CONSTRAINT PK_post_id PRIMARY KEY (post_id),
+    CONSTRAINT FK_thread_id FOREIGN KEY (thread_id) REFERENCES community_threads(thread_id),
+    CONSTRAINT FK_author_id FOREIGN KEY (author_id) REFERENCES users(user_id),
 );
 
 CREATE TABLE user_communities (
@@ -153,6 +145,8 @@ CREATE TABLE user_communities (
     CONSTRAINT PK_user_id_community_id PRIMARY KEY (user_id, community_id),
     CONSTRAINT FK_user_id FOREIGN KEY (user_id) REFERENCES users(user_id),
     CONSTRAINT FK_community_id FOREIGN KEY (community_id) REFERENCES communities(community_id)
-)
+);
+
+END TRANSACTION;
 
 
