@@ -1,29 +1,33 @@
 package dev.sethaker.climbwithme.controller;
 
-import dev.sethaker.climbwithme.dao.UserAddressDao;
-import dev.sethaker.climbwithme.dao.UserDao;
-import dev.sethaker.climbwithme.model.User;
+import dev.sethaker.climbwithme.dao.RegistrationDao;
+import dev.sethaker.climbwithme.model.Auth0User;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/register")
 public class RegistrationController {
+    private RegistrationDao registrationDao;
 
-    private final UserDao userDao;
-    private final UserAddressDao userAddressDao;
-
+    /*
+     * Endpoint is called by auth0's post user registration flow, see linked
+     * documentation for more details.
+     * https://auth0.com/docs/customize/actions/flows-and-triggers/post-user-
+     * registration-flow
+     * 
+     * The flow that calls this endpoint is in the Actions tab on Auth0's app
+     * management dashboard
+     * https://manage.auth0.com/dashboard/us/dev-sethaker/actions/flows
+     */
     @PostMapping("/new_user")
-    public HttpStatus registerNewUser(@RequestBody User user) {
-        if(userDao.createNewUser(user)){
+    public HttpStatus registerNewUser(@RequestBody Auth0User user) {
+        if (registrationDao.createNewUser(user)) {
             return HttpStatus.CREATED;
         } else {
             return HttpStatus.BAD_REQUEST;
         }
     }
-
 }

@@ -17,37 +17,44 @@ import java.util.List;
 @Getter
 public class User {
     @JsonIgnore
-    private int userId;
-    //from Auth0
-    @JsonAlias(value = {"auth_id", "user_id"})
+    private int userId; // database user id
+    // from Auth0
+    @JsonAlias(value = { "auth_id", "user_id" })
     private String authId;
-    //from Auth0
-    @JsonAlias(value = "first_name")
+
+    @JsonAlias(value = "name")
+    private String fullName;
+    // from Auth0
+    @JsonAlias(value = { "first_name", "given_name" })
     private String firstName;
-    //from Auth0
-    @JsonAlias(value = "last_name")
+    // from Auth0
+    @JsonAlias(value = { "last_name", "family_name" })
     private String lastName;
-    //from Auth0
+    // from Auth0
     private String email;
-    //from Auth0
+    // from Auth0
     @JsonAlias(value = "email_verified")
     private Boolean emailVerified;
-    //from frontEnd
+    // from frontEnd
     @JsonAlias(value = "date_of_birth")
     private LocalDate dateOfBirth;
-    //from frontEnd
-    @JsonAlias(value = "primary_phone")
-    private Long primaryPhone;
-    //from Auth0
-    @JsonAlias(value = "created_on")
+    // from frontEnd
+    @JsonAlias(value = "phone_number")
+    private String primaryPhone;
+
+    @JsonAlias(value = "phone_verified")
+    private Boolean phoneVerified;
+
+    // from Auth0
+    @JsonAlias(value = "created_at")
     private LocalDateTime createdOn;
-    //from FrontEnd
+    // from FrontEnd
     @JsonAlias(value = "gender_code")
     private Character genderCode;
-    //from frontEnd
+    // from frontEnd
     @JsonAlias(value = "is_active")
     private Boolean isActive;
-    //from Auth0
+    // from Auth0
     private String picture;
 
     @JsonAlias(value = "user_address")

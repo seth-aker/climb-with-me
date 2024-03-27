@@ -4,18 +4,21 @@ CREATE TABLE users (
     user_id SERIAL NOT NULL,
     auth_id varchar NOT NULL, --Comes from whatever authentication service we decide to use
     full_name varchar,
-    first_name varchar,
-    last_name varChar,
+    given_name varchar,
+    family_name varChar,
     email varChar UNIQUE,
     email_verified boolean,
-    date_of_birth DATE,
-    primary_phone varchar UNIQUE,
-    created_on timestamptz DEFAULT now(),
-    last_modified timestamptz DEFAULT now(),
+    date_of_birth varChar,
+    phone_number varchar UNIQUE,
+    phone_verified boolean,
+    created_at varChar,
+    updated_at varChar,
     gender_code varChar(1), 
     is_active boolean DEFAULT TRUE,
     picture varChar, --link
     weight_range varchar, --eg: <100lbs, 100-120lbs, 120-140lbs, etc)
+    last_password_reset varChar,
+    username varChar,
     CONSTRAINT PK_user PRIMARY KEY (user_id)
 );
 
@@ -54,7 +57,7 @@ CREATE TABLE user_styles (
 CREATE TABLE friendship (
     requester_id int NOT NULL,
     addressee_id int NOT NULL,
-    created_on timestamptz DEFAULT now(),
+    created_at timestamptz DEFAULT now(),
     CONSTRAINT PK_requester_addressee_id PRIMARY KEY (requester_id, addressee_id),
     CONSTRAINT FK_requester_id FOREIGN KEY (requester_id) REFERENCES users(user_id),
     CONSTRAINT FK_addressee_id FOREIGN KEY (addressee_id) REFERENCES users(user_id)
@@ -75,7 +78,7 @@ CREATE TABLE friendship_status (
 CREATE TABLE chats (
     chat_id SERIAL NOT NULL,
     name varChar,
-    created_on timestamptz DEFAULT now(),
+    created_at timestamptz DEFAULT now(),
     CONSTRAINT PK_chat PRIMARY KEY (chat_id)
 );
 
@@ -102,7 +105,7 @@ CREATE TABLE chat_users (
 CREATE TABLE communities (
     community_id SERIAL NOT NULL,
     community_name varChar UNIQUE,
-    created_on timestamptz DEFAULT now(),
+    created_at timestamptz DEFAULT now(),
     description varchar,
     banner_img varchar,
     CONSTRAINT PK_community_id PRIMARY KEY (community_id)
@@ -120,7 +123,7 @@ CREATE TABLE community_threads (
     thread_id SERIAL NOT NULL,
     author_id int NOT NULL,
     community_id int NOT NULL,
-    created_on timestamptz DEFAULT now(),
+    created_at timestamptz DEFAULT now(),
     topic varchar,
     CONSTRAINT PK_community_threads PRIMARY KEY (thread_id),
     CONSTRAINT FK_author_id FOREIGN KEY (author_id) REFERENCES users(user_id),
@@ -131,7 +134,7 @@ CREATE TABLE thread_post (
     thread_id int NOT NULL,
     author_id int NOT NULL,
     post_text varchar NOT NULL,
-    created_on timestamptz DEFAULT now(),
+    created_at timestamptz DEFAULT now(),
     last_edited timestamptz, --TODO: create a trigger to update this anytime a row is updated.
     CONSTRAINT PK_post_id PRIMARY KEY (post_id),
     CONSTRAINT FK_thread_id FOREIGN KEY (thread_id) REFERENCES community_threads(thread_id),
