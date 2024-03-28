@@ -12,22 +12,26 @@ import lombok.Setter;
 @Getter
 public class Address {
 
-    int addressId;
+    private int addressId;
+
     @JsonAlias(value = "address_line_1")
-    String addressLine1;
+    private String addressLine1;
 
     @JsonAlias(value = "address_line_2")
-    String addressLine2;
+    private String addressLine2;
 
-    String city;
+    @JsonAlias(value = "address_line_3")
+    private String addressLine3;
+
+    private String city;
 
     @JsonAlias(value = "state_province")
-    String stateProvince;
+    private String stateProvince;
 
     @JsonAlias(value = "postal_code")
-    int postalCode;
+    private String postalCode;
 
-    String country;
+    private String country;
 
     @JsonAlias(value = "is_default")
     private Boolean isDefault;

@@ -16,7 +16,8 @@ public class JdbcRegistrationDao implements RegistrationDao {
 
     public boolean createNewUser(Auth0User user) {
         try {
-            return 1 == jdbcTemplate.update("CALL create_new_user(?,?,?,?,?,?,?,?,?,?,?,?,?,?);",
+            // returns true when update method returns 1 row affected
+            return 1 == jdbcTemplate.update("CALL create_new_user(?,?,?,?,?,?,?,?,?,?,?,?,?);",
                     user.getAuthId(),
                     user.getCreatedAt(),
                     user.getEmail(),
@@ -25,7 +26,6 @@ public class JdbcRegistrationDao implements RegistrationDao {
                     user.getGivenName(),
                     user.getLastPasswordReset(),
                     user.getFullName(),
-                    user.getNickname(),
                     user.getPhoneNumber(),
                     user.getPhoneVerified(),
                     user.getPicture(),

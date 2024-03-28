@@ -20,6 +20,7 @@ CREATE TABLE users (
     last_password_reset varChar,
     username varChar,
     CONSTRAINT PK_user PRIMARY KEY (user_id)
+    CONSTRAINT UC_auth_id UNIQUE (auth_id)
 );
 
 CREATE TABLE addresses (
@@ -32,7 +33,7 @@ CREATE TABLE addresses (
     postal_code varchar,
     country varChar,
     is_default boolean,
-    CONSTRAINT PK_address_id PRIMARY KEY (address_id),
+    CONSTRAINT PK_address_id PRIMARY KEY (address_id)
 );
 
 CREATE TABLE user_addresses (
@@ -138,7 +139,7 @@ CREATE TABLE thread_post (
     last_edited timestamptz, --TODO: create a trigger to update this anytime a row is updated.
     CONSTRAINT PK_post_id PRIMARY KEY (post_id),
     CONSTRAINT FK_thread_id FOREIGN KEY (thread_id) REFERENCES community_threads(thread_id),
-    CONSTRAINT FK_author_id FOREIGN KEY (author_id) REFERENCES users(user_id),
+    CONSTRAINT FK_author_id FOREIGN KEY (author_id) REFERENCES users(user_id)
 );
 
 CREATE TABLE user_communities (

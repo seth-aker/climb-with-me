@@ -18,9 +18,13 @@ public class ClimbingStyle {
      * r = Top Rope,
      */
     private Character styleCode;
-    //eg 5.12a or V3
-    private String experienceLevel;
-    private boolean hasGear;
-    private boolean preferred;
-}
 
+    // eg 5.12a or V3
+    private String maxGrade;
+
+    private Boolean indoorOnly;
+
+    private Boolean isPreferred;
+
+    private String yearsExperience;
+}
