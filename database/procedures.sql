@@ -85,4 +85,64 @@ CREATE OR REPLACE PROCEDURE insert_climbing_style(
     END;
     $$;
 
+CREATE OR REPLACE PROCEDURE insert_user_address(
+    _user_id INT,
+    _full_address varChar,
+    _address_line_1 varChar,
+    _address_line_2 varchar,
+    _address_line_3 varChar,
+    _city varChar,
+    _state_province varChar,
+    _postal_code varChar,
+    _country varChar,
+    _is_default boolean
+    )
+    LANGUAGE plpgsql
+    AS $$
+    DECLARE
+        addressId INT;
+    BEGIN
+        addressId = (SELECT address_id FROM addresses WHERE full_address = _full_address);
+        IF (addressId IS NULL) 
+        THEN 
+            INSERT INTO addresses (
+                    full_address, 
+                    address_line_1, 
+                    address_line_2, 
+                    address_line_3, 
+                    city, 
+                    state_province, 
+                    postal_code, 
+                    country
+                    )
+                VALUES (
+                    _full_address,
+                    _address_line_1,
+                    _address_line_2,
+                    _address_line_3,
+                    _city,
+                    _state_province,
+                    _postal_code,
+                    _country 
+                    )
+            RETURNING address_id INTO addressId;
+        END IF;
+        
+        IF(_is_default IS TRUE) THEN
+            UPDATE user_addresses 
+            SET is_default = FALSE 
+            WHERE user_id = _user_id;
+        END IF;
+
+        INSERT INTO user_addresses (
+            user_id, 
+            address_id, 
+            is_default
+            ) 
+        VALUES (
+            _user_id, 
+            addressId, 
+            _is_default);
+    END;
+    $$;
 END TRANSACTION;

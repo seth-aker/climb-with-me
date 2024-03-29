@@ -25,6 +25,7 @@ CREATE TABLE users (
 
 CREATE TABLE addresses (
     address_id SERIAL NOT NULL,
+    full_address varChar UNIQUE,
     address_line_1 varChar,
     address_line_2 varChar,
     address_line_3 varChar,
@@ -32,13 +33,13 @@ CREATE TABLE addresses (
     state_province varChar,
     postal_code varchar,
     country varChar,
-    is_default boolean,
     CONSTRAINT PK_address_id PRIMARY KEY (address_id)
 );
 
 CREATE TABLE user_addresses (
     user_id INT NOT NULL,
     address_id INT NOT NULL,
+    is_default boolean,
     CONSTRAINT PK_user_addresses PRIMARY KEY (user_id, address_id),
     CONSTRAINT FK_user_id FOREIGN KEY (user_id) REFERENCES users(user_id),
     CONSTRAINT FK_address_id FOREIGN KEY (address_id) REFERENCES addresses(address_id)
