@@ -14,6 +14,9 @@ public class Address {
 
     private int addressId;
 
+    @JsonAlias(value = "full_address")
+    private String fullAddress;
+
     @JsonAlias(value = "address_line_1")
     private String addressLine1;
 

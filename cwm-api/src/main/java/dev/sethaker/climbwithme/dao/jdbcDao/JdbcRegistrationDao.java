@@ -1,8 +1,9 @@
-package dev.sethaker.climbwithme.dao;
+package dev.sethaker.climbwithme.dao.jdbcDao;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import dev.sethaker.climbwithme.dao.daoInterface.RegistrationDao;
 import dev.sethaker.climbwithme.exception.DaoException;
 import dev.sethaker.climbwithme.model.Auth0User;
 import lombok.AllArgsConstructor;

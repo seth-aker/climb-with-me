@@ -1,4 +1,4 @@
-package dev.sethaker.climbwithme.dao;
+package dev.sethaker.climbwithme.dao.daoInterface;
 
 import dev.sethaker.climbwithme.model.Auth0User;
 

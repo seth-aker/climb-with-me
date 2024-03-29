@@ -1,6 +1,6 @@
 package dev.sethaker.climbwithme.controller;
 
-import dev.sethaker.climbwithme.dao.RegistrationDao;
+import dev.sethaker.climbwithme.dao.daoInterface.RegistrationDao;
 import dev.sethaker.climbwithme.model.Auth0User;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

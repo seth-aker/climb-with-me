@@ -1,7 +1,7 @@
 package dev.sethaker.climbwithme.controller;
 
-import dev.sethaker.climbwithme.dao.UserAddressDao;
-import dev.sethaker.climbwithme.dao.UserDao;
+// import dev.sethaker.climbwithme.dao.daoInterface.UserAddressDao;
+import dev.sethaker.climbwithme.dao.daoInterface.UserDao;
 import dev.sethaker.climbwithme.model.User;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,7 +15,7 @@ import java.security.Principal;
 @RequestMapping("/api/profile")
 public class ProfileController {
     private UserDao userDao;
-    private UserAddressDao userAddressDao;
+    // private UserAddressDao userAddressDao;
 
     @GetMapping("/{publicUserId}")
     public User getUserProfile(@RequestParam String publicUserId, Principal principal) {
@@ -27,7 +27,7 @@ public class ProfileController {
                     "You do not have permission to access this resource");
         } else {
             user = userDao.getUserById(userId);
-            user.setUserAddresses(userAddressDao.getUserAddresses(userId));
+            // user.setUserAddresses(userAddressDao.getUserAddresses(userId));
 
         }
         return user;
