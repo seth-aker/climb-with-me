@@ -62,7 +62,8 @@ CREATE TABLE friendship (
     created_at timestamptz DEFAULT now(),
     CONSTRAINT PK_requester_addressee_id PRIMARY KEY (requester_id, addressee_id),
     CONSTRAINT FK_requester_id FOREIGN KEY (requester_id) REFERENCES users(user_id),
-    CONSTRAINT FK_addressee_id FOREIGN KEY (addressee_id) REFERENCES users(user_id)
+    CONSTRAINT FK_addressee_id FOREIGN KEY (addressee_id) REFERENCES users(user_id),
+    CONSTRAINT CHK_friends_are_different CHECK (requester_id != addressee_id)
 );
 
 CREATE TABLE friendship_status (
@@ -137,7 +138,7 @@ CREATE TABLE thread_post (
     author_id int NOT NULL,
     post_text varchar NOT NULL,
     created_at timestamptz DEFAULT now(),
-    last_edited timestamptz, --TODO: create a trigger to update this anytime a row is updated.
+    last_edited timestamptz DEFAULT now(), --TODO: create a trigger to update this anytime a row is updated.
     CONSTRAINT PK_post_id PRIMARY KEY (post_id),
     CONSTRAINT FK_thread_id FOREIGN KEY (thread_id) REFERENCES community_threads(thread_id),
     CONSTRAINT FK_author_id FOREIGN KEY (author_id) REFERENCES users(user_id)

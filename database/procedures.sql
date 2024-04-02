@@ -134,7 +134,7 @@ CREATE OR REPLACE PROCEDURE insert_user_address(
             WHERE user_id = _user_id;
         END IF;
 
-        INSERT INTO user_addresses (
+        INSERT INTO user_addresses ( 
             user_id, 
             address_id, 
             is_default
@@ -145,4 +145,66 @@ CREATE OR REPLACE PROCEDURE insert_user_address(
             _is_default);
     END;
     $$;
+
+CREATE OR REPLACE PROCEDURE insert_friend_request ( 
+    _requester_id int, 
+    _addressee_id int 
+    )
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+        INSERT INTO friendship (requester_id, addressee_id)
+        VALUES (_requester_id, _addressee_id);
+    
+        INSERT INTO friendship_status (requester_id, addressee_id, status_code, specifier_id)
+        VALUES (_requester_id, _addressee_id, 'p', _requester_id);
+    END;
+    $$;
+
+
+CREATE OR REPLACE PROCEDURE insert_friend_request ( 
+    _requester_id int, 
+    _addressee_id int, 
+    _status_code varChar(1), 
+    _specifier_id int 
+    )
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+        INSERT INTO friendship_status (requester_id, addressee_id, status_code, specifier_id)
+        VALUES (_requester_id, _addressee_id, 'p', _specifier_id);
+    END;
+    $$;
+
+
+CREATE OR REPLACE PROCEDURE new_message(
+    _user_id int,
+    _message varChar,
+    _to_user_id int DEFAULT null, 
+    _chat_id int DEFAULT null, 
+    _chat_name varChar DEFAULT null
+    )
+    LANGUAGE plpgsql
+    AS $$
+    DECLARE varChatId int;
+
+    BEGIN 
+        varChatId = _chat_id;
+        IF(varChatId IS NULL) THEN 
+            INSERT INTO chats(name)
+            VALUES (_chat_name)
+            RETURNING chat_id INTO varChatId;
+
+            INSERT INTO chat_users (user_id, chat_id)
+            VALUES 
+                (_user_id, varChatId), 
+                (_to_user_id, varChatId);
+        END IF;
+
+        INSERT INTO messages (chat_id, from_id, message)
+        VALUES (varChatId, _user_id, _message);
+
+    END;
+    $$;
+
 END TRANSACTION;
