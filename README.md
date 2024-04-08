@@ -2,6 +2,23 @@
 
 Find your next climbing partner
 
+## Backlog:
+
+### Backend
+
+- Basic CRUD operations for the Postgres Database
+- Data scrubbing before calling stored procedures
+- Set Up controllers for the API calls.
+- Develop chat feature using web sockets
+- Develop Algorithm for finding partner matches.
+
+### Front End
+
+- Improve design and css
+- Connect to API calls
+- Implement Chat features for the front end
+- A lot of design and implementation that I am too lazy to write up at this point
+
 ## Dev Note for Auth
 
 This code will run each time a new user signs up.

@@ -8,17 +8,17 @@ CREATE TABLE users (
     family_name varChar,
     email varChar UNIQUE,
     email_verified boolean,
-    date_of_birth varChar,
+    date_of_birth date,
     phone_number varchar UNIQUE,
     phone_verified boolean,
-    created_at varChar,
-    updated_at varChar,
+    created_at timestamptz,
+    updated_at timestamptz,
     gender_code varChar(1), 
     is_active boolean DEFAULT TRUE,
     picture varChar, --link
     weight_range varchar, --eg: <100lbs, 100-120lbs, 120-140lbs, etc)
-    last_password_reset varChar,
-    username varChar,
+    last_password_reset timestamptz,
+    username UNIQUE varChar,
     CONSTRAINT PK_user PRIMARY KEY (user_id)
     CONSTRAINT UC_auth_id UNIQUE (auth_id)
 );

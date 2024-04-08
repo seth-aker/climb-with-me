@@ -1,6 +1,6 @@
 BEGIN TRANSACTION;
 
-CREATE OR REPLACE PROCEDURE create_new_user(
+CREATE OR REPLACE PROCEDURE create_new_user (
     _auth_id varchar, 
     _created_at varchar,
     _email varchar,
@@ -17,7 +17,7 @@ CREATE OR REPLACE PROCEDURE create_new_user(
     )
     LANGUAGE SQL
     AS $$
-    BEGIN   
+    BEGIN 
         INSERT INTO users (
             auth_id, 
             created_at, 
@@ -52,7 +52,49 @@ CREATE OR REPLACE PROCEDURE create_new_user(
     END;
     $$;
 
-CREATE OR REPLACE PROCEDURE insert_climbing_style(
+CREATE OR REPLACE PROCEDURE get_user (_user_id int) 
+LANGUAGE plpgsql
+AS $$
+    BEGIN 
+        SELECT * FROM users WHERE user_id = _user_id;
+    END;
+    $$;
+
+CREATE OR REPLACE PROCEDURE update_user (
+    _user_id int, 
+    _full_name varChar,
+    _given_name varChar,
+    _family_name varchar,
+    _email varChar, 
+    _email_verified boolean,
+    _date_of_birth date,
+    _phone_number varChar,
+    _phone_verified boolean,
+    _created_at timestamptz,
+    _gender_code varChar(1),
+    _is_active boolean,
+    _picture varChar,
+    _weight_range varChar,
+    _last_password_reset timestamptz,
+    _username varChar
+    )
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN ATOMIC
+        UPDATE users SET full_name = _full_name, given_name = _given_name,
+        family_name = _family_name, email = _email,
+        email_verified = _email_verified, date_of_birth = _date_of_birth,
+        phone_number = _phone_number, phone_verified = _phone_verified,
+        created_at = _created_at, updated_at = now(), 
+        gender_code = _gender_code, is_active = _is_active,
+        picture = _picture, weight_range = _weight_range,
+        last_password_reset = _last_password_reset, username = _username
+        WHERE user_id = _user_id;
+    END;
+    $$;
+
+
+CREATE OR REPLACE PROCEDURE insert_climbing_style (
     _style_code varchar, 
     _user_id int,
     _max_grade varChar,
@@ -146,7 +188,7 @@ CREATE OR REPLACE PROCEDURE insert_user_address(
     END;
     $$;
 
-CREATE OR REPLACE PROCEDURE insert_friend_request ( 
+CREATE OR REPLACE PROCEDURE create_friend_request ( 
     _requester_id int, 
     _addressee_id int 
     )
@@ -162,7 +204,7 @@ CREATE OR REPLACE PROCEDURE insert_friend_request (
     $$;
 
 
-CREATE OR REPLACE PROCEDURE insert_friend_request ( 
+CREATE OR REPLACE PROCEDURE update_friend_request ( 
     _requester_id int, 
     _addressee_id int, 
     _status_code varChar(1), 
@@ -171,13 +213,17 @@ CREATE OR REPLACE PROCEDURE insert_friend_request (
     LANGUAGE plpgsql
     AS $$
     BEGIN
-        INSERT INTO friendship_status (requester_id, addressee_id, status_code, specifier_id)
-        VALUES (_requester_id, _addressee_id, 'p', _specifier_id);
+        IF(_status_code = 'a' AND _specifier_id != _addressee_id) THEN
+            RAISE EXCEPTION 'User is unauthorized to accept friend request';
+        ELSE
+            INSERT INTO friendship_status (requester_id, addressee_id, status_code, specifier_id)
+            VALUES (_requester_id, _addressee_id, _status_code, _specifier_id);
+        END IF;
     END;
     $$;
 
 
-CREATE OR REPLACE PROCEDURE new_message(
+CREATE OR REPLACE PROCEDURE new_message (
     _user_id int,
     _message varChar,
     _to_user_id int DEFAULT null, 
