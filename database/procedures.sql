@@ -52,11 +52,21 @@ CREATE OR REPLACE PROCEDURE create_new_user (
     END;
     $$;
 
-CREATE OR REPLACE PROCEDURE get_user (_user_id int) 
-LANGUAGE plpgsql
-AS $$
+CREATE OR REPLACE FUNCTION get_userID_by_authID (IN _auth_id varChar, OUT userId int) 
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+        SELECT INTO userId 
+            user_id FROM users WHERE auth_id = _auth_id;
+    END;
+    $$;
+
+CREATE OR REPLACE FUNCTION get_user_by_ID (_user_id int) 
+    RETURNS setof users
+    LANGUAGE plpgsql
+    AS $$
     BEGIN 
-        SELECT * FROM users WHERE user_id = _user_id;
+        RETURN QUERY SELECT * FROM users AS u WHERE u.user_id = _user_id;
     END;
     $$;
 
@@ -80,7 +90,7 @@ CREATE OR REPLACE PROCEDURE update_user (
     )
     LANGUAGE plpgsql
     AS $$
-    BEGIN ATOMIC
+    BEGIN
         UPDATE users SET full_name = _full_name, given_name = _given_name,
         family_name = _family_name, email = _email,
         email_verified = _email_verified, date_of_birth = _date_of_birth,
@@ -187,6 +197,74 @@ CREATE OR REPLACE PROCEDURE insert_user_address(
             _is_default);
     END;
     $$;
+
+CREATE OR REPLACE FUNCTION get_user_primary_address (_user_id int) 
+    RETURNS setof addresses
+    LANGUAGE plpgsql 
+    AS $$
+    BEGIN 
+        RETURN QUERY SELECT a.address_id, a.full_address, a.address_line_1, 
+            a.address_line_2, a.address_line_3,
+            a.city, a.state_province,
+            a.postal_code, a.country
+        FROM addresses AS a 
+        JOIN user_addresses AS ua ON a.address_id = ua.address_id
+        WHERE ua.user_id = _user_id AND ua.is_default = TRUE;
+    END;
+    $$;
+
+CREATE OR REPLACE FUNCTION get_user_addresses (_user_id int) 
+RETURNS TABLE (
+    address_id int,
+    full_address varChar,
+    address_line_1 varChar,
+    address_line_2 varChar,
+    address_line_3 varChar,
+    city varChar,
+    state_province varChar,
+    postal_code varchar,
+    country varChar
+)
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+        RETURN QUERY SELECT a.address_id, a.full_address, a.address_line_1, 
+            a.address_line_2, a.address_line_3,
+            a.city, a.state_province,
+            a.postal_code, a.country
+        FROM addresses AS a 
+        JOIN user_addresses AS ua ON a.address_id = ua.address_id
+        WHERE ua.user_id = _user_id;
+    END;
+    $$;
+
+CREATE OR REPLACE PROCEDURE update_primary_user_address (
+    _address_id int,
+    _user_id INT
+) 
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN 
+        UPDATE user_addresses 
+        SET is_default = FALSE 
+        WHERE user_id = _user_id;
+        
+        UPDATE user_addresses 
+        SET is_default = TRUE
+        WHERE address_id = _address_id AND user_id = _user_id;
+    END;
+    $$;
+
+CREATE OR REPLACE PROCEDURE delete_user_address (_user_id int, _address_id int)
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN 
+        DELETE FROM user_addresses 
+        WHERE user_id = _user_id AND address_id = _address_id;
+    END; 
+    $$;
+
+
 
 CREATE OR REPLACE PROCEDURE create_friend_request ( 
     _requester_id int, 

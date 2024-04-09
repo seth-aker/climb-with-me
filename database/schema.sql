@@ -18,7 +18,7 @@ CREATE TABLE users (
     picture varChar, --link
     weight_range varchar, --eg: <100lbs, 100-120lbs, 120-140lbs, etc)
     last_password_reset timestamptz,
-    username UNIQUE varChar,
+    username varChar UNIQUE,
     CONSTRAINT PK_user PRIMARY KEY (user_id)
     CONSTRAINT UC_auth_id UNIQUE (auth_id)
 );
