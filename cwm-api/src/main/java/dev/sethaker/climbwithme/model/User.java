@@ -47,7 +47,10 @@ public class User {
 
     // from Auth0
     @JsonAlias(value = "created_at")
-    private LocalDateTime createdOn;
+    private LocalDateTime createdAt;
+
+    @JsonAlias(value = "updated_at")
+    private LocalDateTime updatedAt;
     // from FrontEnd
     @JsonAlias(value = "gender_code")
     private Character genderCode;
@@ -57,9 +60,18 @@ public class User {
     // from Auth0
     private String picture;
 
+    @JsonAlias(value = "weight_range")
+    private String weightRange;
+
+    @JsonAlias(value = "last_password_reset")
+    private LocalDateTime lastPasswordReset;
+
+    private String username;
+
     @JsonAlias(value = "user_address")
     private List<Address> userAddresses;
 
     @JsonAlias(value = "climbing_styles")
     private List<ClimbingStyle> climbingStyles;
+
 }

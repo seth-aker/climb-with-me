@@ -1,5 +1,21 @@
 BEGIN TRANSACTION;
 
+DROP TABLE IF EXISTS user_communities,
+    thread_post,
+    community_threads,
+    community_owner,
+    communities,
+    chat_users,
+    messages,
+    chats,
+    friendship_status,
+    friendship,
+    user_styles,
+    user_addresses,
+    addresses,
+    users
+    CASCADE;
+
 CREATE TABLE users (
     user_id SERIAL NOT NULL,
     auth_id varchar NOT NULL, --Comes from whatever authentication service we decide to use
@@ -19,7 +35,7 @@ CREATE TABLE users (
     weight_range varchar, --eg: <100lbs, 100-120lbs, 120-140lbs, etc)
     last_password_reset timestamptz,
     username varChar UNIQUE,
-    CONSTRAINT PK_user PRIMARY KEY (user_id)
+    CONSTRAINT PK_user PRIMARY KEY (user_id),
     CONSTRAINT UC_auth_id UNIQUE (auth_id)
 );
 
@@ -153,6 +169,6 @@ CREATE TABLE user_communities (
     CONSTRAINT FK_community_id FOREIGN KEY (community_id) REFERENCES communities(community_id)
 );
 
-END TRANSACTION;
+COMMIT;
 
 

@@ -1,16 +1,19 @@
 package dev.sethaker.climbwithme.controller;
 
-import dev.sethaker.climbwithme.dao.daoInterface.RegistrationDao;
+import dev.sethaker.climbwithme.dao.daoInterface.UserDao;
 import dev.sethaker.climbwithme.model.Auth0User;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@AllArgsConstructor
 @RequestMapping("/api/register")
 public class RegistrationController {
-    private RegistrationDao registrationDao;
+    private final UserDao registrationDao;
+
+    public RegistrationController(UserDao registrationDao) {
+        this.registrationDao = registrationDao;
+    }
 
     /*
      * Endpoint is called by auth0's post user registration flow, see linked

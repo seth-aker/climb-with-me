@@ -1,22 +1,23 @@
 BEGIN TRANSACTION;
 
-CREATE OR REPLACE PROCEDURE create_new_user (
-    _auth_id varchar, 
-    _created_at varchar,
-    _email varchar,
-    _email_verified boolean,
-    _family_name varchar,
-    _given_name varchar,
-    _last_password_reset varchar,
-    _full_name varchar, 
-    _phone_number varchar,
-    _phone_verified boolean,
-    _picture varchar,
-    _updated_at varchar,
-    _username varchar
+CREATE OR REPLACE FUNCTION create_new_user (
+    IN _auth_id varchar, 
+    IN _created_at timestamptz,
+    IN _email varchar,
+    IN _email_verified boolean,
+    IN _family_name varchar,
+    IN _given_name varchar,
+    IN _last_password_reset timestamptz,
+    IN _full_name varchar, 
+    IN _phone_number varchar,
+    IN _phone_verified boolean,
+    IN _picture varchar,
+    IN _updated_at timestamptz,
+    IN _username varchar,
+    OUT rowCount int
     )
-    LANGUAGE SQL
-    AS $$
+    LANGUAGE plpgsql
+    AS ' 
     BEGIN 
         INSERT INTO users (
             auth_id, 
@@ -27,9 +28,8 @@ CREATE OR REPLACE PROCEDURE create_new_user (
             given_name,
             last_password_reset,
             full_name,
-            nickname,
             phone_number,
-            phone_verified
+            phone_verified,
             picture,
             updated_at,
             username
@@ -44,31 +44,32 @@ CREATE OR REPLACE PROCEDURE create_new_user (
             _last_password_reset,
             _full_name,
             _phone_number,
-            _phone_verified
+            _phone_verified,
             _picture,
             _updated_at,
             _username
             );
-    END;
-    $$;
+        GET DIAGNOSTICS rowCount = ROW_COUNT;
+    END;';
 
 CREATE OR REPLACE FUNCTION get_userID_by_authID (IN _auth_id varChar, OUT userId int) 
     LANGUAGE plpgsql
-    AS $$
+    AS '
     BEGIN
         SELECT INTO userId 
             user_id FROM users WHERE auth_id = _auth_id;
     END;
-    $$;
+    ';
 
 CREATE OR REPLACE FUNCTION get_user_by_ID (_user_id int) 
     RETURNS setof users
     LANGUAGE plpgsql
-    AS $$
+    AS '
     BEGIN 
         RETURN QUERY SELECT * FROM users AS u WHERE u.user_id = _user_id;
     END;
-    $$;
+    ';
+
 
 CREATE OR REPLACE PROCEDURE update_user (
     _user_id int, 
@@ -89,7 +90,7 @@ CREATE OR REPLACE PROCEDURE update_user (
     _username varChar
     )
     LANGUAGE plpgsql
-    AS $$
+    AS '
     BEGIN
         UPDATE users SET full_name = _full_name, given_name = _given_name,
         family_name = _family_name, email = _email,
@@ -101,7 +102,7 @@ CREATE OR REPLACE PROCEDURE update_user (
         last_password_reset = _last_password_reset, username = _username
         WHERE user_id = _user_id;
     END;
-    $$;
+    ';
 
 
 CREATE OR REPLACE PROCEDURE insert_climbing_style (
@@ -113,7 +114,7 @@ CREATE OR REPLACE PROCEDURE insert_climbing_style (
     _years_experience boolean
     )
     LANGUAGE plpgsql
-    AS $$ 
+    AS ' 
     BEGIN    
     	IF EXISTS (SELECT FROM users WHERE user_id = _user_id) THEN
             INSERT INTO user_styles(
@@ -132,10 +133,10 @@ CREATE OR REPLACE PROCEDURE insert_climbing_style (
                 _is_preferred, 
                 _years_experience
                 );
-        ELSE RAISE EXCEPTION 'Nonexistent user ID --> %', _user_id;
+        ELSE RAISE EXCEPTION ''Nonexistent user ID --> %'', _user_id;
         END IF;
     END;
-    $$;
+    ';
 
 CREATE OR REPLACE PROCEDURE insert_user_address(
     _user_id INT,
@@ -150,7 +151,7 @@ CREATE OR REPLACE PROCEDURE insert_user_address(
     _is_default boolean
     )
     LANGUAGE plpgsql
-    AS $$
+    AS '
     DECLARE
         addressId INT;
     BEGIN
@@ -196,12 +197,13 @@ CREATE OR REPLACE PROCEDURE insert_user_address(
             addressId, 
             _is_default);
     END;
-    $$;
+    ';
+
 
 CREATE OR REPLACE FUNCTION get_user_primary_address (_user_id int) 
     RETURNS setof addresses
     LANGUAGE plpgsql 
-    AS $$
+    AS '
     BEGIN 
         RETURN QUERY SELECT a.address_id, a.full_address, a.address_line_1, 
             a.address_line_2, a.address_line_3,
@@ -211,7 +213,7 @@ CREATE OR REPLACE FUNCTION get_user_primary_address (_user_id int)
         JOIN user_addresses AS ua ON a.address_id = ua.address_id
         WHERE ua.user_id = _user_id AND ua.is_default = TRUE;
     END;
-    $$;
+    ';
 
 CREATE OR REPLACE FUNCTION get_user_addresses (_user_id int) 
 RETURNS TABLE (
@@ -226,7 +228,7 @@ RETURNS TABLE (
     country varChar
 )
     LANGUAGE plpgsql
-    AS $$
+    AS '
     BEGIN
         RETURN QUERY SELECT a.address_id, a.full_address, a.address_line_1, 
             a.address_line_2, a.address_line_3,
@@ -236,14 +238,14 @@ RETURNS TABLE (
         JOIN user_addresses AS ua ON a.address_id = ua.address_id
         WHERE ua.user_id = _user_id;
     END;
-    $$;
+    ';
 
 CREATE OR REPLACE PROCEDURE update_primary_user_address (
     _address_id int,
     _user_id INT
 ) 
     LANGUAGE plpgsql
-    AS $$
+    AS '
     BEGIN 
         UPDATE user_addresses 
         SET is_default = FALSE 
@@ -253,16 +255,16 @@ CREATE OR REPLACE PROCEDURE update_primary_user_address (
         SET is_default = TRUE
         WHERE address_id = _address_id AND user_id = _user_id;
     END;
-    $$;
+    ';
 
 CREATE OR REPLACE PROCEDURE delete_user_address (_user_id int, _address_id int)
     LANGUAGE plpgsql
-    AS $$
+    AS '
     BEGIN 
         DELETE FROM user_addresses 
         WHERE user_id = _user_id AND address_id = _address_id;
     END; 
-    $$;
+    ';
 
 
 
@@ -271,15 +273,15 @@ CREATE OR REPLACE PROCEDURE create_friend_request (
     _addressee_id int 
     )
     LANGUAGE plpgsql
-    AS $$
+    AS '
     BEGIN
         INSERT INTO friendship (requester_id, addressee_id)
         VALUES (_requester_id, _addressee_id);
     
         INSERT INTO friendship_status (requester_id, addressee_id, status_code, specifier_id)
-        VALUES (_requester_id, _addressee_id, 'p', _requester_id);
+        VALUES (_requester_id, _addressee_id, ''p'', _requester_id);
     END;
-    $$;
+    ';
 
 
 CREATE OR REPLACE PROCEDURE update_friend_request ( 
@@ -289,16 +291,16 @@ CREATE OR REPLACE PROCEDURE update_friend_request (
     _specifier_id int 
     )
     LANGUAGE plpgsql
-    AS $$
+    AS '
     BEGIN
-        IF(_status_code = 'a' AND _specifier_id != _addressee_id) THEN
-            RAISE EXCEPTION 'User is unauthorized to accept friend request';
+        IF(_status_code = ''a'' AND _specifier_id != _addressee_id) THEN
+            RAISE EXCEPTION ''User is unauthorized to accept friend request'';
         ELSE
             INSERT INTO friendship_status (requester_id, addressee_id, status_code, specifier_id)
             VALUES (_requester_id, _addressee_id, _status_code, _specifier_id);
         END IF;
     END;
-    $$;
+    ';
 
 
 CREATE OR REPLACE PROCEDURE new_message (
@@ -309,7 +311,7 @@ CREATE OR REPLACE PROCEDURE new_message (
     _chat_name varChar DEFAULT null
     )
     LANGUAGE plpgsql
-    AS $$
+    AS '
     DECLARE varChatId int;
 
     BEGIN 
@@ -329,6 +331,6 @@ CREATE OR REPLACE PROCEDURE new_message (
         VALUES (varChatId, _user_id, _message);
 
     END;
-    $$;
+    ';
 
-END TRANSACTION;
+COMMIT;

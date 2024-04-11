@@ -2,10 +2,14 @@ package dev.sethaker.climbwithme.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /*
  * Object in the body of a POST to create a new user. Documentation found here:
@@ -18,7 +22,8 @@ import lombok.Setter;
 public class Auth0User {
 
     @JsonAlias(value = "created_at")
-    private String createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+    private LocalDateTime createdAt;
 
     private String email;
 
@@ -32,7 +37,8 @@ public class Auth0User {
     private String givenName;
 
     @JsonAlias(value = "last_password_reset")
-    private String lastPasswordReset;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+    private LocalDateTime lastPasswordReset;
 
     @JsonAlias(value = "name")
     private String fullName;
@@ -46,7 +52,8 @@ public class Auth0User {
     private String picture;
 
     @JsonAlias(value = "updated_at")
-    private String updatedAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+    private LocalDateTime updatedAt;
 
     @JsonAlias(value = "user_id")
     private String authId;
