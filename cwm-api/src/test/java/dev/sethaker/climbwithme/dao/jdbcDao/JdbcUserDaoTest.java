@@ -2,10 +2,9 @@ package dev.sethaker.climbwithme.dao.jdbcDao;
 
 import dev.sethaker.climbwithme.exception.DaoException;
 import dev.sethaker.climbwithme.model.Auth0User;
-import org.junit.jupiter.api.AfterEach;
+import dev.sethaker.climbwithme.model.User;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.time.LocalDateTime;
 
@@ -31,7 +30,6 @@ public class JdbcUserDaoTest extends BaseDaoTests {
     public void setUp() {
         dao = new JdbcUserDao(dataSource);
     }
-
     @Test
     public void getUserIdTest() {
         int expectedUserId = 1;
@@ -48,5 +46,31 @@ public class JdbcUserDaoTest extends BaseDaoTests {
     @Test
     public void createNewUserTest() {
         assertTrue(dao.createNewUser(USER_1));
+    }
+
+    @Test
+    public void createNewUserTestWithNullValues() {
+        Auth0User newUser = new Auth0User();
+        newUser.setAuthId("AuthId");
+        newUser.setCreatedAt(LocalDateTime.now());
+        newUser.setEmailVerified(false);
+        newUser.setUpdatedAt(LocalDateTime.now());
+        assertTrue(dao.createNewUser(newUser));
+    }
+
+    @Test
+    public void getUserTest() {
+        dao.createNewUser(USER_1);
+        User result = dao.getUser(USER_1.getAuthId());
+        assertEquals(dao.getUserId(USER_1.getAuthId()), result.getUserId());
+    }
+
+    @Test
+    public void updateUserTest() {
+        dao.createNewUser(USER_1);
+        User updatedUser = USER_1.mapToUser();
+        updatedUser.setPrimaryPhone("123456789");
+        assertEquals(updatedUser.getPrimaryPhone(), dao.updateUser(updatedUser).getPrimaryPhone());
+
     }
 }

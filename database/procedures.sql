@@ -71,24 +71,25 @@ CREATE OR REPLACE FUNCTION get_user_by_ID (_user_id int)
     ';
 
 
-CREATE OR REPLACE PROCEDURE update_user (
-    _user_id int, 
-    _full_name varChar,
-    _given_name varChar,
-    _family_name varchar,
-    _email varChar, 
-    _email_verified boolean,
-    _date_of_birth date,
-    _phone_number varChar,
-    _phone_verified boolean,
-    _created_at timestamptz,
-    _gender_code varChar(1),
-    _is_active boolean,
-    _picture varChar,
-    _weight_range varChar,
-    _last_password_reset timestamptz,
-    _username varChar
-    )
+CREATE OR REPLACE FUNCTION update_user (
+    IN _user_id int, 
+    IN _full_name varChar,
+    IN _given_name varChar,
+    IN _family_name varchar,
+    IN _email varChar, 
+    IN _email_verified boolean,
+    IN _date_of_birth date,
+    IN _phone_number varChar,
+    IN _phone_verified boolean,
+    IN _created_at timestamptz,
+    IN _gender_code varChar(1),
+    IN _is_active boolean,
+    IN _picture varChar,
+    IN _weight_range varChar,
+    IN _last_password_reset timestamptz,
+    IN _username varChar
+    ) 
+    RETURNS SETOF users
     LANGUAGE plpgsql
     AS '
     BEGIN
@@ -101,6 +102,9 @@ CREATE OR REPLACE PROCEDURE update_user (
         picture = _picture, weight_range = _weight_range,
         last_password_reset = _last_password_reset, username = _username
         WHERE user_id = _user_id;
+
+        RETURN QUERY SELECT * FROM users WHERE user_id = _user_id;
+        
     END;
     ';
 

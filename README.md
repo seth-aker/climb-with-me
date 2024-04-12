@@ -62,16 +62,21 @@ exports.onExecutePostUserRegistration = async (event, api) => {
 
 ### Auth0 User Data
 
-_There are more properties but these are the ones we care about_
-
-| Name           | Data Type | Required? |
-| -------------- | --------- | --------- |
-| user_id        | string    | Yes       |
-| created_at     | string    | Yes       |
-| email          | string    | No        |
-| email_verified | boolean   | Yes       |
-| family_name    | string    | No        |
-| given_name     | string    | No        |
-| phone_number   | string    | No        |
-| picture        | string    | No        |
-| updated_at     | string    | Yes       |
+| Name                  | Data Type  | Required? |
+| --------------------- | ---------- | --------- |
+| app_metadata          | dictionary | Yes       |
+| created_at            | string     | Yes       |
+| email                 | string     | No        |
+| email_verified        | boolean    | Yes       |
+| family_name           | string     | No        |
+| given_name            | string     | No        |
+| last_password_reset   | string     | No        |
+| name                  | string     | No        |
+| nickname              | string     | No        |
+| phone_number          | string     | No        |
+| phone_number_verified | boolean    | No        |
+| picture               | string     | No        |
+| updated_at            | string     | Yes       |
+| user_id               | string     | No        |
+| user_metadata         | Dictionary | Yes       |
+| username              | string     | No        |

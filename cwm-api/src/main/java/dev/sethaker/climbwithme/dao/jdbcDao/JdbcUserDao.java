@@ -2,6 +2,7 @@ package dev.sethaker.climbwithme.dao.jdbcDao;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
 import dev.sethaker.climbwithme.dao.daoInterface.UserDao;
@@ -12,6 +13,7 @@ import dev.sethaker.climbwithme.model.User;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.sql.DataSource;
+import java.util.Objects;
 
 @Component
 @Slf4j
@@ -32,6 +34,21 @@ public class JdbcUserDao implements UserDao {
         } catch (NullPointerException e) {
             log.error("Unrecognized AuthId: " + authId, e.getMessage(), e);
             throw new DaoException("Error retrieving user information");
+        }
+    }
+
+    public User getUser(String authId) {
+        try {
+            int userId = getUserId(authId);
+            SqlRowSet results = jdbcTemplate.queryForRowSet("SELECT * FROM get_user_by_ID(?)", userId);
+            if(results.next()) {
+                return mapRowSetToUser(results);
+            } else {
+                throw new DaoException("Error, user not found");
+            }
+        } catch (DataAccessException e) {
+            log.error(e.getMessage(), e);
+            throw new DaoException(e.getMessage());
         }
     }
 
@@ -61,9 +78,9 @@ public class JdbcUserDao implements UserDao {
 
     }
     @Override
-    public boolean updateUser(User user) {
+    public User updateUser(User user) {
         try {
-            return 1 == jdbcTemplate.update("CALL update_user(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            SqlRowSet rowSet = jdbcTemplate.queryForRowSet("SELECT * FROM update_user(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                     getUserId(user.getAuthId()),
                     user.getFullName(),
                     user.getFirstName(),
@@ -80,11 +97,48 @@ public class JdbcUserDao implements UserDao {
                     user.getWeightRange(),
                     user.getLastPasswordReset(),
                     user.getUsername());
+            if(rowSet.next()) {
+                return mapRowSetToUser(rowSet);
+            } else {
+                log.error("Rowset did not contain any results in JdbcUserDao.updateUser function");
+                throw new DaoException("Error, user not found");
+            }
 
         } catch (DataAccessException e) {
             log.error(e.getMessage(), e);
             throw new DaoException(e.getMessage());
         }
 
+    }
+
+    private User mapRowSetToUser(SqlRowSet rowSet) {
+        User user = new User();
+        user.setAuthId(rowSet.getString("auth_id"));
+        user.setUserId(rowSet.getInt("user_id"));
+        user.setFullName(rowSet.getString("full_name"));
+        user.setFirstName(rowSet.getString("given_name"));
+        user.setLastName(rowSet.getString("family_name"));
+        user.setEmail(rowSet.getString("email"));
+        user.setEmailVerified(rowSet.getBoolean("email_verified"));
+        if(Objects.nonNull(rowSet.getDate("date_of_birth"))) {
+            user.setDateOfBirth(rowSet.getDate("date_of_birth").toLocalDate());
+        }
+        user.setPrimaryPhone(rowSet.getString("phone_number"));
+        user.setPhoneVerified(rowSet.getBoolean("phone_verified"));
+        if(Objects.nonNull(rowSet.getTimestamp("created_at"))) {
+            user.setCreatedAt(rowSet.getTimestamp("created_at").toLocalDateTime());
+        }
+        if(Objects.nonNull(rowSet.getTimestamp("updated_at"))) {
+            user.setUpdatedAt(rowSet.getTimestamp("updated_at").toLocalDateTime());
+        }
+        user.setGenderCode(rowSet.getString("gender_code"));
+        user.setIsActive(rowSet.getBoolean("is_active"));
+        user.setPicture(rowSet.getString("picture"));
+        user.setWeightRange(rowSet.getString("weight_range"));
+        if(Objects.nonNull(rowSet.getTimestamp("last_password_reset"))) {
+            user.setLastPasswordReset(rowSet.getTimestamp("last_password_reset").toLocalDateTime());
+        }
+        user.setUsername(rowSet.getString("username"));
+        return user;
     }
 }

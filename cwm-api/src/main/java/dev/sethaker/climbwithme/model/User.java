@@ -53,7 +53,7 @@ public class User {
     private LocalDateTime updatedAt;
     // from FrontEnd
     @JsonAlias(value = "gender_code")
-    private Character genderCode;
+    private String genderCode;
     // from frontEnd
     @JsonAlias(value = "is_active")
     private Boolean isActive;

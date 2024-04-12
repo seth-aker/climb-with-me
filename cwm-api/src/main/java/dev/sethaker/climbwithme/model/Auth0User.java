@@ -59,4 +59,21 @@ public class Auth0User {
     private String authId;
 
     private String username;
+
+    public User mapToUser() {
+        User user = new User();
+        user.setCreatedAt(this.getCreatedAt());
+        user.setEmail(this.getEmail());
+        user.setEmailVerified(this.getEmailVerified());
+        user.setLastName(this.getFamilyName());
+        user.setFirstName(this.getGivenName());
+        user.setLastPasswordReset(this.getLastPasswordReset());
+        user.setFullName(this.getFullName());
+        user.setPrimaryPhone(this.getPhoneNumber());
+        user.setPhoneVerified(this.getPhoneVerified());
+        user.setUpdatedAt(this.getUpdatedAt());
+        user.setAuthId(this.getAuthId());
+        user.setUsername(this.getUsername());
+        return user;
+    }
 }

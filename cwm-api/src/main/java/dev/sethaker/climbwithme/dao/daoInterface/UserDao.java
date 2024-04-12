@@ -9,5 +9,5 @@ public interface UserDao {
 
     boolean createNewUser(Auth0User user);
 
-    boolean updateUser(User user);
+    User updateUser(User user);
 }
