@@ -4,10 +4,11 @@ import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/dat
 import validator from 'validator';
 import isDate from '../../utils/isDate';
 import { styles as baseStyles } from '../../styles/base';
+import { registerNewUser } from '../../service/RegisterService';
 
 import useRegistrationContext from '../../hooks/useRegistrationContext';
 import Button from '../../components/CustomButton';
-import { useAuth0 } from 'react-native-auth0';
+import { Credentials, useAuth0 } from 'react-native-auth0';
 import { useToken } from '../../hooks/useToken';
 import { router } from 'expo-router';
 
@@ -20,13 +21,15 @@ type Errors = {
 
 }
 export default function RegisterUserInfo() {
-    const { user, authorize } = useAuth0();
+    const { user, authorize, getCredentials} = useAuth0();
+    const {accessToken, setAccessToken} = useToken();
     const {email, setEmail, 
             firstName, setFirstName, 
             lastName, setLastName, 
             dateOfBirth, setDateOfBirth } = useRegistrationContext();
             
     const maxDate = new Date();
+   
     const [dateOfBirthString, setDateOfBirthString] = useState("");
     const [showCalendar, setShowCalendar] = useState(false);
     const [errors, setErrors] = useState({} as Errors);
@@ -39,10 +42,12 @@ export default function RegisterUserInfo() {
             setLastName(user.familyName ? user.familyName : "")
             setDateOfBirth(user.birthdate ? new Date(user.birthdate) : new Date())
             setDateOfBirthString(user.birthdate ? user.birthdate : dateOfBirthString)
-        } else {
-            authorize();
-        }
+            //console.log(`AccessTokenObj: ${accessToken}, User: ${JSON.stringify(user)}`)
+            
+        } 
+
     }, [user])
+
     //TODO: Refactor this code to be more readable/less bulky, possibly in a separate file.
     function validateInput() {
         if(!validator.isEmail(email)) {

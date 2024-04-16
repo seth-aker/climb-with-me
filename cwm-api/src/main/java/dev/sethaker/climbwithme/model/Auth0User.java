@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 public class Auth0User {
 
     @JsonAlias(value = "created_at")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     private LocalDateTime createdAt;
 
     private String email;
@@ -37,7 +37,7 @@ public class Auth0User {
     private String givenName;
 
     @JsonAlias(value = "last_password_reset")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     private LocalDateTime lastPasswordReset;
 
     @JsonAlias(value = "name")
@@ -52,10 +52,10 @@ public class Auth0User {
     private String picture;
 
     @JsonAlias(value = "updated_at")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     private LocalDateTime updatedAt;
 
-    @JsonAlias(value = "user_id")
+    @JsonAlias(value = {"user_id", "sub"})
     private String authId;
 
     private String username;

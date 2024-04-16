@@ -73,4 +73,19 @@ public class JdbcUserDaoTest extends BaseDaoTests {
         assertEquals(updatedUser.getPrimaryPhone(), dao.updateUser(updatedUser).getPrimaryPhone());
 
     }
+
+    @Test
+    public void deactivateUserTest() {
+        dao.createNewUser(USER_1);
+        assertTrue(dao.deactivateUser(USER_1.getAuthId()),"Expected function deactivateUser() to return true but returned false." );
+
+        User user1 = dao.getUser(USER_1.getAuthId());
+        assertFalse(user1.getIsActive(), "After deactivation expected user status 'is_active' to be false, returned true;");
+    }
+
+    @Test
+    public void deactivateUserReturnsFalseWhenNoUserFound() {
+        dao.createNewUser(USER_1);
+        assertFalse(dao.deactivateUser("FAKEID"), "Expected function to return false when given a bad authId, see function getUser()");
+    }
 }

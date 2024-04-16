@@ -10,4 +10,6 @@ public interface UserDao {
     boolean createNewUser(Auth0User user);
 
     User updateUser(User user);
+
+    boolean deactivateUser(String authId);
 }

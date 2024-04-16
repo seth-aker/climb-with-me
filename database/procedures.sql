@@ -108,6 +108,24 @@ CREATE OR REPLACE FUNCTION update_user (
     END;
     ';
 
+CREATE OR REPLACE PROCEDURE deactivate_user (
+    IN _userId int,
+    INOUT successful boolean DEFAULT false
+    )
+    LANGUAGE plpgsql
+    AS '
+    DECLARE rowCount int;
+    BEGIN 
+        UPDATE users SET is_active = false WHERE user_id = _userId;
+        GET DIAGNOSTICS rowCount = ROW_COUNT;
+        IF(rowCount != 1) THEN
+            ROLLBACK;
+            successful = false;
+        ELSE 
+            successful = true;
+        END IF;
+    END;
+    ';
 
 CREATE OR REPLACE PROCEDURE insert_climbing_style (
     _style_code varchar, 

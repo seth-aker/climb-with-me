@@ -111,6 +111,22 @@ public class JdbcUserDao implements UserDao {
 
     }
 
+    public boolean deactivateUser(String authId) {
+        try {
+            return jdbcTemplate.queryForObject("CALL deactivate_user(?)", Boolean.class, getUserId(authId));
+        } catch (DataAccessException e) {
+            log.error(e.getMessage(), e);
+            throw new DaoException(e.getMessage());
+        } catch (NullPointerException e) {
+            log.error("Error unpacking Boolean object from deactivate_user() function.", e);
+            throw new DaoException("Error retrieving user information");
+        } catch (DaoException e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
+    }
+
+
     private User mapRowSetToUser(SqlRowSet rowSet) {
         User user = new User();
         user.setAuthId(rowSet.getString("auth_id"));

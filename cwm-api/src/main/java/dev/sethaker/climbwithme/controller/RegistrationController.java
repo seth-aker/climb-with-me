@@ -2,17 +2,21 @@ package dev.sethaker.climbwithme.controller;
 
 import dev.sethaker.climbwithme.dao.daoInterface.UserDao;
 import dev.sethaker.climbwithme.model.Auth0User;
-import lombok.AllArgsConstructor;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.security.PermitAll;
 
 @RestController
 @RequestMapping("/api/register")
+@CrossOrigin
 public class RegistrationController {
-    private final UserDao registrationDao;
+    private final UserDao userDao;
 
-    public RegistrationController(UserDao registrationDao) {
-        this.registrationDao = registrationDao;
+    public RegistrationController(UserDao userDao) {
+        this.userDao = userDao;
     }
 
     /*
@@ -26,11 +30,13 @@ public class RegistrationController {
      * https://manage.auth0.com/dashboard/us/dev-sethaker/actions/flows
      */
     @PostMapping("/new_user")
-    public HttpStatus registerNewUser(@RequestBody Auth0User user) {
-        if (registrationDao.createNewUser(user)) {
-            return HttpStatus.CREATED;
+    @PermitAll
+    public ResponseEntity registerNewUser(@RequestBody Auth0User user) {
+
+        if (userDao.createNewUser(user)) {
+            return new ResponseEntity(HttpStatus.CREATED);
         } else {
-            return HttpStatus.BAD_REQUEST;
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
     }
 }

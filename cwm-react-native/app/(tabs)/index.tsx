@@ -8,7 +8,9 @@ import { router } from 'expo-router';
 import { useToken } from '../../hooks/useToken';
 import { useEffect } from 'react';
 import {styles as baseStyles } from '../../styles/base'
-
+import jwtDecode from 'jwt-decode'
+import { registerNewUser } from '../../service/RegisterService';
+import { convertUser } from 'react-native-auth0/src/utils/userConversion'
 //These login components are probably in the wrong spot but they are here for now.
 
 
@@ -18,9 +20,8 @@ export default function TabOneScreen() {
   
   useEffect(() => {
     if(user) {
-      console.log("user exists")
+      // console.log("user exists")
       getToken().then((response) => {
-        console.log("getToken response: " + response);
         setAccessToken(response);
       });
     }
@@ -50,8 +51,23 @@ export default function TabOneScreen() {
   }
   
   const handleRegister = async () => {
+    try {
+      const cred = await authorize({audience: "http://localhost:8080", additionalParameters: {"screen_hint": "signup"}})
+      if(cred) {
+        const result = await registerNewUser(cred.accessToken, convertUser(jwtDecode(cred.idToken)))
+        console.log(`Registration Result: ${JSON.stringify(result)}`)
+        if(result.status === 201) {
+          router.push("/register")
+        } else {
+          //const error message: result.statusText
+          //router.push("/someErrorPage")
+        }
+      }
+      
+    } catch (error) {
+      console.log(error)
+    }
     
-    router.push("/register")
   }
   return (
     <View style={styles.container}>
