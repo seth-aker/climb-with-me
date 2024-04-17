@@ -2,7 +2,6 @@ package dev.sethaker.climbwithme.controller;
 
 import dev.sethaker.climbwithme.dao.daoInterface.UserDao;
 import dev.sethaker.climbwithme.model.Auth0User;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,12 +30,12 @@ public class RegistrationController {
      */
     @PostMapping("/new_user")
     @PermitAll
-    public ResponseEntity registerNewUser(@RequestBody Auth0User user) {
+    public ResponseEntity<?> registerNewUser(@RequestBody Auth0User user) {
 
         if (userDao.createNewUser(user)) {
-            return new ResponseEntity(HttpStatus.CREATED);
+            return ResponseEntity.status(HttpStatus.CREATED).body(null);
         } else {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred, please try again");
         }
     }
 }

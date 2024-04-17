@@ -1,6 +1,7 @@
 package dev.sethaker.climbwithme.dao.jdbcDao;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import dev.sethaker.climbwithme.model.Auth0User;
 import dev.sethaker.climbwithme.model.User;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.sql.DataSource;
 import java.util.Objects;
@@ -24,16 +26,20 @@ public class JdbcUserDao implements UserDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
+    /**
+     Returns the primary key of the users table using the authId.
+     If the authId is not found, returns -1.
+     */
     @Override
     public int getUserId(String authId) {
         try {
             return jdbcTemplate.queryForObject("SELECT * FROM get_userID_by_authID(?)", int.class, authId);
         } catch (DataAccessException e) {
             log.error(e.getMessage(), e);
-            throw new DaoException(e.getMessage());
+            throw new DaoException(e.getMessage(), e);
         } catch (NullPointerException e) {
             log.error("Unrecognized AuthId: " + authId, e.getMessage(), e);
-            throw new DaoException("Error retrieving user information");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
@@ -70,10 +76,32 @@ public class JdbcUserDao implements UserDao {
                     user.getPicture(),
                     user.getUpdatedAt(),
                     user.getUsername());
-
+        } catch (DataAccessException | NullPointerException e) {
+            log.error("An error occurred creating new user", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
         } catch (Exception e) {
             log.error("An error occurred creating new user", e);
-            throw new DaoException("An error occurred creating new user");
+            HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            String message = "An error occurred creating new user";
+
+            if(e.getMessage().contains("users_email_key")) {
+                httpStatus = HttpStatus.FORBIDDEN;
+                message = "The email address you submitted is already in use.";
+
+            } else if (e.getMessage().contains("users_phone_number_key")) {
+                httpStatus = HttpStatus.FORBIDDEN;
+                message = "The phone number you submitted is already in use";
+
+            } else if(e.getMessage().contains("users_username_key")) {
+                httpStatus = HttpStatus.FORBIDDEN;
+                message = "The username you submitted is already in use.";
+
+            } else if (e.getMessage().contains("uc_auth_id")) {
+                httpStatus = HttpStatus.FORBIDDEN;
+                message = "This account already is registered";
+            }
+
+            throw new ResponseStatusException(httpStatus, message);
         }
 
     }

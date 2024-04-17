@@ -58,6 +58,10 @@ CREATE OR REPLACE FUNCTION get_userID_by_authID (IN _auth_id varChar, OUT userId
     BEGIN
         SELECT INTO userId 
             user_id FROM users WHERE auth_id = _auth_id;
+        
+        IF userId IS NULL THEN 
+        userId = -1;
+        END IF;
     END;
     ';
 
