@@ -2,6 +2,7 @@ package dev.sethaker.climbwithme.dao.jdbcDao;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
@@ -144,13 +145,10 @@ public class JdbcUserDao implements UserDao {
             return jdbcTemplate.queryForObject("CALL deactivate_user(?)", Boolean.class, getUserId(authId));
         } catch (DataAccessException e) {
             log.error(e.getMessage(), e);
-            throw new DaoException(e.getMessage());
+            return false;
         } catch (NullPointerException e) {
             log.error("Error unpacking Boolean object from deactivate_user() function.", e);
             throw new DaoException("Error retrieving user information");
-        } catch (DaoException e) {
-            log.error(e.getMessage(), e);
-            return false;
         }
     }
 

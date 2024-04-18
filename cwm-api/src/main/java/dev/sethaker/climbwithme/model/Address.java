@@ -12,7 +12,7 @@ import lombok.Setter;
 @Getter
 public class Address {
 
-    private int addressId;
+    private Integer addressId;
 
     @JsonAlias(value = "full_address")
     private String fullAddress;
@@ -38,4 +38,5 @@ public class Address {
 
     @JsonAlias(value = "is_default")
     private Boolean isDefault;
+
 }

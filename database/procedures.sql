@@ -123,8 +123,8 @@ CREATE OR REPLACE PROCEDURE deactivate_user (
         UPDATE users SET is_active = false WHERE user_id = _userId;
         GET DIAGNOSTICS rowCount = ROW_COUNT;
         IF(rowCount != 1) THEN
-            ROLLBACK;
             successful = false;
+            ROLLBACK;
         ELSE 
             successful = true;
         END IF;
@@ -164,23 +164,26 @@ CREATE OR REPLACE PROCEDURE insert_climbing_style (
     END;
     ';
 
-CREATE OR REPLACE PROCEDURE insert_user_address(
-    _user_id INT,
-    _full_address varChar,
-    _address_line_1 varChar,
-    _address_line_2 varchar,
-    _address_line_3 varChar,
-    _city varChar,
-    _state_province varChar,
-    _postal_code varChar,
-    _country varChar,
-    _is_default boolean
+CREATE OR REPLACE FUNCTION insert_user_address(
+    IN _user_id INT,
+    IN _full_address varChar,
+    IN _address_line_1 varChar,
+    IN _address_line_2 varchar,
+    IN _address_line_3 varChar,
+    IN _city varChar,
+    IN _state_province varChar,
+    IN _postal_code varChar,
+    IN _country varChar,
+    IN _is_default boolean,
+    OUT rowCount int
     )
     LANGUAGE plpgsql
     AS '
     DECLARE
-        addressId INT;
+        addressId int;
+        runningCount int;
     BEGIN
+        rowCount = 0;
         addressId = (SELECT address_id FROM addresses WHERE full_address = _full_address);
         IF (addressId IS NULL) 
         THEN 
@@ -205,12 +208,17 @@ CREATE OR REPLACE PROCEDURE insert_user_address(
                     _country 
                     )
             RETURNING address_id INTO addressId;
+            GET DIAGNOSTICS runningCount = ROW_COUNT;
+            rowCount = (runningCount + rowCount);
         END IF;
         
         IF(_is_default IS TRUE) THEN
             UPDATE user_addresses 
             SET is_default = FALSE 
             WHERE user_id = _user_id;
+
+            GET DIAGNOSTICS runningCount = ROW_COUNT;
+            rowCount = (runningCount + rowCount);
         END IF;
 
         INSERT INTO user_addresses ( 
@@ -222,19 +230,38 @@ CREATE OR REPLACE PROCEDURE insert_user_address(
             _user_id, 
             addressId, 
             _is_default);
+
+        EXCEPTION WHEN UNIQUE_VIOLATION THEN
+            UPDATE user_addresses SET is_default = _is_default
+            WHERE user_id = _user_id AND address_id = addressId;
+
+
+        GET DIAGNOSTICS runningCount = ROW_COUNT;
+            rowCount = (runningCount + rowCount);
     END;
     ';
 
 
-CREATE OR REPLACE FUNCTION get_user_primary_address (_user_id int) 
-    RETURNS setof addresses
+CREATE OR REPLACE FUNCTION get_user_default_address (_user_id int) 
+    RETURNS TABLE (
+    address_id int,
+    full_address varChar,
+    address_line_1 varChar,
+    address_line_2 varChar,
+    address_line_3 varChar,
+    city varChar,
+    state_province varChar,
+    postal_code varchar,
+    country varChar,
+    is_default boolean
+    )
     LANGUAGE plpgsql 
     AS '
     BEGIN 
         RETURN QUERY SELECT a.address_id, a.full_address, a.address_line_1, 
             a.address_line_2, a.address_line_3,
             a.city, a.state_province,
-            a.postal_code, a.country
+            a.postal_code, a.country, ua.is_default
         FROM addresses AS a 
         JOIN user_addresses AS ua ON a.address_id = ua.address_id
         WHERE ua.user_id = _user_id AND ua.is_default = TRUE;
@@ -251,44 +278,58 @@ RETURNS TABLE (
     city varChar,
     state_province varChar,
     postal_code varchar,
-    country varChar
-)
+    country varChar,
+    is_default boolean
+    )
     LANGUAGE plpgsql
     AS '
     BEGIN
         RETURN QUERY SELECT a.address_id, a.full_address, a.address_line_1, 
             a.address_line_2, a.address_line_3,
             a.city, a.state_province,
-            a.postal_code, a.country
+            a.postal_code, a.country, ua.is_default
         FROM addresses AS a 
         JOIN user_addresses AS ua ON a.address_id = ua.address_id
         WHERE ua.user_id = _user_id;
     END;
     ';
 
-CREATE OR REPLACE PROCEDURE update_primary_user_address (
-    _address_id int,
-    _user_id INT
+CREATE OR REPLACE FUNCTION update_default_user_address (
+    IN _address_id int,
+    IN _user_id INT,
+    OUT rowCount INT
 ) 
     LANGUAGE plpgsql
     AS '
+    DECLARE queryReturn int;
     BEGIN 
-        UPDATE user_addresses 
-        SET is_default = FALSE 
-        WHERE user_id = _user_id;
         
-        UPDATE user_addresses 
-        SET is_default = TRUE
-        WHERE address_id = _address_id AND user_id = _user_id;
+        SELECT INTO queryReturn
+            address_id FROM addresses AS a 
+            JOIN user_addresses as ua ON a.address_id = ua.address_id
+            WHERE a.address_id = _address_id AND ua.user_id = _user_id;
+        
+        IF(queryReturn IS NOT NULL) THEN
+            UPDATE user_addresses 
+            SET is_default = FALSE 
+            WHERE user_id = _user_id;
+            
+            UPDATE user_addresses 
+            SET is_default = TRUE
+            WHERE address_id = _address_id AND user_id = _user_id;
+        END IF;
+
+        GET DIAGNOSTICS rowCount = ROW_COUNT;
     END;
     ';
 
-CREATE OR REPLACE PROCEDURE delete_user_address (_user_id int, _address_id int)
+CREATE OR REPLACE FUNCTION delete_user_address (IN _user_id int, IN _address_id int, OUT rowCount int)
     LANGUAGE plpgsql
     AS '
     BEGIN 
         DELETE FROM user_addresses 
         WHERE user_id = _user_id AND address_id = _address_id;
+        GET DIAGNOSTICS rowCount = ROW_COUNT;
     END; 
     ';
 

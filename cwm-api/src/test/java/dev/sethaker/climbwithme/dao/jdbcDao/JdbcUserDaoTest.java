@@ -1,6 +1,5 @@
 package dev.sethaker.climbwithme.dao.jdbcDao;
 
-import dev.sethaker.climbwithme.exception.DaoException;
 import dev.sethaker.climbwithme.model.Auth0User;
 import dev.sethaker.climbwithme.model.User;
 import org.junit.Before;
@@ -39,8 +38,8 @@ public class JdbcUserDaoTest extends BaseDaoTests {
     }
 
     @Test
-    public void invalidUserIdThrowsDaoException() {
-        assertThrows(DaoException.class, () -> dao.getUserId("fakeuserId"), "Expected .getUserId to throw execption but it did not");
+    public void invalidUserIdReturnsNegative1() {
+        assertEquals(-1, dao.getUserId("fakeuserId"), "Expected .getUserId to return -1 but it did not");
     }
 
     @Test

@@ -1,6 +1,7 @@
 package dev.sethaker.climbwithme.controller;
 
 // import dev.sethaker.climbwithme.dao.daoInterface.UserAddressDao;
+import dev.sethaker.climbwithme.dao.daoInterface.UserDao;
 import dev.sethaker.climbwithme.model.User;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import java.security.Principal;
 // @AllArgsConstructor
 @RequestMapping("/api/profile")
 public class ProfileController {
+  private UserDao userDao;
 
     // private UserAddressDao userAddressDao;
 
