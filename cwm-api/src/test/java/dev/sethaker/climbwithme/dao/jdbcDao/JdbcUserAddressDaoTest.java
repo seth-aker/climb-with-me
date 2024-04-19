@@ -87,6 +87,15 @@ public class JdbcUserAddressDaoTest extends BaseDaoTests{
         assertNull("Expected address object to return null", address);
     }
 
+    @Test
+    public void deleteUserTest() {
+        int numOfAddresses = dao.getUserAddresses(1).size();
+        assertTrue(dao.deleteUserAddress(1,1));
+        assertEquals((numOfAddresses - 1), dao.getUserAddresses(1).size());
+
+
+    }
+
 
 
 }

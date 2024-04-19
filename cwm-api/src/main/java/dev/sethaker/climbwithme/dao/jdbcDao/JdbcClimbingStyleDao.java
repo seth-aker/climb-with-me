@@ -1,5 +1,6 @@
 package dev.sethaker.climbwithme.dao.jdbcDao;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +19,7 @@ public class JdbcClimbingStyleDao implements ClimbingStyleDao {
     @Override
     public boolean insertClimbingStyle(ClimbingStyle userStyle, int userId) {
         try {
-            return 1 == jdbcTemplate.update("CALL insert_climbing_style(?,?,?,?,?,?)",
+            return 1 == jdbcTemplate.queryForObject("SELECT * FROM insert_climbing_style(?,?,?,?,?,?)", int.class,
                     userStyle.getStyleCode(),
                     userId,
                     userStyle.getMaxGrade(),
@@ -27,9 +28,39 @@ public class JdbcClimbingStyleDao implements ClimbingStyleDao {
                     userStyle.getYearsExperience());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new DaoException("An error occured inserting a new climbing style for user: " + userId);
+            return false;
+//            throw new DaoException("An error occured inserting a new climbing style for user: " + userId);
         }
 
+    }
+
+    @Override
+    public boolean updateClimbingStyle(ClimbingStyle userStyle, int userId) {
+        try {
+            return 1 == jdbcTemplate.queryForObject("SELECT * FROM update_climbing_style(?,?,?,?,?,?)", int.class,
+                    userStyle.getStyleCode(),
+                    userId,
+                    userStyle.getMaxGrade(),
+                    userStyle.getIndoorOnly(),
+                    userStyle.getIsPreferred(),
+                    userStyle.getYearsExperience());
+
+        } catch (DataAccessException e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean deleteUserClimbingStyle(ClimbingStyle userStyle, int userId) {
+        try {
+            return 1 == jdbcTemplate.queryForObject("SELECT * FROM delete_climbing_style(?,?)", int.class,
+                    userId, userStyle.getStyleCode());
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
     }
 
 }

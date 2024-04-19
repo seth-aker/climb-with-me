@@ -131,13 +131,14 @@ CREATE OR REPLACE PROCEDURE deactivate_user (
     END;
     ';
 
-CREATE OR REPLACE PROCEDURE insert_climbing_style (
-    _style_code varchar, 
-    _user_id int,
-    _max_grade varChar,
-    _indoor_only boolean,
-    _is_preferred boolean,
-    _years_experience boolean
+CREATE OR REPLACE FUNCTION insert_climbing_style (
+    IN _style_code varchar, 
+    IN _user_id int,
+    IN _max_grade varChar,
+    IN _indoor_only boolean,
+    IN _is_preferred boolean,
+    IN _years_experience varChar,
+    OUT rowCount int
     )
     LANGUAGE plpgsql
     AS ' 
@@ -159,10 +160,48 @@ CREATE OR REPLACE PROCEDURE insert_climbing_style (
                 _is_preferred, 
                 _years_experience
                 );
+            GET DIAGNOSTICS rowCount = ROW_COUNT;
         ELSE RAISE EXCEPTION ''Nonexistent user ID --> %'', _user_id;
         END IF;
     END;
     ';
+
+CREATE OR REPLACE FUNCTION update_climbing_style (
+    IN _style_code varchar, 
+    IN _user_id int,
+    IN _max_grade varChar,
+    IN _indoor_only boolean,
+    IN _is_preferred boolean,
+    IN _years_experience varChar,
+    OUT rowCount int
+) 
+LANGUAGE plpgsql
+AS '
+BEGIN
+    UPDATE user_styles SET max_grade = _max_grade, indoor_only = _indoor_only, 
+    is_preferred = _is_preferred, years_experience = _years_experience 
+    WHERE style_code = _style_code AND user_id = _user_id;
+
+    GET DIAGNOSTICS rowCount = ROW_COUNT;
+END;
+';
+
+CREATE OR REPLACE FUNCTION delete_climbing_style(
+    IN _user_id int,
+    IN _style_code varChar,
+    OUT rowCount int
+)
+LANGUAGE plpgsql
+AS '
+BEGIN
+    DELETE FROM user_styles WHERE user_id = _user_id AND style_code = _style_code;
+    GET DIAGNOSTICS rowCount = ROW_COUNT;
+    IF(rowCount > 1) THEN 
+        ROLLBACK;
+    END IF;
+END;
+
+';
 
 CREATE OR REPLACE FUNCTION insert_user_address(
     IN _user_id INT,

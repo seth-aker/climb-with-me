@@ -65,7 +65,7 @@ public class JdbcUserAddressDao implements UserAddressDao {
         }
     }
 
-    private List<Address> getUserAddresses(int userId) {
+    public List<Address> getUserAddresses(int userId) {
         List<Address> addresses = new ArrayList<>();
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet("SELECT * FROM get_user_addresses(?)",
                 userId);
@@ -75,7 +75,7 @@ public class JdbcUserAddressDao implements UserAddressDao {
         return addresses;
     }
 
-    private boolean deleteUserAddress(int userId, int addressId) {
+    public boolean deleteUserAddress(int userId, int addressId) {
         try {
             return 1 == jdbcTemplate.queryForObject("SELECT * FROM delete_user_address(?,?)", int.class,
                     userId, addressId);
