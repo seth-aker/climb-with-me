@@ -166,6 +166,18 @@ CREATE OR REPLACE FUNCTION insert_climbing_style (
     END;
     ';
 
+
+CREATE OR REPLACE FUNCTION get_user_climbing_styles (
+    IN _user_id int
+) 
+RETURNS setof user_styles
+LANGUAGE plpgsql
+AS '
+BEGIN 
+    RETURN QUERY SELECT * FROM user_styles WHERE user_id = _user_id;
+END;
+';
+
 CREATE OR REPLACE FUNCTION update_climbing_style (
     IN _style_code varchar, 
     IN _user_id int,

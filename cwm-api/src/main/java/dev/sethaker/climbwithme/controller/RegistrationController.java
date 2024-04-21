@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.PermitAll;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/register")
@@ -29,9 +29,8 @@ public class RegistrationController {
      * https://manage.auth0.com/dashboard/us/dev-sethaker/actions/flows
      */
     @PostMapping("/new_user")
-    @PermitAll
-    public ResponseEntity<?> registerNewUser(@RequestBody Auth0User user) {
-
+    public ResponseEntity<?> registerNewUser(@RequestBody Auth0User user, Principal principal) {
+        user.setAuthId(principal.getName());
         if (userDao.createNewUser(user)) {
             return ResponseEntity.status(HttpStatus.CREATED).body(null);
         } else {
