@@ -1,8 +1,9 @@
 package dev.sethaker.climbwithme.dao.jdbcDao;
 
+import dev.sethaker.climbwithme.model.PrivateUser;
+import dev.sethaker.climbwithme.model.User;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
-import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Component;
 import dev.sethaker.climbwithme.dao.daoInterface.UserDao;
 import dev.sethaker.climbwithme.exception.DaoException;
 import dev.sethaker.climbwithme.model.Auth0User;
-import dev.sethaker.climbwithme.model.User;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.server.ResponseStatusException;
@@ -44,12 +44,12 @@ public class JdbcUserDao implements UserDao {
         }
     }
 
-    public User getUser(String authId) {
+    public PrivateUser getUser(String authId) {
         try {
             int userId = getUserId(authId);
             SqlRowSet results = jdbcTemplate.queryForRowSet("SELECT * FROM get_user_by_ID(?)", userId);
             if(results.next()) {
-                return mapRowSetToUser(results);
+                return mapRowSetToPrivateUser(results);
             } else {
                 throw new DaoException("Error, user not found");
             }
@@ -59,6 +59,33 @@ public class JdbcUserDao implements UserDao {
         }
     }
 
+    @Override
+    public int getIdByUsername(String username) {
+        try {
+            return jdbcTemplate.queryForObject("SELECT user_id FROM users WHERE username = ?", int.class, username);
+        } catch (Exception e) {
+            log.error("Username: " + username + " not found", e);
+            return -1;
+        }
+
+    }
+
+    @Override
+    public User getPublicUser(String username) {
+        try {
+            int userId = getIdByUsername(username);
+            SqlRowSet results = jdbcTemplate.queryForRowSet("SELECT * FROM get_user_by_ID(?)", userId);
+            if(results.next()) {
+                return mapRowSetToPublicUser(results);
+            } else {
+                throw new DaoException("Error, username: " + username + " not found");
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            //TODO: make error throw 403 unauthorized if isActive field is false;
+            return null;
+        }
+    }
     @Override
     public boolean createNewUser(Auth0User user) {
         try {
@@ -107,27 +134,27 @@ public class JdbcUserDao implements UserDao {
 
     }
     @Override
-    public User updateUser(User user) {
+    public PrivateUser updateUser(PrivateUser privateUser) {
         try {
             SqlRowSet rowSet = jdbcTemplate.queryForRowSet("SELECT * FROM update_user(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                    getUserId(user.getAuthId()),
-                    user.getFullName(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    user.getEmail(),
-                    user.getEmailVerified(),
-                    user.getDateOfBirth(),
-                    user.getPrimaryPhone(),
-                    user.getPhoneVerified(),
-                    user.getCreatedAt(),
-                    user.getGenderCode(),
-                    user.getIsActive(),
-                    user.getPicture(),
-                    user.getWeightRange(),
-                    user.getLastPasswordReset(),
-                    user.getUsername());
+                    getUserId(privateUser.getAuthId()),
+                    privateUser.getFullName(),
+                    privateUser.getFirstName(),
+                    privateUser.getLastName(),
+                    privateUser.getEmail(),
+                    privateUser.getEmailVerified(),
+                    privateUser.getDateOfBirth(),
+                    privateUser.getPrimaryPhone(),
+                    privateUser.getPhoneVerified(),
+                    privateUser.getCreatedAt(),
+                    privateUser.getGenderCode(),
+                    privateUser.getIsActive(),
+                    privateUser.getPicture(),
+                    privateUser.getWeightRange(),
+                    privateUser.getLastPasswordReset(),
+                    privateUser.getUsername());
             if(rowSet.next()) {
-                return mapRowSetToUser(rowSet);
+                return mapRowSetToPrivateUser(rowSet);
             } else {
                 log.error("Rowset did not contain any results in JdbcUserDao.updateUser function");
                 throw new DaoException("Error, user not found");
@@ -153,34 +180,45 @@ public class JdbcUserDao implements UserDao {
     }
 
 
-    private User mapRowSetToUser(SqlRowSet rowSet) {
+    private PrivateUser mapRowSetToPrivateUser(SqlRowSet rowSet) {
+        PrivateUser privateUser = new PrivateUser();
+        privateUser.setAuthId(rowSet.getString("auth_id"));
+        privateUser.setUserId(rowSet.getInt("user_id"));
+        privateUser.setFullName(rowSet.getString("full_name"));
+        privateUser.setFirstName(rowSet.getString("given_name"));
+        privateUser.setLastName(rowSet.getString("family_name"));
+        privateUser.setEmail(rowSet.getString("email"));
+        privateUser.setEmailVerified(rowSet.getBoolean("email_verified"));
+        if(Objects.nonNull(rowSet.getDate("date_of_birth"))) {
+            privateUser.setDateOfBirth(rowSet.getDate("date_of_birth").toLocalDate());
+        }
+        privateUser.setPrimaryPhone(rowSet.getString("phone_number"));
+        privateUser.setPhoneVerified(rowSet.getBoolean("phone_verified"));
+        if(Objects.nonNull(rowSet.getTimestamp("created_at"))) {
+            privateUser.setCreatedAt(rowSet.getTimestamp("created_at").toLocalDateTime());
+        }
+        if(Objects.nonNull(rowSet.getTimestamp("updated_at"))) {
+            privateUser.setUpdatedAt(rowSet.getTimestamp("updated_at").toLocalDateTime());
+        }
+        privateUser.setGenderCode(rowSet.getString("gender_code"));
+        privateUser.setIsActive(rowSet.getBoolean("is_active"));
+        privateUser.setPicture(rowSet.getString("picture"));
+        privateUser.setWeightRange(rowSet.getString("weight_range"));
+        if(Objects.nonNull(rowSet.getTimestamp("last_password_reset"))) {
+            privateUser.setLastPasswordReset(rowSet.getTimestamp("last_password_reset").toLocalDateTime());
+        }
+        privateUser.setUsername(rowSet.getString("username"));
+        return privateUser;
+    }
+
+    private User mapRowSetToPublicUser(SqlRowSet rowSet) {
         User user = new User();
-        user.setAuthId(rowSet.getString("auth_id"));
-        user.setUserId(rowSet.getInt("user_id"));
+        user.setUsername(rowSet.getString("username"));
         user.setFullName(rowSet.getString("full_name"));
         user.setFirstName(rowSet.getString("given_name"));
         user.setLastName(rowSet.getString("family_name"));
-        user.setEmail(rowSet.getString("email"));
-        user.setEmailVerified(rowSet.getBoolean("email_verified"));
-        if(Objects.nonNull(rowSet.getDate("date_of_birth"))) {
-            user.setDateOfBirth(rowSet.getDate("date_of_birth").toLocalDate());
-        }
-        user.setPrimaryPhone(rowSet.getString("phone_number"));
-        user.setPhoneVerified(rowSet.getBoolean("phone_verified"));
-        if(Objects.nonNull(rowSet.getTimestamp("created_at"))) {
-            user.setCreatedAt(rowSet.getTimestamp("created_at").toLocalDateTime());
-        }
-        if(Objects.nonNull(rowSet.getTimestamp("updated_at"))) {
-            user.setUpdatedAt(rowSet.getTimestamp("updated_at").toLocalDateTime());
-        }
-        user.setGenderCode(rowSet.getString("gender_code"));
-        user.setIsActive(rowSet.getBoolean("is_active"));
         user.setPicture(rowSet.getString("picture"));
-        user.setWeightRange(rowSet.getString("weight_range"));
-        if(Objects.nonNull(rowSet.getTimestamp("last_password_reset"))) {
-            user.setLastPasswordReset(rowSet.getTimestamp("last_password_reset").toLocalDateTime());
-        }
-        user.setUsername(rowSet.getString("username"));
+        user.setGenderCode(rowSet.getString("gender_code"));
         return user;
     }
 }

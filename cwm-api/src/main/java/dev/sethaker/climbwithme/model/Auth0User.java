@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 /*
@@ -60,20 +59,20 @@ public class Auth0User {
 
     private String username;
 
-    public User mapToUser() {
-        User user = new User();
-        user.setCreatedAt(this.getCreatedAt());
-        user.setEmail(this.getEmail());
-        user.setEmailVerified(this.getEmailVerified());
-        user.setLastName(this.getFamilyName());
-        user.setFirstName(this.getGivenName());
-        user.setLastPasswordReset(this.getLastPasswordReset());
-        user.setFullName(this.getFullName());
-        user.setPrimaryPhone(this.getPhoneNumber());
-        user.setPhoneVerified(this.getPhoneVerified());
-        user.setUpdatedAt(this.getUpdatedAt());
-        user.setAuthId(this.getAuthId());
-        user.setUsername(this.getUsername());
-        return user;
+    public PrivateUser mapToUser() {
+        PrivateUser privateUser = new PrivateUser();
+        privateUser.setCreatedAt(this.getCreatedAt());
+        privateUser.setEmail(this.getEmail());
+        privateUser.setEmailVerified(this.getEmailVerified());
+        privateUser.setLastName(this.getFamilyName());
+        privateUser.setFirstName(this.getGivenName());
+        privateUser.setLastPasswordReset(this.getLastPasswordReset());
+        privateUser.setFullName(this.getFullName());
+        privateUser.setPrimaryPhone(this.getPhoneNumber());
+        privateUser.setPhoneVerified(this.getPhoneVerified());
+        privateUser.setUpdatedAt(this.getUpdatedAt());
+        privateUser.setAuthId(this.getAuthId());
+        privateUser.setUsername(this.getUsername());
+        return privateUser;
     }
 }
