@@ -10,6 +10,11 @@ const en = {
     readyForLaunch: "Your app, almost ready for launch!",
     exciting: "(ohh, this is exciting!)",
   },
+  loginScreen: {
+    login: "Log in",
+    create: "Create new account",
+    welcomeText: "Let's Climb!"
+  },
   errorScreen: {
     title: "Something went wrong!",
     friendlySubtitle:

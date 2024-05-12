@@ -174,7 +174,7 @@ export function Button(props: ButtonProps) {
 
 const $baseViewStyle: ViewStyle = {
   minHeight: 56,
-  borderRadius: 4,
+  borderRadius: 56,
   justifyContent: "center",
   alignItems: "center",
   flexDirection: "row",
@@ -201,8 +201,8 @@ const $viewPresets = {
     $baseViewStyle,
     {
       borderWidth: 1,
-      borderColor: colors.palette.neutral400,
-      backgroundColor: colors.palette.neutral100,
+      borderColor: colors.palette.neutral200,
+      backgroundColor: colors.palette.primary500,
     },
   ] as StyleProp<ViewStyle>,
 
@@ -210,20 +210,23 @@ const $viewPresets = {
 
   reversed: [
     $baseViewStyle,
-    { backgroundColor: colors.palette.neutral800 },
+    { backgroundColor: colors.palette.neutral200,
+      borderWidth: 1,
+      borderColor: colors.palette.primary500
+     },
   ] as StyleProp<ViewStyle>,
 }
 
 const $textPresets: Record<Presets, StyleProp<TextStyle>> = {
-  default: $baseTextStyle,
-  filled: $baseTextStyle,
-  reversed: [$baseTextStyle, { color: colors.palette.neutral100 }],
+  default: [$baseTextStyle, { color: colors.palette.neutral200}],
+  filled: [$baseTextStyle, { color: colors.palette.neutral200}],
+  reversed: [$baseTextStyle, { color: colors.palette.primary500 }],
 }
 
 const $pressedViewPresets: Record<Presets, StyleProp<ViewStyle>> = {
-  default: { backgroundColor: colors.palette.neutral200 },
+  default: { backgroundColor: colors.palette.primary600 },
   filled: { backgroundColor: colors.palette.neutral400 },
-  reversed: { backgroundColor: colors.palette.neutral700 },
+  reversed: { backgroundColor: colors.palette.neutral300, borderColor: colors.palette.primary200 },
 }
 
 const $pressedTextPresets: Record<Presets, StyleProp<TextStyle>> = {
