@@ -11,13 +11,15 @@ import {
 } from "@react-navigation/native"
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
 import { observer } from "mobx-react-lite"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { useColorScheme } from "react-native"
 import * as Screens from "app/screens"
 import Config from "../config"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { colors } from "app/theme"
 import { useStores } from "app/models"
+import { useAuth0 } from "react-native-auth0"
+
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -35,6 +37,7 @@ import { useStores } from "app/models"
 export type AppStackParamList = {
   Welcome: undefined
   Login: undefined
+  Loading: undefined
   // 🔥 Your screens go here
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
@@ -54,30 +57,58 @@ export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStack
 const Stack = createNativeStackNavigator<AppStackParamList>()
 
 const AppStack = observer(function AppStack() {
-  const {
-    authenticationStore: { isAuthenticated },
-  } = useStores();
+  const { authenticationStore: {isAuthenticated, setAuthToken}} = useStores();
+  const { getCredentials} = useAuth0(); 
+  const [isLoading, setIsLoading] = useState(true);
+  // const [initialRouteName, setInitialRouteName] = useState<keyof AppStackParamList>("Loading")
+  
+  // const getInitialRouteName: () => keyof AppStackParamList = () => {
+  //   if(isLoading) {
+  //     return "Loading"
+  //   } else if (isAuthenticated) {
+  //     return "Welcome"
+  //   } else {
+  //     return "Login"
+  //   }
+  // }
+  // Used to sync the authentication store with Auth0's SDK and determine what screen to load first.
+  useEffect(() => {
+    const updateIsAuthenticated = async () => {
+      setIsLoading(true)
+      const credentials = await getCredentials()
+      setAuthToken(credentials?.accessToken)
+      setIsLoading(false)
+    }
+    updateIsAuthenticated()
+  },[])
 
+
+  
   return (
-    <Stack.Navigator
-      screenOptions={{ headerShown: false, navigationBarColor: colors.background }}
-      initialRouteName={isAuthenticated ? "Welcome" : "Login"}
-    >
-      {isAuthenticated ? (
-        <>
-          <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} />
-
-        </>
-      ) : (
-        <>
-          <Stack.Screen name="Login" component={Screens.LoginScreen} />
-        </>
-      )}
-          
-      {/** 🔥 Your screens go here */}
-      {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
-    </Stack.Navigator>
-  )
+  
+      <Stack.Navigator
+        screenOptions={{ headerShown: false, navigationBarColor: colors.background }}
+        initialRouteName={"Loading"}
+      >
+        {isLoading ? (
+          <>
+            <Stack.Screen name="Loading" component={Screens.LoadingScreen} />
+          </>
+        ) : 
+        isAuthenticated ? (
+          <>
+            <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} />
+          </>
+        ) : (
+          <>
+            <Stack.Screen name="Login" component={Screens.LoginScreen} />
+          </>
+        )}
+            
+        {/** 🔥 Your screens go here */}
+        {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
+      </Stack.Navigator>
+    )
 })
 
 export interface NavigationProps
