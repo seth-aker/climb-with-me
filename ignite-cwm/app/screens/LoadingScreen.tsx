@@ -1,17 +1,16 @@
 import React, { useEffect } from "react"
-import Animated, { useAnimatedProps, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming} from "react-native-reanimated"
-import { Screen } from "app/components"
+import Animated, {  useAnimatedProps, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming, Easing} from "react-native-reanimated"
 import { Svg, Circle, G} from 'react-native-svg';
-import { Easing } from "react-native";
+import { View, ViewStyle } from "react-native";
 import { colors } from "app/theme";
-import { AppStackScreenProps } from "app/navigators";
-import { observer } from "mobx-react-lite";
 
-interface LoadingScreenProps extends AppStackScreenProps<"Loading"> {}
+
+
+
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-export const LoadingScreen: React.FC<LoadingScreenProps> = observer(function LoadingScreen(_props) {
-    const circumference = 500;
+export const LoadingScreen = () => {
+    const circumference = 250;
     const radius = circumference / (2 * Math.PI);
     const strokeWidth = 5;
     const halfCircle = radius + strokeWidth;
@@ -26,15 +25,19 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = observer(function Loa
 
     const startAnimation = () => {
         progress.value = withTiming(0.6, {duration: 1000})
-        progress.value = withRepeat(withSequence(
-            withTiming(0.7, {duration: 800}),
-            withTiming(0.1, {duration: 2000})
-        ), -1, true);
-
+        
+        progress.value = withRepeat(
+            withSequence(
+                withTiming(0.7, {duration: 800}),
+                withTiming(0.1, {duration: 2000})
+            ), -1, true
+        );
+    
         rotation.value = withRepeat(
             withTiming(360, { duration: 900, easing: Easing.linear}), -1, false
-        );
-    };
+        )
+      
+    }
 
     const animatedCircleProps = useAnimatedProps(() => {
         return {
@@ -44,21 +47,19 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = observer(function Loa
 
     const animatedViewStyle = useAnimatedStyle(() => {
         return {
-            transform: [{rotate: rotation.value + 'deg'}]
+            transform: [{rotate: `${rotation.value}deg`}]
         }
     }, []);
-
+    
     return (
-        <Screen
-            preset="auto"
-            safeAreaEdges={["top", "bottom"]}
+        <View style={$mainViewStyle}
         >
             <Animated.View style={animatedViewStyle}>
                 <Svg width={diameter} height={diameter} viewBox={`0 0 ${diameter} ${diameter}`}>
                     <G origin={`${halfCircle}, ${halfCircle}`} rotation={'-90'}>
                         <AnimatedCircle
                             cx={'50%'}
-                            cy={'50%'}
+                            cy={"50%"}
                             r={radius}
                             animatedProps={animatedCircleProps}
                             strokeWidth={strokeWidth}
@@ -69,8 +70,12 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = observer(function Loa
                     </G>
                 </Svg>
             </Animated.View>
-        </Screen>
+        </View>
     )
 
 }
-)
+
+const $mainViewStyle : ViewStyle = {
+    justifyContent: "center",
+    alignItems: "center",
+}

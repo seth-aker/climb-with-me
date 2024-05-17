@@ -30,7 +30,8 @@ import { customFontsToLoad } from "./theme"
 import Config from "./config"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { ViewStyle } from "react-native"
-import { Auth0Provider } from "react-native-auth0"
+import { Auth0Provider, } from "react-native-auth0"
+
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
 
@@ -74,9 +75,16 @@ function App(props: AppProps) {
 
   const [areFontsLoaded] = useFonts(customFontsToLoad)
 
-  const { rehydrated } = useInitialRootStore(() => {
+  const { rehydrated,  } = useInitialRootStore(() => {
     // This runs after the root store has been initialized and rehydrated.
-
+    // const { authenticationStore: {setAuthToken} } = rootStore;
+    // const { getCredentials } = useAuth0();
+    // console.log("Get Cred PreRun")
+    // getCredentials().then((cred) => {
+    //   const accessToken = cred?.accessToken; 
+    //   setAuthToken(accessToken)
+    // });
+    // console.log("Credentials Rec")
     // If your initialization scripts run very fast, it's good to show the splash screen for just a bit longer to prevent flicker.
     // Slightly delaying splash screen hiding for better UX; can be customized or removed as needed,
     // Note: (vanilla Android) The splash-screen will not appear if you launch your app via the terminal or Android Studio. Kill the app and launch it normally by tapping on the launcher icon. https://stackoverflow.com/a/69831106

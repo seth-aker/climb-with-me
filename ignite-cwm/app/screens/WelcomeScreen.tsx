@@ -1,22 +1,41 @@
 import { observer } from "mobx-react-lite"
 import React, { FC } from "react"
 import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
-import { Text } from "app/components"
+import { Button, Text } from "app/components"
 import { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
 import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
+import { LoadingScreen } from "./LoadingScreen"
+import { useAuth0 } from "react-native-auth0"
+import { useStores } from "app/models"
 
 const welcomeLogo = require("../../assets/images/logo.png")
 
 
-interface WelcomeScreenProps extends AppStackScreenProps<"Welcome"> {}
+interface WelcomeScreenProps extends AppStackScreenProps<"Welcome"> {
+}
 
-export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeScreen(
+export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeScreen(_props
 ) {
-
+  const { navigation } = _props;
   const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
+  const { clearSession } = useAuth0();
+  const { authenticationStore: { logout, tokenLoading } } = useStores();
+  const handleLogout = async () => {
+    try {
+      logout();
+      await clearSession();
+      navigation.navigate("Login")
+  } catch (e) {
+    console.log("Log out cancelled")
+  }
+}
 
   return (
+    tokenLoading ? 
+    <>
+      <LoadingScreen />
+    </> : (
     <View style={$container}>
       <View style={$topContainer}>
         <Image style={$welcomeLogo} source={welcomeLogo} resizeMode="contain" />
@@ -26,14 +45,16 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeSc
           tx="welcomeScreen.readyForLaunch"
           preset="heading"
         />
-        <Text tx="welcomeScreen.exciting" preset="subheading" />
+        <Text tx="welcomeScreen.exciting" preset="subheading" /> 
       </View>
 
-      <View style={[$bottomContainer, $bottomContainerInsets]}>
+    <View style={[$bottomContainer, $bottomContainerInsets]}>
         <Text tx="welcomeScreen.postscript" size="md" />
+        <Button text="Logout" onPress={handleLogout} />
       </View>
     </View>
   )
+)
 })
 
 const $container: ViewStyle = {
