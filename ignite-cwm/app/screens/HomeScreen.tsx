@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite"
-import React, { FC } from "react"
+import React, { FC, useEffect, useState } from "react"
 import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
 import { Button, Text } from "app/components"
 import { AppStackScreenProps } from "../navigators"
@@ -8,19 +8,28 @@ import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
 import { LoadingScreen } from "./LoadingScreen"
 import { useAuth0 } from "react-native-auth0"
 import { useStores } from "app/models"
+import * as Location from "expo-location"
 
 const welcomeLogo = require("../../assets/images/logo.png")
 
 
-interface WelcomeScreenProps extends AppStackScreenProps<"Welcome"> {
+interface HomeScreenProps extends AppStackScreenProps<"Home"> {
 }
 
-export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeScreen(_props
+export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_props
 ) {
   const { navigation } = _props;
   const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
   const { clearSession } = useAuth0();
   const { authenticationStore: { logout, tokenLoading } } = useStores();
+  const [location, setLocation] = useState<Location.LocationObject | undefined>(undefined)
+  
+  useEffect(() => {
+    (async () => {
+      let location = await Location.getCurrentPositionAsync();
+    })();
+  })
+  
   const handleLogout = async () => {
     try {
       logout();

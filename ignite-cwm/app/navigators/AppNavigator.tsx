@@ -36,7 +36,7 @@ import { useAuth0 } from "react-native-auth0"
  *   https://reactnavigation.org/docs/typescript/#organizing-types
  */
 export type AppStackParamList = {
-  Welcome: undefined
+  Home: undefined
   Login: undefined
   // 🔥 Your screens go here
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
@@ -72,12 +72,12 @@ const AppStack = observer(function AppStack(_props) {
   
       <Stack.Navigator
         screenOptions={{ headerShown: false, navigationBarColor: colors.background }}
-        initialRouteName={isAuthenticated ? "Welcome" : "Login"}
+        initialRouteName={isAuthenticated ? "Home" : "Login"}
       >
 
         {isAuthenticated ? (
           <>
-            <Stack.Screen name="Welcome" component={Screens.WelcomeScreen}>
+            <Stack.Screen name="Home" component={Screens.HomeScreen}>
              
               </Stack.Screen>
           </>
