@@ -23,12 +23,23 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
   const { clearSession } = useAuth0();
   const { authenticationStore: { logout, tokenLoading } } = useStores();
   const [location, setLocation] = useState<Location.LocationObject | undefined>(undefined)
+  const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
   
+
   useEffect(() => {
     (async () => {
-      let location = await Location.getCurrentPositionAsync();
+      let { status } = await Location.getForegroundPermissionsAsync();
+      if(status !== "granted") {
+        status = (await Location.requestForegroundPermissionsAsync()).status
+      }
+      if(status !== "granted") {
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
+      const location = await Location.getCurrentPositionAsync();
+      setLocation(location);
     })();
-  })
+  }, [])
   
   const handleLogout = async () => {
     try {
@@ -59,6 +70,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
 
     <View style={[$bottomContainer, $bottomContainerInsets]}>
         <Text tx="welcomeScreen.postscript" size="md" />
+        <Text text={errorMsg || JSON.stringify(location) || "Waiting for location data..."}></Text>
         <Button text="Logout" onPress={handleLogout} />
       </View>
     </View>

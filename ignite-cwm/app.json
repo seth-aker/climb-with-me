@@ -55,6 +55,12 @@
     },
     "plugins": [
       [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Climb With Me to use your location."
+        }
+      ],
+      [
         "react-native-auth0",
         {
           "domain": "dev-sethaker.us.auth0.com"
