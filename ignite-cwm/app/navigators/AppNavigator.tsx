@@ -8,6 +8,7 @@ import {
   DarkTheme,
   DefaultTheme,
   NavigationContainer,
+  NavigatorScreenParams,
 } from "@react-navigation/native"
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
 import { observer } from "mobx-react-lite"
@@ -19,6 +20,7 @@ import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { colors } from "app/theme"
 import { useStores } from "app/models"
 import { useAuth0 } from "react-native-auth0"
+import { HomeTabNavigator, HomeTabParamList } from "./HomeTabsNavigator"
 
 
 
@@ -36,7 +38,7 @@ import { useAuth0 } from "react-native-auth0"
  *   https://reactnavigation.org/docs/typescript/#organizing-types
  */
 export type AppStackParamList = {
-  Home: undefined
+  HomeTabs: NavigatorScreenParams<HomeTabParamList>
   Login: undefined
   // 🔥 Your screens go here
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
@@ -72,14 +74,14 @@ const AppStack = observer(function AppStack(_props) {
   
       <Stack.Navigator
         screenOptions={{ headerShown: false, navigationBarColor: colors.background }}
-        initialRouteName={isAuthenticated ? "Home" : "Login"}
+        initialRouteName={isAuthenticated ? "HomeTabs" : "Login"}
       >
 
         {isAuthenticated ? (
           <>
-            <Stack.Screen name="Home" component={Screens.HomeScreen}>
+            <Stack.Screen name="HomeTabs" component={HomeTabNavigator} />
              
-              </Stack.Screen>
+             
           </>
         ) : (
           <>

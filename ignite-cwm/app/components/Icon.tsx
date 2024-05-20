@@ -1,7 +1,6 @@
 import * as React from "react"
 import { ComponentType } from "react"
 import {
-  Image,
   ImageStyle,
   StyleProp,
   TouchableOpacity,
@@ -10,14 +9,15 @@ import {
   ViewProps,
   ViewStyle,
 } from "react-native"
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome"
+import { IconProp as FaIconProps} from "@fortawesome/fontawesome-svg-core"
 
-export type IconTypes = keyof typeof iconRegistry
 
 interface IconProps extends TouchableOpacityProps {
   /**
    * The name of the icon
    */
-  icon: IconTypes
+  icon: FaIconProps
 
   /**
    * An optional tint color for the icon
@@ -67,7 +67,7 @@ export function Icon(props: IconProps) {
     TouchableOpacityProps | ViewProps
   >
 
-  const $imageStyle: StyleProp<ImageStyle> = [
+  const $imageStyle: StyleProp<ViewStyle> = [
     $imageStyleBase,
     color !== undefined && { tintColor: color },
     size !== undefined && { width: size, height: size },
@@ -80,27 +80,16 @@ export function Icon(props: IconProps) {
       {...WrapperProps}
       style={$containerStyleOverride}
     >
-      <Image style={$imageStyle} source={iconRegistry[icon]} />
+      <FontAwesomeIcon 
+        icon={icon} 
+        style={$imageStyle} 
+        size={size}
+        color={color}
+        />
     </Wrapper>
   )
 }
 
-export const iconRegistry = {
-  back: require("../../assets/icons/back.png"),
-  bell: require("../../assets/icons/bell.png"),
-  caretLeft: require("../../assets/icons/caretLeft.png"),
-  caretRight: require("../../assets/icons/caretRight.png"),
-  check: require("../../assets/icons/check.png"),
-  'cwm-icon': require("../../assets/icons/cwm-icon.png"),
-  hidden: require("../../assets/icons/hidden.png"),
-  ladybug: require("../../assets/icons/ladybug.png"),
-  lock: require("../../assets/icons/lock.png"),
-  menu: require("../../assets/icons/menu.png"),
-  more: require("../../assets/icons/more.png"),
-  settings: require("../../assets/icons/settings.png"),
-  view: require("../../assets/icons/view.png"),
-  x: require("../../assets/icons/x.png"),
-}
 
 const $imageStyleBase: ImageStyle = {
   resizeMode: "contain",

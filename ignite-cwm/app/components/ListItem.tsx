@@ -8,7 +8,8 @@ import {
   ViewStyle,
 } from "react-native"
 import { colors, spacing } from "../theme"
-import { Icon, IconTypes } from "./Icon"
+import { Icon } from "./Icon"
+import { IconProp } from "@fortawesome/fontawesome-svg-core"
 import { Text, TextProps } from "./Text"
 
 export interface ListItemProps extends TouchableOpacityProps {
@@ -63,7 +64,7 @@ export interface ListItemProps extends TouchableOpacityProps {
   /**
    * Icon that should appear on the left.
    */
-  leftIcon?: IconTypes
+  leftIcon?: IconProp
   /**
    * An optional tint color for the left icon
    */
@@ -71,7 +72,7 @@ export interface ListItemProps extends TouchableOpacityProps {
   /**
    * Icon that should appear on the right.
    */
-  rightIcon?: IconTypes
+  rightIcon?: IconProp
   /**
    * An optional tint color for the right icon
    */
@@ -89,7 +90,7 @@ export interface ListItemProps extends TouchableOpacityProps {
 }
 
 interface ListItemActionProps {
-  icon?: IconTypes
+  icon?: IconProp
   iconColor?: string
   Component?: ReactElement
   size: number

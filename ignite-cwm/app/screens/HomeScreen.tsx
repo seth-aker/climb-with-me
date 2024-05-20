@@ -1,8 +1,8 @@
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useState } from "react"
 import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
-import { Button, Text } from "app/components"
-import { AppStackScreenProps } from "../navigators"
+import { Button, Screen, Text } from "app/components"
+import { HomeTabScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
 import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
 import { LoadingScreen } from "./LoadingScreen"
@@ -13,7 +13,7 @@ import * as Location from "expo-location"
 const welcomeLogo = require("../../assets/images/logo.png")
 
 
-interface HomeScreenProps extends AppStackScreenProps<"Home"> {
+interface HomeScreenProps extends HomeTabScreenProps<"Home"> {
 }
 
 export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_props
@@ -56,7 +56,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
     <>
       <LoadingScreen />
     </> : (
-    <View style={$container}>
+    <Screen style={$container}>
       <View style={$topContainer}>
         <Image style={$welcomeLogo} source={welcomeLogo} resizeMode="contain" />
         <Text
@@ -73,7 +73,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
         <Text text={errorMsg || JSON.stringify(location) || "Waiting for location data..."}></Text>
         <Button text="Logout" onPress={handleLogout} />
       </View>
-    </View>
+    </Screen>
   )
 )
 })
