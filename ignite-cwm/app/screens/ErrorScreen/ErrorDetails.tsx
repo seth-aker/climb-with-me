@@ -22,7 +22,7 @@ export function ErrorDetails(props: ErrorDetailsProps) {
       contentContainerStyle={$contentContainer}
     >
       <View style={$topSection}>
-        <Icon icon="ladybug" size={64} />
+        <Icon icon="bug" size={64} color={colors.error}/>
         <Text style={$heading} preset="subheading" tx="errorScreen.title" />
         <Text tx="errorScreen.friendlySubtitle" />
       </View>
@@ -39,6 +39,7 @@ export function ErrorDetails(props: ErrorDetailsProps) {
       <Button
         preset="reversed"
         style={$resetButton}
+        textStyle={{color: colors.palette.neutral100}}
         onPress={props.onReset}
         tx="errorScreen.reset"
       />
@@ -84,6 +85,7 @@ const $errorBacktrace: TextStyle = {
 }
 
 const $resetButton: ViewStyle = {
+  borderColor: colors.palette.neutral100,
   backgroundColor: colors.error,
   paddingHorizontal: spacing.xxl,
 }

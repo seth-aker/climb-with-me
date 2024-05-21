@@ -1,7 +1,8 @@
+// TODO: Update color styles to look and feel good with the app
+
 import React, { ComponentType, FC, useMemo } from "react"
 import {
   GestureResponderEvent,
-  Image,
   ImageStyle,
   Platform,
   StyleProp,
@@ -21,9 +22,10 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated"
 import { colors, spacing } from "../theme"
-import { iconRegistry, IconTypes } from "./Icon"
+import { IconProp } from "@fortawesome/fontawesome-svg-core"
 import { Text, TextProps } from "./Text"
 import { isRTL } from "app/i18n"
+import { Icon } from "./Icon"
 
 type Variants = "checkbox" | "switch" | "radio"
 
@@ -122,7 +124,7 @@ interface CheckboxToggleProps extends BaseToggleProps {
   /**
    * Checkbox-only prop that changes the icon used for the "on" state.
    */
-  checkboxIcon?: IconTypes
+  checkboxIcon?: IconProp
 }
 
 interface RadioToggleProps extends BaseToggleProps {
@@ -283,19 +285,19 @@ function Checkbox(props: ToggleInputProps) {
     disabled && colors.palette.neutral400,
     status === "error" && colors.error,
     !on && colors.palette.neutral800,
-    colors.palette.secondary500,
+    colors.palette.primary500,
   ].filter(Boolean)[0]
 
   const onBackgroundColor = [
     disabled && colors.transparent,
     status === "error" && colors.errorBackground,
-    colors.palette.secondary500,
+    colors.palette.primary300,
   ].filter(Boolean)[0]
 
   const iconTintColor = [
     disabled && colors.palette.neutral600,
     status === "error" && colors.error,
-    colors.palette.accent100,
+    colors.textDim,
   ].filter(Boolean)[0]
 
   return (
@@ -314,14 +316,22 @@ function Checkbox(props: ToggleInputProps) {
           useAnimatedStyle(() => ({ opacity: withTiming(on ? 1 : 0) }), [on]),
         ]}
       >
-        <Image
+        <Icon 
+          icon={checkboxIcon || "check"} 
+          style={[
+            $checkboxDetail,
+            !!iconTintColor && { tintColor: iconTintColor },
+            $detailStyleOverride,
+        ]}
+        />
+        {/* <Image
           source={checkboxIcon ? iconRegistry[checkboxIcon] : iconRegistry.check}
           style={[
             $checkboxDetail,
             !!iconTintColor && { tintColor: iconTintColor },
             $detailStyleOverride,
           ]}
-        />
+        /> */}
       </Animated.View>
     </View>
   )
@@ -543,10 +553,15 @@ function SwitchAccessibilityLabel(props: ToggleInputProps & { role: "on" | "off"
       )}
 
       {switchAccessibilityMode === "icon" && shouldLabelBeVisible && (
-        <Image
+        
+        <Icon
           style={[$switchAccessibilityIcon, { tintColor: color }]}
-          source={role === "off" ? iconRegistry.hidden : iconRegistry.view}
-        />
+          icon={role === "off" ? "eye-slash" : "eye"}
+          />
+        // <Image
+        //   style={[$switchAccessibilityIcon, { tintColor: color }]}
+        //   source={role === "off" ? iconRegistry.hidden : iconRegistry.view}
+        // />
       )}
     </View>
   )

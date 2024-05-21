@@ -1,4 +1,4 @@
-import React, { ComponentType, forwardRef, Ref, useImperativeHandle, useRef } from "react"
+import React, { ComponentType, forwardRef, Ref,  useImperativeHandle,  useRef } from "react"
 import {
   StyleProp,
   TextInput,
@@ -164,11 +164,11 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
    */
   function focusInput() {
     if (disabled) return
-
-    input.current?.focus()
+      input.current?.focus()
   }
 
   useImperativeHandle(ref, () => input.current as TextInput)
+
 
   return (
     <TouchableOpacity

@@ -25,7 +25,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
   const [location, setLocation] = useState<Location.LocationObject | undefined>(undefined)
   const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
   
-
+  // TODO: make this into a hook that can be used anywhere
   useEffect(() => {
     (async () => {
       let { status } = await Location.getForegroundPermissionsAsync();
@@ -40,6 +40,8 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
       setLocation(location);
     })();
   }, [])
+
+  
   
   const handleLogout = async () => {
     try {
@@ -69,7 +71,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
       </View>
 
     <View style={[$bottomContainer, $bottomContainerInsets]}>
-        <Text tx="welcomeScreen.postscript" size="md" />
+        <Text text="Location Data:" size="md" />
         <Text text={errorMsg || JSON.stringify(location) || "Waiting for location data..."}></Text>
         <Button text="Logout" onPress={handleLogout} />
       </View>

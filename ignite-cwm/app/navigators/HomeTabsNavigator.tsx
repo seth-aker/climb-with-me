@@ -5,17 +5,18 @@ import { TextStyle, ViewStyle } from "react-native"
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { colors, spacing, typography } from "app/theme"
-import { HomeScreen } from "app/screens"
+import { HomeScreen, ProfileScreen } from "app/screens"
 import en from "app/i18n/en"
 // import { translate } from "i18n-js"
 import { Icon } from "app/components"
 import { MessageScreen } from "app/screens/MessageScreen"
+import { FriendsScreen } from "app/screens/FriendsScreen"
 
 export type HomeTabParamList = {
     Home: undefined
     Messages: undefined
     Friends: undefined
-    Menu: undefined
+    Profile: undefined
 }
 
 
@@ -36,8 +37,8 @@ export function HomeTabNavigator() {
                 headerShown: false,
                 tabBarHideOnKeyboard: true,
                 tabBarStyle: [$tabBar, { height: bottom + 70}],
-                tabBarActiveTintColor: colors.text,
-                tabBarInactiveTintColor: colors.text,
+                tabBarActiveTintColor: colors.tint,
+                tabBarInactiveTintColor: colors.textDim,
                 tabBarLabelStyle: $tabBarLabel,
                 tabBarItemStyle: $tabBarItem,
             }}
@@ -68,7 +69,26 @@ export function HomeTabNavigator() {
                     ),
                 }}
             />
-
+            <Tab.Screen 
+                name="Friends"
+                component={FriendsScreen}
+                options={{
+                    tabBarLabel: en.homeNavigator.friendsTab,
+                    tabBarIcon: ({ focused }) => (
+                        <Icon icon="user-group" color={focused ? colors.tint : colors.textDim} size={30} />
+                    )
+                }}
+            />
+            <Tab.Screen 
+                name="Profile"
+                component={ProfileScreen}
+                options={{
+                    tabBarLabel: en.homeNavigator.menuTab,
+                    tabBarIcon: ({ focused }) => (
+                        <Icon icon="user" color={focused ? colors.tint : colors.textDim} size={30} />
+                    )
+                }}
+            />
         </Tab.Navigator>
     )
 }
