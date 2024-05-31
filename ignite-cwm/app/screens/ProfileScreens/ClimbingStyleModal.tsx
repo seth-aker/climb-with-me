@@ -2,7 +2,7 @@
 import { Button, Header, Icon } from "app/components"
 import { ModalPicker } from "app/components/ModalPicker/ModalPicker"
 import { colors, spacing } from "app/theme"
-import { Option, climbingGrades as CGOptions, yearsExpOptions, climbingStyles } from "data/ModalPickerOptions"
+import { Option, climbingGrades as CGOptions, yearsExpOptions, climbingStyles } from "../../../data/ModalPickerOptions"
 import React, { useEffect, useState } from "react"
 import { Modal, ModalProps, TextStyle, View, ViewStyle } from "react-native"
 
