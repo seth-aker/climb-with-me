@@ -2,7 +2,7 @@ import React, { ComponentType } from "react"
 import { Pressable, StyleProp, TextStyle, View, ViewStyle } from "react-native"
 import { Text, TextProps } from "../Text"
 import { TxKeyPath, isRTL } from "app/i18n"
-import { Option } from "data/dropDownPickerOptions"
+import { Option } from "data/ModalPickerOptions"
 import { colors, spacing, typography } from "app/theme"
 
 
@@ -12,6 +12,7 @@ export interface PickerViewAccessoryProps {
 }
 
 export interface PickerViewProps {
+    status?: "error" | undefined
     disabled?: boolean
     openModal: (modalState: boolean) => void
     value?: Option
@@ -46,10 +47,12 @@ export const PickerView = (props: PickerViewProps) => {
         labelTx,
         labelTxOptions,
         LabelTextProps,
+        status
      } = props
     
     const $inputWrapperStyles = [
         $inputWrapperStyle,
+        status === "error" && { borderColor: colors.error },
         LeftAccessory && { paddingStart: 0 },
         RightAccessory && { paddingEnd: 0 },
         $inputWrapperStyleOverride,

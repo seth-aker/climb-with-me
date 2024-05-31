@@ -2,17 +2,18 @@ import React, { ComponentType, useState } from "react"
 import { ColorValue, Modal, TextStyle, View, ViewStyle } from "react-native";
 import { PickerView, PickerViewAccessoryProps } from "./PickerView";
 import { ListView } from "../ListView";
-import { Option } from "data/dropDownPickerOptions";
+import { Option } from "data/ModalPickerOptions";
 import { PickerListItem } from "./PickerListItem";
 import { TextProps } from "../Text";
 import { Header } from "../Header";
 import { colors } from "app/theme";
 
 export interface ModalPickerProps {
-    data?: Option[];
+    data?: Option[] ;
     disabled?: boolean
     onChange?: (value: any) => void
     value?: Option
+    status?: "error" | undefined
     containerStyle?: ViewStyle
     hideSearchBar?: boolean;
     searchBarStyle?: ViewStyle;
@@ -46,6 +47,7 @@ export const ModalPicker = (props: ModalPickerProps) => {
         inputWrapperStyle: $inputWrapperStyle,
         headerTitle,
         pickerTextStyle: $pickerTextStyle,
+        status
      } = props
 
     const [modalVisible, setModalVisible] = useState(false);
@@ -55,14 +57,13 @@ export const ModalPicker = (props: ModalPickerProps) => {
         onChange && onChange(item)
     }
 
-    
-    
     return (
         <View>
             <PickerView
                 disabled={disabled} 
                 openModal={setModalVisible}
                 value={value}
+                status={status}
                 inputWrapperStyle={$inputWrapperStyle}
                 textStyle={$pickerTextStyle}
                 {...props}

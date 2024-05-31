@@ -1,4 +1,4 @@
-import { Option } from "data/dropDownPickerOptions"
+import { Option } from "data/ModalPickerOptions"
 import React from "react"
 import { Pressable, TextStyle, View, ViewStyle } from "react-native"
 import { Text } from "../Text"
@@ -9,7 +9,7 @@ export interface PickerListItemProps {
     item: Option
     handleItemOnPress: (item: Option) => void
     listTextStyle?: TextStyle 
-    itemSeparartorStyle?: ViewStyle
+    itemSeparatorStyle?: ViewStyle
 }
 
 export const PickerListItem = (props: PickerListItemProps) => {
@@ -18,7 +18,7 @@ export const PickerListItem = (props: PickerListItemProps) => {
         handleItemOnPress, 
         item, 
         listTextStyle: $listTextStyle,
-        itemSeparartorStyle: $dividerStyleOverride
+        itemSeparatorStyle: $dividerStyleOverride
     } = props
 
     const $dividerStyles = [$divider, $dividerStyleOverride]

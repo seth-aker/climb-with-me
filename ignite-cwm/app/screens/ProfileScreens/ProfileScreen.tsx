@@ -1,21 +1,20 @@
 
-import { Icon, Screen,  TextField, } from "app/components";
+import { Icon, Screen,  TextField, Button, Card, ListView, Text} from "app/components";
 import { HomeTabScreenProps } from "app/navigators";
 import { colors, spacing } from "app/theme";
 import { observer } from "mobx-react-lite";
 import React, { FC, useEffect, useState } from "react";
-import {TextStyle, ViewStyle } from "react-native";
+import {ImageStyle, ScrollView, TextStyle, View, ViewStyle } from "react-native";
 import { useAuth0 } from "react-native-auth0";
-import { climbingGrades as CGOptions, climbingStyles, genderOptions, weightRangeOptions, Option } from "../../../data/dropDownPickerOptions"
+import { genderOptions, weightRangeOptions, Option } from "../../../data/ModalPickerOptions"
 import { formatPhoneNumber } from "app/utils/formatPhoneNumber";
 import { ProfileHeader } from "./ProfileHeader";
-
 import { ModalPicker } from "app/components/ModalPicker/ModalPicker";
+import { ClimbingStyle as UserStyle} from "../../../data/data"
+import { ClimbingStyleModal } from "./ClimbingStyleModal";
+
 interface ProfileScreenProps extends HomeTabScreenProps<"Profile"> {
 }
-
-
-
 
 export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileScreen(_props) {
     
@@ -23,8 +22,8 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
     const { user } = useAuth0();
     const [aboutMeText, setAboutMeText] = useState("");
     const [editable, setEditable] = useState(false);
-    // const [climbingStyleModalVisible, setClimbingStyleModalVisible] = useState(false);
-
+    const [climbingStyleModalVisible, setClimbingStyleModalVisible] = useState(false);
+    const [userStyles, setUserStyles] = useState<UserStyle[]>([])
     
     const [phoneNumber, setPhoneNumber] = useState("")
 
@@ -36,40 +35,57 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
         setAboutMeText(input)
     }
 
+    const handleAddClimbingStyleOnPress = () => {
+        setClimbingStyleModalVisible(true)
+        setClimbingStyle(undefined)
+        setMaxGradeIndoor(undefined)
+        setMaxGradeOutdoor(undefined)
+        setYearsExp(undefined)
+    }
+
+    const submitNewClimbingStyle = () => {
+        if(climbingStyle && yearsExp) {
+            const newUserStyle: UserStyle = {
+                style: climbingStyle,
+                maxGradeIndoor,
+                maxGradeOutdoor,
+                yearsExp
+            }
+            setUserStyles([...userStyles, newUserStyle])
+            setClimbingStyleModalVisible(false)
+        }
+     
+    }
     const [gender, setGender] = useState<Option>()
-    
 
     const [weightRange, setWeightRange] = useState<Option>();
 
-    const [climbingStyle, setClimbingStyle] = useState("");
-    // const [climbingStyleOpen, setClimbingStyleOpen] = useState(false);
+    const [climbingStyle, setClimbingStyle] = useState<Option>();
 
-    // const [maxGrade, setMaxGrade] = useState("");
-    // const [maxGradeOpen, setMaxGradeOpen] = useState(false);
+    const [maxGradeIndoor, setMaxGradeIndoor] = useState<Option>();
+    const [maxGradeOutdoor, setMaxGradeOutdoor] = useState<Option>();
 
-    const [climbingGrades, setClimbingGrades] = useState(CGOptions.sport)
+    const [yearsExp, setYearsExp] = useState<Option>()
+    const [userStylesEmpty, setUserStylesEmpty] = useState(true);
 
-    // const [indoorOnly, setIndoorOnly] = useState(true);
-
-    // const toggleClimbingStyleModal = () => {
-    //     setClimbingStyleModalVisible(!climbingStyleModalVisible);
-    // }
+    
 
     useEffect(() => {
-        if(climbingStyle === "sport" || climbingStyle === "top rop"){
-            setClimbingGrades(CGOptions.sport)
-        } else if(climbingStyle === "bouldering") {
-            setClimbingGrades((CGOptions.bouldering))
-        } 
-    }, [climbingStyle])
-
+        if(userStyles.length < 1) {
+            setUserStylesEmpty(true)
+        } else {
+            setUserStylesEmpty(false)
+        }
+    }, [userStyles])
     return (
-        <Screen preset="scroll"  safeAreaEdges={["top"]} contentContainerStyle={$screenContainer}>
+        <Screen preset="fixed"  safeAreaEdges={["top",]} contentContainerStyle={$screenContainer}>
+            <ScrollView style={$scrollViewContainer}>
+
             <ProfileHeader
                 editable={editable}
                 setEditable={setEditable}
                 user={user}
-            />
+                />
             <TextField 
                 inputWrapperStyle={editable ? $editableContainerStyles: $disabledContainerStyles}
                 editable={editable}
@@ -78,7 +94,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
                 label="About Me"
                 multiline={true}
                 onChangeText={handleAboutMeTextChange}
-            />
+                />
             <TextField 
                 label="Phone Number"
                 containerStyle={$containerStyle}
@@ -101,10 +117,10 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
                 containerStyle={$containerStyle}
                 RightAccessory={() => (
                     <Icon 
-                        icon={"caret-down"}
+                    icon={"caret-down"}
                     />
                 )}
-            />
+                />
             <ModalPicker 
                 value={weightRange}
                 onChange={setWeightRange}
@@ -118,104 +134,111 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
                 containerStyle={$containerStyle}
                 RightAccessory={() => (
                     <Icon 
-                        icon={"caret-down"}
+                    icon={"caret-down"}
                     />
                 )}
-            />
-                {/* <CustomDropDownPicker 
-                    containerStyle={$multiLineContainerStyle}
-                    style={editable ? $editableContainerStyles : $disabledContainerStyles}
-                    disabled={!editable}
-                    open={genderOpen}
-                    value={gender}
-                    items={genderOptions}
-                    setValue={setGender}
-                    setOpen={onGenderOpen}
-                    textStyle={editable ? $editableTextStyles : $disabledTextStyles}
-                    label="Gender"
-                    visible={genderModalVisible}
-                    zIndex={1000}
-                    zIndexInverse={3000}
-                    />
-        
-            <Modal
-                visible={weightRangeVisible}
-            >
-                <CustomDropDownPicker 
-                style={editable ? $editableContainerStyles : $disabledContainerStyles}
-                disabled={!editable}
-                open={weightRangeOpen}
-                value={weightRange}
-                items={weightRangeOptions}
-                setValue={setWeightRange}
-                setOpen={onWeightRangeOpen}
-                textStyle={editable ? $editableTextStyles : $disabledTextStyles}
-                label="Approximate Weight"
-                zIndex={3000}
-                zIndexInverse={1000}
                 />
+          
+            <View 
+                style={$flashListContainerStyle}
+            >
+                <Text 
+                    preset="formLabel"
+                    text="Climbing Styles"
+                />
+                {userStylesEmpty && <Card 
+                   style={$cardContainerStyle}
+                   ContentComponent={<Button 
+                                        text="Add a Climbing Style"
+                                        disabled={!editable}
+                                        onPress={() => handleAddClimbingStyleOnPress()}
+                                        style={$addClimbingStyleButton}
+                                        textStyle={$addClimbingStyleButtonText}
+                                        LeftAccessory={() => 
+                                            <Icon 
+                                            icon="plus"
+                                            color={colors.palette.neutral500}
+                                            style={$iconStyle}
+                                            containerStyle={$iconContainer}
+                                            />
+                                        }
+                                        />}
+                />}
+                {!userStylesEmpty && <ListView 
+                    data={userStyles}
+                    estimatedItemSize={50}
+                    renderItem={({ item }) => {
+                        const contentIndoor = (item.maxGradeIndoor ? `Max Indoor Grade: ${item.maxGradeIndoor.label}` : "")
+                        const contentOutdoor = (item.maxGradeOutdoor ? `Max Outdoor Grade: ${item.maxGradeOutdoor.label}` : "")
+                        const spacer = (item.maxGradeIndoor && item.maxGradeOutdoor) ? "\n" : ""
+                        return (
+                             <Card 
+                                preset="default"
+                                heading={item.style.label}
+                                content={(contentIndoor + spacer + contentOutdoor)}
+                                footer={`Experience: ${item.yearsExp?.label}`}
+                                style={$cardContainerStyle}
+                            />
+                        )
+                    }}
+                    
+                    />}
+            </View>
 
-            </Modal>
-            
-            <Button 
+            {!userStylesEmpty && <Button 
                 text="Add Climbing Style"
-                onPress={toggleClimbingStyleModal}
+                disabled={!editable}
+                onPress={() => handleAddClimbingStyleOnPress()}
                 LeftAccessory={() => 
                     <Icon 
                     icon="plus"
+                    color={colors.background}
+                    style={$iconStyle}
+                    containerStyle={$iconContainer}
                     />
                 }
-                /> */}
-            {/* <Modal
+                />}
+            
+            <ClimbingStyleModal 
                 visible={climbingStyleModalVisible}
-                >
-                <View>
-                    <CustomDropDownPicker
-                        style={$editableContainerStyles}
-                        value={climbingStyle}
-                        open={climbingStyleOpen}
-                        setOpen={setClimbingStyleOpen}
-                        setValue={setClimbingStyle}
-                        items={climbingStyles}
-                        label="Climbing Style"
-                        zIndex={1000}
-                        />
-                    <CustomDropDownPicker
-                        style={$editableContainerStyles}
-                        value={maxGrade}
-                        setValue={setMaxGrade}
-                        open={maxGradeOpen}
-                        setOpen={setMaxGradeOpen}
-                        items={climbingGrades}
-                        label="Current Max Grade"
-                        zIndex={2000}
-                        />
-                    <Toggle 
-                        variant="checkbox"
-                        label="Indoor Only"
-                        value={indoorOnly}
-                        onPress={() => setIndoorOnly(!indoorOnly)}
-                        />
-                </View>
-                
-            </Modal> */}
+                setVisible={setClimbingStyleModalVisible}
+                climbingStyle={climbingStyle}
+                setClimbingStyle={setClimbingStyle}
+                maxGradeIndoor={maxGradeIndoor}
+                setMaxGradeIndoor={setMaxGradeIndoor}
+                maxGradeOutdoor={maxGradeOutdoor}
+                setMaxGradeOutdoor={setMaxGradeOutdoor}
+                yearsExp={yearsExp}
+                setYearsExp={setYearsExp}
+                submitNewClimbingStyle={submitNewClimbingStyle}
+            />
+            </ScrollView>
         </Screen>
     )
 })
                         
 
 const $screenContainer: ViewStyle = {
-    padding: spacing.lg,
     flex: 1,
-    justifyContent: "flex-start"
+    justifyContent: "flex-start",
+    
 }
-
+const $scrollViewContainer: ViewStyle = {
+    paddingHorizontal: spacing.md
+}
 
 const $containerStyle: ViewStyle = {
     marginVertical: spacing.xs
 }
-
-
+const $cardContainerStyle: ViewStyle = {
+    marginVertical: spacing.xs,
+    flex: 1,
+    alignItems: "center",
+    justifyContent: 'center',
+    shadowColor: "none",
+    shadowOffset: {width: 0, height: 0},
+    elevation: 0
+}
 
 const $editableTextStyles: TextStyle = {
     color: colors.text
@@ -234,3 +257,30 @@ const $disabledContainerStyles: ViewStyle = {
     borderColor: colors.palette.neutral400,
     backgroundColor: colors.palette.neutral200
 }
+
+ const $iconContainer: ViewStyle = {
+    padding: spacing.xxs,
+    alignContent: "center",
+    justifyContent: "center",
+    alignItems: "center",
+
+}
+ const $iconStyle: ImageStyle = {
+    margin: spacing.xxs,
+ }
+
+ const $flashListContainerStyle: ViewStyle = {
+    minHeight: 3
+ }
+
+ const $addClimbingStyleButton: ViewStyle = {
+    backgroundColor: colors.palette.neutral100,
+    borderStyle: "dashed",
+    borderRadius: spacing.sm,
+    borderColor: colors.palette.neutral500,
+    width: "50%",
+    alignSelf: "center",
+ }
+ const $addClimbingStyleButtonText: TextStyle = {
+    color: colors.palette.neutral500
+ }
