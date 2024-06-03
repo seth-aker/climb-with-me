@@ -35,6 +35,7 @@ CREATE TABLE users (
     weight_range varchar, --eg: <100lbs, 100-120lbs, 120-140lbs, etc)
     last_password_reset timestamptz,
     username varChar UNIQUE,
+    about_me_text: varChar,
     CONSTRAINT PK_user PRIMARY KEY (user_id),
     CONSTRAINT UC_auth_id UNIQUE (auth_id)
 );

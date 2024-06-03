@@ -83,7 +83,7 @@ export function HomeTabNavigator() {
                 name="Profile"
                 component={ProfileScreen}
                 options={{
-                    tabBarLabel: en.homeNavigator.menuTab,
+                    tabBarLabel: en.homeNavigator.profileTab,
                     tabBarIcon: ({ focused }) => (
                         <Icon icon="user" color={focused ? colors.tint : colors.textDim} size={30} />
                     )

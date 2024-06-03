@@ -54,8 +54,8 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
             setUserStyles([...userStyles, newUserStyle])
             setClimbingStyleModalVisible(false)
         }
-     
     }
+    
     const [gender, setGender] = useState<Option>()
 
     const [weightRange, setWeightRange] = useState<Option>();
@@ -77,6 +77,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
             setUserStylesEmpty(false)
         }
     }, [userStyles])
+    
     return (
         <Screen preset="fixed"  safeAreaEdges={["top",]} contentContainerStyle={$screenContainer}>
             <ScrollView style={$scrollViewContainer}>
@@ -147,12 +148,12 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
                     text="Climbing Styles"
                 />
                 {userStylesEmpty && <Card 
-                   style={$cardContainerStyle}
+                   style={editable ? $cardContainerStyle : [$cardContainerStyle, $disabledContainerStyles]}
                    ContentComponent={<Button 
                                         text="Add a Climbing Style"
                                         disabled={!editable}
                                         onPress={() => handleAddClimbingStyleOnPress()}
-                                        style={$addClimbingStyleButton}
+                                        style={editable ? $addClimbingStyleButton : $disabledClimbingStyleButton}
                                         textStyle={$addClimbingStyleButtonText}
                                         LeftAccessory={() => 
                                             <Icon 
@@ -275,6 +276,15 @@ const $disabledContainerStyles: ViewStyle = {
 
  const $addClimbingStyleButton: ViewStyle = {
     backgroundColor: colors.palette.neutral100,
+    borderStyle: "dashed",
+    borderRadius: spacing.sm,
+    borderColor: colors.palette.neutral500,
+    width: "50%",
+    alignSelf: "center",
+ }
+
+ const $disabledClimbingStyleButton: ViewStyle = {
+    backgroundColor: colors.background,
     borderStyle: "dashed",
     borderRadius: spacing.sm,
     borderColor: colors.palette.neutral500,

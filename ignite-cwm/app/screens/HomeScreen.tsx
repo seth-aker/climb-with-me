@@ -29,9 +29,11 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
   useEffect(() => {
     (async () => {
       let { status } = await Location.getForegroundPermissionsAsync();
+      // checks current permission status and if not granted yet, requests permission 
       if(status !== "granted") {
         status = (await Location.requestForegroundPermissionsAsync()).status
       }
+      // checks permission status again if the user granted permission from the Location.requestForegroundPermissionsAsync() function. 
       if(status !== "granted") {
         setErrorMsg('Permission to access location was denied');
         return;
@@ -72,7 +74,10 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
 
     <View style={[$bottomContainer, $bottomContainerInsets]}>
         <Text text="Location Data:" size="md" />
-        <Text text={errorMsg || JSON.stringify(location) || "Waiting for location data..."}></Text>
+        {!errorMsg && !location && 
+          <LoadingScreen />
+        }
+        <Text text={errorMsg || JSON.stringify(location)}></Text>
         <Button text="Logout" onPress={handleLogout} />
       </View>
     </Screen>

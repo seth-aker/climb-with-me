@@ -6,7 +6,7 @@ const en = {
   },
   homeNavigator: {
     homeTab: "Home",
-    menuTab: "Menu",
+    profileTab: "Profile",
     friendsTab: "Friends",
     messagesTab: "Messages",
   },
