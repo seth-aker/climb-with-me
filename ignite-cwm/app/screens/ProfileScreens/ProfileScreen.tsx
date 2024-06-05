@@ -4,7 +4,7 @@ import { HomeTabScreenProps } from "app/navigators";
 import { colors, spacing } from "app/theme";
 import { observer } from "mobx-react-lite";
 import React, { FC, useEffect, useState } from "react";
-import {ImageStyle, ScrollView, TextStyle, View, ViewStyle } from "react-native";
+import { ImageStyle, ScrollView, TextStyle, View, ViewStyle } from "react-native";
 import { useAuth0 } from "react-native-auth0";
 import { genderOptions, weightRangeOptions, Option } from "../../../data/ModalPickerOptions"
 import { formatPhoneNumber } from "app/utils/formatPhoneNumber";

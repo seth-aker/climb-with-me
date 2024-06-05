@@ -129,6 +129,6 @@ export const weightRangeOptions: Option[] = [
 export const climbingStyles: Option[] = [
     {label: "Sport Climbing", value: "sport"},
     {label: "Bouldering", value: "bouldering"},
-    {label: "Trad CLimbing", value: "trad"},
+    {label: "Trad Climbing", value: "trad"},
     {label: "Top Rop" , value: "top rope"}
 ]
