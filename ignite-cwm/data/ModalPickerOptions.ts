@@ -130,5 +130,5 @@ export const climbingStyles: Option[] = [
     {label: "Sport Climbing", value: "sport"},
     {label: "Bouldering", value: "bouldering"},
     {label: "Trad Climbing", value: "trad"},
-    {label: "Top Rop" , value: "top rope"}
+    {label: "Top Rope" , value: "top rope"}
 ]

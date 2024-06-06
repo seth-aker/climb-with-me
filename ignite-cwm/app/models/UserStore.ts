@@ -1,5 +1,7 @@
-import { types } from "mobx-state-tree";
-import { ClimbingStyleModel } from "./ClimbingStyleModel";
+import { Instance, SnapshotIn, SnapshotOut, flow, types } from "mobx-state-tree";
+import { ClimbingStyleModel, IClimbingStyle } from "./ClimbingStyleModel";
+import { api } from "app/services/api";
+import { ApiResponse } from "apisauce";
 
 
 export const UserStoreModel = types
@@ -51,7 +53,9 @@ export const UserStoreModel = types
          * User's about me section.
          */
         aboutMeText: types.maybe(types.string),
-        climbingStyles: types.array(ClimbingStyleModel)
+        climbingStyles: types.array(ClimbingStyleModel),
+
+        state: types.enumeration("State", ["pending", "success", "error"])
     }).actions((store) => ({
         setName(name: string) {
             store.name = name;
@@ -89,8 +93,40 @@ export const UserStoreModel = types
         setAboutMeText(aboutMeText: string) {
             store.aboutMeText = aboutMeText;
         },
-        
+        addClimbingStyle(climbingStyle: IClimbingStyle) {
+            store.climbingStyles.push(climbingStyle);
+        },
+        removeClimbingStyle(climbingStyle: IClimbingStyle) {
+            store.climbingStyles.remove(climbingStyle)
+        },
 
-       
+        /**
+         * Takes the sub (the user's guid) from an Auth0 user obj and their auth token to load their data from the backend.
+         */
+        getUser: flow(function* getUser(sub: string, token: string) {
+            // TODO: Reset the store here
+            
+            store.state = "pending";
+            api.apisauce.setHeader("Bearer", token)
+            try {
+                const response: ApiResponse<IUserStore> = yield api.apisauce.get(`/users/${sub}`)
+                const user = response.data;
+                if(user) {
+                    store = user;
+                    store.state = "success"
+                } else {
+                    store.state = "error"
+                }
+
+            } catch (error) {
+                if(error instanceof Error) {
+                    console.log(error.message)
+                }
+                store.state = "error"
+            }
+        })
     }))
 
+export interface IUserStore extends Instance<typeof UserStoreModel> {};
+export interface IUserStoreSnapshotIn extends SnapshotIn<typeof UserStoreModel> {};
+export interface IUserStoreSnapshotOut extends SnapshotOut<typeof UserStoreModel> {};

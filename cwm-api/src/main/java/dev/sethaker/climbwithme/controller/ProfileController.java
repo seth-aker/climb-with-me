@@ -11,7 +11,7 @@ import java.security.Principal;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/profile")
+@RequestMapping("/api/v1/users")
 public class ProfileController {
   private UserDao userDao;
 

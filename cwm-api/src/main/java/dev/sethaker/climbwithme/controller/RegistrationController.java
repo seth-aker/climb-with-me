@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/api/register")
+@RequestMapping("/api/v1/register")
 @CrossOrigin
 public class RegistrationController {
     private final UserDao userDao;

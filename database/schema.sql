@@ -29,7 +29,7 @@ CREATE TABLE users (
     phone_verified boolean,
     created_at timestamptz,
     updated_at timestamptz,
-    gender_code varChar(1), 
+    gender_code varChar, 
     is_active boolean DEFAULT TRUE,
     picture varChar, --link
     weight_range varchar, --eg: <100lbs, 100-120lbs, 120-140lbs, etc)
@@ -65,9 +65,8 @@ CREATE TABLE user_addresses (
 CREATE TABLE user_styles (
     style_code varChar(1) NOT NULL, --STYLE CODES: s: sport climbing, b: bouldering, t: trad climbing, r: top rope
     user_id int NOT NULL,
-    max_grade varChar,
-    indoor_only boolean,
-    is_preferred boolean DEFAULT FALSE,
+    max_grade_indoor varChar,
+    max_grade_outdoor varchar,
     years_experience varchar,
     CONSTRAINT PK_user_style PRIMARY KEY (style_code, user_id),
     CONSTRAINT FK_user_id FOREIGN KEY (user_id) REFERENCES users(user_id)
