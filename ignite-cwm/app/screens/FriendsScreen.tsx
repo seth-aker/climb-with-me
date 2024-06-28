@@ -4,7 +4,8 @@ import { spacing } from "app/theme";
 import { observer } from "mobx-react-lite";
 import React, { FC } from "react";
 import { View, Image, ViewStyle, TextStyle, ImageStyle, TouchableOpacity } from "react-native";
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Icon } from '../../app/components/Icon';
+import { faCake, faCircle, faInbox, faInfo, faMessage } from "@fortawesome/free-solid-svg-icons";
 
 interface FriendsScreenProps extends HomeTabScreenProps<"Friends"> {}
 
@@ -31,21 +32,17 @@ export const FriendsScreen: FC<FriendsScreenProps> = observer(function FriendsSc
 
 // Individual friend component
 const Friend: FC<{ name: string; avatar: string }> = ({ name, avatar }) => {
-  return (
-    <View style={$friendContainer}>
-      <Image source={{ uri: avatar }} style={$avatar} />
-      <Text text={name} style={$friendName} />
-      <View style={$iconsContainer}>
-        <TouchableOpacity onPress={() => console.log(`Message ${name}`)}>
-          <Icon name="message" size={24} color="#000" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => console.log(`Info about ${name}`)}>
-          <Icon name="info" size={24} color="#000" />
-        </TouchableOpacity>
+    return (
+      <View style={$friendContainer}>
+        <Image source={{ uri: avatar }} style={$avatar} />
+        <Text text={name} style={$friendName} />
+        <View style={$iconsContainer}>
+          <Icon icon={faMessage} size={24} color="#000" onPress={() => console.log(`Message ${name}`)} />
+          <Icon icon={faInfo} size={24} color="#000" onPress={() => console.log(`Info about ${name}`)} />
+        </View>
       </View>
-    </View>
-  );
-};
+    );
+  };
 
 const $screenContainer: ViewStyle = {
   paddingTop: spacing.md,
