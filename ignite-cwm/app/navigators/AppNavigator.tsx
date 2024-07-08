@@ -21,6 +21,8 @@ import { colors } from "app/theme"
 import { useStores } from "app/models"
 import { useAuth0 } from "react-native-auth0"
 import { HomeTabNavigator, HomeTabParamList } from "./HomeTabsNavigator"
+import { IUser } from "app/models/UserStore"
+import { IClimbingStyle } from "app/models/ClimbingStyleModel"
 
 
 
@@ -60,14 +62,39 @@ const Stack = createNativeStackNavigator<AppStackParamList>()
 
 const AppStack = observer(function AppStack(_props) {
 
-  const { authenticationStore: {isAuthenticated, updateAndValidateToken}} = useStores();
-  const { getCredentials } = useAuth0(); 
+const { 
+  authenticationStore: {isAuthenticated, updateAndValidateToken},
+  userStore: { setUser },
+
+} = useStores();
+  const { getCredentials, user } = useAuth0(); 
 
   
 
   // Used to sync the authentication store with Auth0's SDK and determine what screen to load first.
   useEffect(() => {
     updateAndValidateToken(getCredentials)
+    if(user) {
+      const userObj: IUser = {
+        name: user.name,
+        authId: user.sub,
+        familyName: user.familyName,
+        givenName: user.givenName,
+        email: user.email,
+        emailVerified: user.emailVerified ? user.emailVerified : false,
+        phoneNumber: user.phoneNumber,
+        phoneVerified: user.phoneNumberVerified ? user.phoneNumberVerified : false,
+        dob: user.birthdate ? new Date(user.birthdate) : undefined,
+        profileImg: user.picture,
+        backgroundImg: undefined,
+        weightRange: undefined,
+        aboutMeText: undefined,
+        gender: undefined,
+        climbingStyles: [] as IClimbingStyle[],
+        state: "success"
+      }
+      setUser(userObj)
+    }
   },[])
   
   return (

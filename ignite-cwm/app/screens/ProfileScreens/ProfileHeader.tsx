@@ -1,32 +1,29 @@
 import React, { View, Image, ImageStyle, ViewStyle, Pressable, } from "react-native"
 import { Text, Button, Icon, } from "app/components"
-import { User } from "react-native-auth0"
 import { colors, spacing } from "app/theme"
 import { LoadingScreen } from "../LoadingScreen"
 import { useState } from "react"
 import { PhotoUploadModal } from "app/components/PhotoUploadModal"
 import { ImagePickerResult } from "expo-image-picker"
+import { useStores } from "app/models"
 
 export interface ProfileHeaderProps {
-    user: User | null
     editable: boolean
     setEditable: (editable: boolean) => void
 }
 
 export function ProfileHeader(props: ProfileHeaderProps) {
-    const { user, editable, setEditable} = props;
+    const {userStore: {name, profileImg, backgroundImg, setProfileImg, setBackgroundImg}} = useStores();
+    const { editable, setEditable} = props;
     const [profilePicModalVisible, setProfilePicModalVisible] = useState(false);   
 
-    const [profImg, setProfImg] = useState<ImagePickerResult>()
-
-    const [backgroundImage, setBackgroundImage] = useState<ImagePickerResult>()
     const [backgroundImgModalVis, setBackgroundImgModalVis] = useState(false);
 
     const setProfileImage = async (image: ImagePickerResult) => {
         if(image.canceled) {
             return false
         }
-        setProfImg(image)
+        setProfileImg(image.assets[0].uri)
         return true
     }
 
@@ -34,16 +31,16 @@ export function ProfileHeader(props: ProfileHeaderProps) {
         if(image.canceled) {
             return false;
         }
-        setBackgroundImage(image);
+        setBackgroundImg(image.assets[0].uri);
         return true;
     }
     
     return (
         <View>
             <View style={$profileImgContainer}>
-                {user || profImg ? ( 
+                { profileImg ? ( 
                     <Image 
-                        src={profImg?.assets ? profImg.assets[0].uri : user?.picture}
+                        src={profileImg}
                         resizeMode="cover"
                         style={$profileImage}
                         />
@@ -68,8 +65,8 @@ export function ProfileHeader(props: ProfileHeaderProps) {
                 />
             </View>
             <View style={$backgroundImgContainer}>
-                {backgroundImage && <Image 
-                    src={backgroundImage.assets ? backgroundImage.assets[0].uri : undefined}
+                {backgroundImg && <Image 
+                    src={backgroundImg}
                     style={$backgroundImageStyle}
                 />}
                 <Pressable 
@@ -90,7 +87,7 @@ export function ProfileHeader(props: ProfileHeaderProps) {
                 />
             </View>        
             <Text 
-                text={user ? user.name : undefined}
+                text={name}
                 preset="heading"
             />
             <View style={$buttonContainer}>

@@ -5,20 +5,7 @@ export const ClimbingStyleModel = types.model("ClimbingStyle", {
     maxGradeIndoor: types.maybe(types.string),
     maxGradeOutdoor: types.maybe(types.string),
     yearsExp: types.maybe(types.string),
-}).actions((store) => ({
-    setStyle(style: string) {
-        store.style = style;
-    },
-    setMaxGradeIndoor(grade: string) {
-        store.maxGradeIndoor = grade;
-    },
-    setMaxGradeOutdoor(grade: string) {
-        store.maxGradeOutdoor = grade;
-    },
-    setYearsExp(yearsExp: string) {
-        store.yearsExp = yearsExp;
-    }
-}));
+});
 
 export interface IClimbingStyle extends Instance<typeof ClimbingStyleModel> {};
 export interface IClimbingStyleSnapshotIn extends SnapshotIn< typeof ClimbingStyleModel> {};

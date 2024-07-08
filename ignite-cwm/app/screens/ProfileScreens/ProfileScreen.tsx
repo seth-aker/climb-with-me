@@ -5,13 +5,13 @@ import { colors, spacing } from "app/theme";
 import { observer } from "mobx-react-lite";
 import React, { FC, useEffect, useState } from "react";
 import { ImageStyle, ScrollView, TextStyle, View, ViewStyle } from "react-native";
-import { useAuth0 } from "react-native-auth0";
 import { genderOptions, weightRangeOptions, Option } from "../../../data/ModalPickerOptions"
 import { formatPhoneNumber } from "app/utils/formatPhoneNumber";
 import { ProfileHeader } from "./ProfileHeader";
 import { ModalPicker } from "app/components/ModalPicker/ModalPicker";
-import { ClimbingStyle as UserStyle} from "../../../data/data"
 import { ClimbingStyleModal } from "./ClimbingStyleModal";
+import { useStores } from "app/models";
+import { IClimbingStyle } from "app/models/ClimbingStyleModel";
 
 interface ProfileScreenProps extends HomeTabScreenProps<"Profile"> {
 }
@@ -19,20 +19,18 @@ interface ProfileScreenProps extends HomeTabScreenProps<"Profile"> {
 export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileScreen(_props) {
     
     // in the future use backend API instead of Auth0 because user info is harder to change with Auth0
-    const { user } = useAuth0();
-    const [aboutMeText, setAboutMeText] = useState("");
+   // const { user} = useAuth0();
+    const {userStore: user} = useStores(); 
     const [editable, setEditable] = useState(false);
     const [climbingStyleModalVisible, setClimbingStyleModalVisible] = useState(false);
-    const [userStyles, setUserStyles] = useState<UserStyle[]>([])
-    
-    const [phoneNumber, setPhoneNumber] = useState("")
 
+    
     const handlePhoneNumberChange = (input: string) => {       
-        setPhoneNumber(formatPhoneNumber(input, phoneNumber))
+        user.setPhoneNumber(formatPhoneNumber(input, user.phoneNumber ? user.phoneNumber : ""))
     }
 
     const handleAboutMeTextChange = (input: string) => {
-        setAboutMeText(input)
+        user.setAboutMeText(input);
     }
 
     const handleAddClimbingStyleOnPress = () => {
@@ -45,13 +43,13 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
 
     const submitNewClimbingStyle = () => {
         if(climbingStyle && yearsExp) {
-            const newUserStyle: UserStyle = {
-                style: climbingStyle,
-                maxGradeIndoor,
-                maxGradeOutdoor,
-                yearsExp
+            const newUserStyle: IClimbingStyle = {
+                style: climbingStyle.label,
+                maxGradeIndoor: maxGradeIndoor?.label,
+                maxGradeOutdoor: maxGradeOutdoor?.label,
+                yearsExp: yearsExp.label
             }
-            setUserStyles([...userStyles, newUserStyle])
+            user.addClimbingStyle(newUserStyle)
             setClimbingStyleModalVisible(false)
         }
     }
@@ -71,12 +69,12 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
     
 
     useEffect(() => {
-        if(userStyles.length < 1) {
+        if(user.climbingStyles.length < 1) {
             setUserStylesEmpty(true)
         } else {
             setUserStylesEmpty(false)
         }
-    }, [userStyles])
+    }, [user.climbingStyles])
     
     return (
         <Screen preset="fixed"  safeAreaEdges={["top",]} contentContainerStyle={$screenContainer}>
@@ -85,13 +83,12 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
             <ProfileHeader
                 editable={editable}
                 setEditable={setEditable}
-                user={user}
                 />
             <TextField 
                 inputWrapperStyle={editable ? $editableContainerStyles: $disabledContainerStyles}
                 editable={editable}
                 placeholder="Tell everyone about yourself"
-                value={aboutMeText}
+                value={user.aboutMeText}
                 label="About Me"
                 multiline={true}
                 onChangeText={handleAboutMeTextChange}
@@ -102,7 +99,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
                 inputWrapperStyle={editable ? $editableContainerStyles: $disabledContainerStyles}
                 editable={editable}
                 placeholder="(###) ###-####"
-                value={phoneNumber}
+                value={user.phoneNumber}
                 onChangeText={handlePhoneNumberChange}
                 />
             <ModalPicker 
@@ -166,18 +163,18 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
                                         />}
                 />}
                 {!userStylesEmpty && <ListView 
-                    data={userStyles}
+                    data={user.climbingStyles.map((item) => item)}
                     estimatedItemSize={50}
                     renderItem={({ item }) => {
-                        const contentIndoor = (item.maxGradeIndoor ? `Max Indoor Grade: ${item.maxGradeIndoor.label}` : "")
-                        const contentOutdoor = (item.maxGradeOutdoor ? `Max Outdoor Grade: ${item.maxGradeOutdoor.label}` : "")
+                        const contentIndoor = (item.maxGradeIndoor ? `Max Indoor Grade: ${item.maxGradeIndoor}` : "")
+                        const contentOutdoor = (item.maxGradeOutdoor ? `Max Outdoor Grade: ${item.maxGradeOutdoor}` : "")
                         const spacer = (item.maxGradeIndoor && item.maxGradeOutdoor) ? "\n" : ""
                         return (
                              <Card 
                                 preset="default"
-                                heading={item.style.label}
+                                heading={item.style}
                                 content={(contentIndoor + spacer + contentOutdoor)}
-                                footer={`Experience: ${item.yearsExp?.label}`}
+                                footer={`Experience: ${item.yearsExp}`}
                                 style={$cardContainerStyle}
                             />
                         )
