@@ -9,15 +9,17 @@ import { Text } from "./Text";
 export interface PhotoUploadModalProps extends ModalProps {
     setVisible: (isVis: boolean) => void
     setImage: (image: ImagePicker.ImagePickerResult) => Promise<boolean> 
+    // If not set, will default to 162,162 ie a square.
+    aspectRatio?: [number, number]
 }
 export const PhotoUploadModal = (props: PhotoUploadModalProps) => {
-    const { visible, setVisible, setImage } = props;
+    const { visible, setVisible, setImage, aspectRatio } = props;
     
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
-            aspect: [162, 162],
+            aspect: aspectRatio || [162,162],
             quality: 1,
             });
         if(!result.canceled) {
