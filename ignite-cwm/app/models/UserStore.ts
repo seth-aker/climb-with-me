@@ -44,12 +44,6 @@ export const UserStoreModel = types
          */
         backgroundImg: types.maybe(types.string),
         /**
-         * Still deciding whether to include this or not.
-         * It can be important for climbing so partner's weight difference is not super drastic 
-         * But it is a little uncomfortable to ask for. 
-         */
-        weightRange: types.maybe(types.string),
-        /**
          * User's about me section.
          */
         aboutMeText: types.maybe(types.string),
@@ -90,9 +84,6 @@ export const UserStoreModel = types
         },
         setBackgroundImg(uri?: string) {
             store.backgroundImg = uri;
-        },
-        setWeightRange(range?: string) {
-            store.weightRange = range;
         },
         setAboutMeText(aboutMeText?: string) {
             store.aboutMeText = aboutMeText;
@@ -143,10 +134,9 @@ export const UserStoreModel = types
             store.profileImg = user.profileImg
             store.backgroundImg = user.backgroundImg
             store.aboutMeText = user.aboutMeText
-            store.weightRange = user.weightRange
-            // user.climbingStyles?.forEach((style) => {
-            //     store.climbingStyles.push(style)
-            // })
+            user.climbingStyles?.forEach((style) => {
+                store.climbingStyles.push(style)
+            })
             store.state = "success"
         }
 

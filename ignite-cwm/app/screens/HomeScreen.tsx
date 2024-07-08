@@ -5,7 +5,7 @@ import { Button, Screen, Text } from "app/components"
 import { HomeTabScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
 import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
-import { LoadingScreen } from "./LoadingScreen"
+import { LoadingSpinner } from "./LoadingSpinner"
 import { useAuth0 } from "react-native-auth0"
 import { useStores } from "app/models"
 import * as Location from "expo-location"
@@ -58,7 +58,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
   return (
     tokenLoading ? 
     <>
-      <LoadingScreen />
+      <LoadingSpinner />
     </> : (
     <Screen style={$container}>
       <View style={$topContainer}>
@@ -75,7 +75,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
     <View style={[$bottomContainer, $bottomContainerInsets]}>
         <Text text="Location Data:" size="md" />
         {!errorMsg && !location && 
-          <LoadingScreen />
+          <LoadingSpinner />
         }
         <Text text={errorMsg || JSON.stringify(location)}></Text>
         <Button text="Logout" onPress={handleLogout} />

@@ -1,15 +1,17 @@
 import React, { useEffect } from "react"
-import Animated, {  useAnimatedProps, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming, Easing} from "react-native-reanimated"
+import Animated, { useAnimatedProps, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming, Easing} from "react-native-reanimated"
 import { Svg, Circle, G} from 'react-native-svg';
 import { View, ViewStyle } from "react-native";
 import { colors } from "app/theme";
 
 
-
-
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-export const LoadingScreen = () => {
+interface LoadingSpinnerProps {
+    style?: ViewStyle
+}
+export const LoadingSpinner = (props: LoadingSpinnerProps ) => {
+    const { style: $styleOverride } = props;
     const circumference = 250;
     const radius = circumference / (2 * Math.PI);
     const strokeWidth = 5;
@@ -50,6 +52,11 @@ export const LoadingScreen = () => {
             transform: [{rotate: `${rotation.value}deg`}]
         }
     }, []);
+
+    const $mainViewStyle = [
+        $mainViewStyleDefault,
+        $styleOverride
+    ]
     
     return (
         <View style={$mainViewStyle}
@@ -75,7 +82,7 @@ export const LoadingScreen = () => {
 
 }
 
-const $mainViewStyle : ViewStyle = {
+const $mainViewStyleDefault : ViewStyle = {
     justifyContent: "center",
     alignItems: "center",
 }

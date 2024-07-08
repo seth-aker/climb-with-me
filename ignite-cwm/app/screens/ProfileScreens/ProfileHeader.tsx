@@ -1,7 +1,7 @@
 import React, { View, Image, ImageStyle, ViewStyle, Pressable, } from "react-native"
 import { Text, Button, Icon, } from "app/components"
 import { colors, spacing } from "app/theme"
-import { LoadingScreen } from "../LoadingScreen"
+import { LoadingSpinner } from "../LoadingSpinner"
 import { useState } from "react"
 import { PhotoUploadModal } from "app/components/PhotoUploadModal"
 import { ImagePickerResult } from "expo-image-picker"
@@ -45,7 +45,7 @@ export function ProfileHeader(props: ProfileHeaderProps) {
                         style={$profileImage}
                         />
                 ) : (
-                    <LoadingScreen />
+                    <LoadingSpinner />
                 )}
                 <Pressable 
                     style={$editProfileImageButton}
