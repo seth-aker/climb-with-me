@@ -6,7 +6,7 @@ import { observer } from "mobx-react-lite";
 import React, { FC, useEffect, useState } from "react";
 import { ImageStyle, ScrollView, TextStyle, View, ViewStyle } from "react-native";
 import { useAuth0 } from "react-native-auth0";
-import { genderOptions, weightRangeOptions, Option } from "../../../data/ModalPickerOptions"
+import { genderOptions, Option } from "../../../data/ModalPickerOptions"
 import { formatPhoneNumber } from "app/utils/formatPhoneNumber";
 import { ProfileHeader } from "./ProfileHeader";
 import { ModalPicker } from "app/components/ModalPicker/ModalPicker";
@@ -58,8 +58,6 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
     
     const [gender, setGender] = useState<Option>()
 
-    const [weightRange, setWeightRange] = useState<Option>();
-
     const [climbingStyle, setClimbingStyle] = useState<Option>();
 
     const [maxGradeIndoor, setMaxGradeIndoor] = useState<Option>();
@@ -87,6 +85,10 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
                 setEditable={setEditable}
                 user={user}
                 />
+            <View
+                style={$formContainerStyle}
+            >
+
             <TextField 
                 inputWrapperStyle={editable ? $editableContainerStyles: $disabledContainerStyles}
                 editable={editable}
@@ -122,39 +124,22 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
                     />
                 )}
                 />
-            <ModalPicker 
-                value={weightRange}
-                onChange={setWeightRange}
-                disabled={!editable}
-                data={weightRangeOptions}
-                placeholder="Please select approximate weight range"
-                headerTitle="Please select approximate weight range"
-                label={"Approx Weight"}
-                inputWrapperStyle={editable ? $editableContainerStyles : $disabledContainerStyles}
-                pickerTextStyle={editable ? $editableTextStyles: $disabledTextStyles}
-                containerStyle={$containerStyle}
-                RightAccessory={() => (
-                    <Icon 
-                    icon={"caret-down"}
-                    />
-                )}
-                />
           
             <View 
                 style={$flashListContainerStyle}
-            >
+                >
                 <Text 
                     preset="formLabel"
                     text="Climbing Styles"
-                />
+                    />
                 {userStylesEmpty && <Card 
                    style={editable ? $cardContainerStyle : [$cardContainerStyle, $disabledContainerStyles]}
                    ContentComponent={<Button 
-                                        text="Add a Climbing Style"
-                                        disabled={!editable}
-                                        onPress={() => handleAddClimbingStyleOnPress()}
-                                        style={editable ? $addClimbingStyleButton : $disabledClimbingStyleButton}
-                                        textStyle={$addClimbingStyleButtonText}
+                    text="Add a Climbing Style"
+                    disabled={!editable}
+                    onPress={() => handleAddClimbingStyleOnPress()}
+                    style={editable ? $addClimbingStyleButton : $disabledClimbingStyleButton}
+                    textStyle={$addClimbingStyleButtonText}
                                         LeftAccessory={() => 
                                             <Icon 
                                             icon="plus"
@@ -164,7 +149,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
                                             />
                                         }
                                         />}
-                />}
+                                        />}
                 {!userStylesEmpty && <ListView 
                     data={userStyles}
                     estimatedItemSize={50}
@@ -173,12 +158,12 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
                         const contentOutdoor = (item.maxGradeOutdoor ? `Max Outdoor Grade: ${item.maxGradeOutdoor.label}` : "")
                         const spacer = (item.maxGradeIndoor && item.maxGradeOutdoor) ? "\n" : ""
                         return (
-                             <Card 
-                                preset="default"
-                                heading={item.style.label}
-                                content={(contentIndoor + spacer + contentOutdoor)}
-                                footer={`Experience: ${item.yearsExp?.label}`}
-                                style={$cardContainerStyle}
+                            <Card 
+                            preset="default"
+                            heading={item.style.label}
+                            content={(contentIndoor + spacer + contentOutdoor)}
+                            footer={`Experience: ${item.yearsExp?.label}`}
+                            style={$cardContainerStyle}
                             />
                         )
                     }}
@@ -212,7 +197,8 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
                 yearsExp={yearsExp}
                 setYearsExp={setYearsExp}
                 submitNewClimbingStyle={submitNewClimbingStyle}
-            />
+                />
+            </View>
             </ScrollView>
         </Screen>
     )
@@ -225,7 +211,11 @@ const $screenContainer: ViewStyle = {
     
 }
 const $scrollViewContainer: ViewStyle = {
-    paddingHorizontal: spacing.md
+
+}
+
+const $formContainerStyle: ViewStyle = {
+        paddingHorizontal: spacing.md
 }
 
 const $containerStyle: ViewStyle = {

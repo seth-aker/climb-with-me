@@ -8,7 +8,7 @@ import { spacing } from "app/theme";
 interface FriendCardProps {
   name: string;
   avatar: string;
-  numberOfClimbs: number;
+  numberOfClimbs: string;
 }
 
 export const FriendCard: FC<FriendCardProps> = ({ name, avatar, numberOfClimbs }) => {

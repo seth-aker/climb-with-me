@@ -32,10 +32,10 @@ CREATE TABLE users (
     gender_code varChar, 
     is_active boolean DEFAULT TRUE,
     picture varChar, --link
-    weight_range varchar, --eg: <100lbs, 100-120lbs, 120-140lbs, etc)
+    background_picture varChar, --link to background photo
     last_password_reset timestamptz,
     username varChar UNIQUE,
-    about_me_text: varChar,
+    about_me_text varChar,
     CONSTRAINT PK_user PRIMARY KEY (user_id),
     CONSTRAINT UC_auth_id UNIQUE (auth_id)
 );
@@ -63,12 +63,12 @@ CREATE TABLE user_addresses (
 );
 
 CREATE TABLE user_styles (
-    style_code varChar(1) NOT NULL, --STYLE CODES: s: sport climbing, b: bouldering, t: trad climbing, r: top rope
+    climbing_style varChar NOT NULL,
     user_id int NOT NULL,
     max_grade_indoor varChar,
     max_grade_outdoor varchar,
     years_experience varchar,
-    CONSTRAINT PK_user_style PRIMARY KEY (style_code, user_id),
+    CONSTRAINT PK_user_style PRIMARY KEY (climbing_style, user_id),
     CONSTRAINT FK_user_id FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 

@@ -115,16 +115,6 @@ export const yearsExpOptions: Option[] = [
     {label: "30+ years", value: "30+"},
 ]
 
-export const weightRangeOptions: Option[] = [
-    {label: "<100lbs", value: "<100lbs"},
-    {label: "101-120lbs", value: "101-120lbs"},
-    {label: "121-140lbs", value: "121-140lbs"},
-    {label: "141-160lbs", value: "141-160lbs"},
-    {label: "161-180lbs", value: "161-180lbs"},
-    {label: "181-200lbs", value: "181-200lbs"},
-    {label: "201-220lbs", value: "201-220lbs"},
-    {label: "220lbs+", value: "220lbs+"}
-]
 
 export const climbingStyles: Option[] = [
     {label: "Sport Climbing", value: "sport"},

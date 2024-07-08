@@ -1,5 +1,6 @@
 BEGIN TRANSACTION;
 
+--On creation of an account, these values are created using information from auth0.
 CREATE OR REPLACE FUNCTION create_new_user (
     IN _auth_id varchar, 
     IN _created_at timestamptz,
@@ -89,7 +90,7 @@ CREATE OR REPLACE FUNCTION update_user (
     IN _gender_code varChar(1),
     IN _is_active boolean,
     IN _picture varChar,
-    IN _weight_range varChar,
+    IN _background_picture varChar, 
     IN _last_password_reset timestamptz,
     IN _username varChar
     ) 
@@ -103,7 +104,7 @@ CREATE OR REPLACE FUNCTION update_user (
         phone_number = _phone_number, phone_verified = _phone_verified,
         created_at = _created_at, updated_at = now(), 
         gender_code = _gender_code, is_active = _is_active,
-        picture = _picture, weight_range = _weight_range,
+        picture = _picture, background_picture = _background_picture,
         last_password_reset = _last_password_reset, username = _username
         WHERE user_id = _user_id;
 
@@ -132,11 +133,10 @@ CREATE OR REPLACE PROCEDURE deactivate_user (
     ';
 
 CREATE OR REPLACE FUNCTION insert_climbing_style (
-    IN _style_code varchar, 
+    IN _climbing_style varchar, 
     IN _user_id int,
-    IN _max_grade varChar,
-    IN _indoor_only boolean,
-    IN _is_preferred boolean,
+    IN _max_grade_indoor varChar,
+    IN _max_grade_outdoor boolean,
     IN _years_experience varChar,
     OUT rowCount int
     )
@@ -145,19 +145,17 @@ CREATE OR REPLACE FUNCTION insert_climbing_style (
     BEGIN    
     	IF EXISTS (SELECT FROM users WHERE user_id = _user_id) THEN
             INSERT INTO user_styles(
-                style_code, 
+                climbing_style,
                 user_id,
-                max_grade, 
-                indoor_only, 
-                is_preferred, 
+                max_grade_indoor, 
+                max_grade_outdoor, 
                 years_experience
                 )
             VALUES (
-                _style_code, 
+                _climbing_style, 
                 _user_id, 
-                _max_grade, 
-                _indoor_only, 
-                _is_preferred, 
+                _max_grade_indoor, 
+                _max_grade_outdoor, 
                 _years_experience
                 );
             GET DIAGNOSTICS rowCount = ROW_COUNT;
@@ -179,20 +177,19 @@ END;
 ';
 
 CREATE OR REPLACE FUNCTION update_climbing_style (
-    IN _style_code varchar, 
+    IN _climbing_style varchar, 
     IN _user_id int,
-    IN _max_grade varChar,
-    IN _indoor_only boolean,
-    IN _is_preferred boolean,
+    IN _max_grade_indoor varChar,
+    IN _max_grade_outdoor boolean,
     IN _years_experience varChar,
     OUT rowCount int
 ) 
 LANGUAGE plpgsql
 AS '
 BEGIN
-    UPDATE user_styles SET max_grade = _max_grade, indoor_only = _indoor_only, 
-    is_preferred = _is_preferred, years_experience = _years_experience 
-    WHERE style_code = _style_code AND user_id = _user_id;
+    UPDATE user_styles SET max_grade_indoor = _max_grade_indoor, max_grade_outdoor = _max_grade_outdoor, 
+    years_experience = _years_experience 
+    WHERE climbing_style = _climbing_style AND user_id = _user_id;
 
     GET DIAGNOSTICS rowCount = ROW_COUNT;
 END;
@@ -200,13 +197,13 @@ END;
 
 CREATE OR REPLACE FUNCTION delete_climbing_style(
     IN _user_id int,
-    IN _style_code varChar,
+    IN _climbing_style varChar,
     OUT rowCount int
 )
 LANGUAGE plpgsql
 AS '
 BEGIN
-    DELETE FROM user_styles WHERE user_id = _user_id AND style_code = _style_code;
+    DELETE FROM user_styles WHERE user_id = _user_id AND climbing_style = _climbing_style;
     GET DIAGNOSTICS rowCount = ROW_COUNT;
     IF(rowCount > 1) THEN 
         ROLLBACK;

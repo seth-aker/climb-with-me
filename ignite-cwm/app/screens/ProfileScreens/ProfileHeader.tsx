@@ -87,12 +87,14 @@ export function ProfileHeader(props: ProfileHeaderProps) {
                     visible={backgroundImgModalVis}
                     setImage={_setBackgroundImage}
                     setVisible={setBackgroundImgModalVis}
+                    aspectRatio={[420,280]}
                 />
-            </View>        
+            </View>
+            <View style={$textAndButtonContainer}>
             <Text 
                 text={user ? user.name : undefined}
                 preset="heading"
-            />
+                />
             <View style={$buttonContainer}>
                 <Button 
                     text={editable ? "Save Changes" : "Edit Profile"}
@@ -108,7 +110,7 @@ export function ProfileHeader(props: ProfileHeaderProps) {
                         size={20}
                         />}
                         
-                />
+                        />
                 <Button 
                     text="Settings"
                     style={$editSettingsButtonStyle}
@@ -119,7 +121,8 @@ export function ProfileHeader(props: ProfileHeaderProps) {
                         color={colors.palette.neutral200}
                         size={20}
                         />}
-                />
+                        />
+                </View>        
             </View>
         </View>
     )
@@ -129,9 +132,9 @@ const $buttonContainer: ViewStyle = {
     flexDirection: "row",
 }
  const $editProfileButtonStyle: ViewStyle = {
-    width: "50%",
-    borderRadius: 10,
-    alignSelf: "flex-end",
+     width: "50%",
+     borderRadius: 10,
+     alignSelf: "flex-end",
  }
 
   const $editSettingsButtonStyle: ViewStyle = {
@@ -156,7 +159,7 @@ const $buttonContainer: ViewStyle = {
 const $profileImgContainer: ViewStyle = {
     height: 162,
     width: 162,
-    marginVertical: spacing.md,
+    marginVertical: spacing.sm,
     zIndex: 1000
 }
 const $profileImage: ImageStyle = {
@@ -166,7 +169,8 @@ const $profileImage: ImageStyle = {
     borderWidth: 3,
     borderColor: colors.border,
     height: "100%",
-    width: "100%"
+    width: "100%",
+    marginLeft: spacing.sm
 }
 
 const $editProfileImageButton: ViewStyle = {
@@ -185,14 +189,14 @@ const $editProfileImageButton: ViewStyle = {
 
 const $backgroundImgContainer: ViewStyle = {
     position: "absolute",
-    height: 162 + spacing.md,
+    height: 162 + spacing.md * 2,
     width: "100%",
 }
 
 const $backgroundImageStyle: ImageStyle = {
     width: "100%",
     height: "100%",
-    zIndex: 3000
+    zIndex: 100
 }
 
 const $editBackgroundImageButton: ViewStyle = {
@@ -208,4 +212,8 @@ const $editBackgroundImageButton: ViewStyle = {
     alignItems: "center",
     justifyContent: "center",
     zIndex: 3500
+}
+
+const $textAndButtonContainer: ViewStyle = {
+    padding: spacing.md
 }
