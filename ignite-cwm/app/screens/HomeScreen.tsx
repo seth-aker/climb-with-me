@@ -5,10 +5,11 @@ import { Button, Screen, Text } from "app/components"
 import { HomeTabScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
 import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
-import { LoadingSpinner } from "./LoadingSpinner"
+import { LoadingSpinner } from "../components/LoadingSpinner"
 import { useAuth0 } from "react-native-auth0"
 import { useStores } from "app/models"
 import * as Location from "expo-location"
+import { NewClimbModal } from "app/components/NewClimbModal"
 
 const welcomeLogo = require("../../assets/images/logo.png")
 
@@ -25,6 +26,8 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
   const [location, setLocation] = useState<Location.LocationObject | undefined>(undefined)
   const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
   
+  const [newPostModalVis, setNewPostModalVis] = useState(false);
+
   // TODO: make this into a hook that can be used anywhere
   useEffect(() => {
     (async () => {
@@ -43,8 +46,6 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
     })();
   }, [])
 
-  
-  
   const handleLogout = async () => {
     try {
       logout();
@@ -78,6 +79,8 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
           <LoadingSpinner />
         }
         <Text text={errorMsg || JSON.stringify(location)}></Text>
+        <Button text="Create New Post" onPress={() => setNewPostModalVis(true)} />
+        <NewClimbModal visible={newPostModalVis} setVisible={setNewPostModalVis}/>
         <Button text="Logout" onPress={handleLogout} />
       </View>
     </Screen>

@@ -9,17 +9,25 @@ const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 interface LoadingSpinnerProps {
     style?: ViewStyle
+    stroke?: string,
+    strokeWidth?: number
+    circumference?: number
 }
 export const LoadingSpinner = (props: LoadingSpinnerProps ) => {
-    const { style: $styleOverride } = props;
-    const circumference = 250;
+    const { style: $styleOverride, 
+        stroke: strokeOverride, 
+        strokeWidth: strokeWidthOverride, 
+        circumference: circumferenceOverride } = props;
+        
+    const circumference = circumferenceOverride || 250;
     const radius = circumference / (2 * Math.PI);
-    const strokeWidth = 5;
+    const strokeWidth = strokeWidthOverride || 5;
     const halfCircle = radius + strokeWidth;
     const diameter = 2 * halfCircle;
 
     const progress = useSharedValue(0);
     const rotation = useSharedValue(0);
+
 
     useEffect(() => {
         startAnimation();
@@ -58,6 +66,8 @@ export const LoadingSpinner = (props: LoadingSpinnerProps ) => {
         $styleOverride
     ]
     
+    const stroke = strokeOverride || colors.tint;
+    
     return (
         <View style={$mainViewStyle}
         >
@@ -70,7 +80,7 @@ export const LoadingSpinner = (props: LoadingSpinnerProps ) => {
                             r={radius}
                             animatedProps={animatedCircleProps}
                             strokeWidth={strokeWidth}
-                            stroke={colors.tint}
+                            stroke={stroke}
                             fill={'transparent'}
                             strokeDasharray={circumference}
                             />

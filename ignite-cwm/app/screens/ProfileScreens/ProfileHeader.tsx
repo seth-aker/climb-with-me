@@ -1,7 +1,7 @@
 import React, { View, Image, ImageStyle, ViewStyle, Pressable, } from "react-native"
 import { Text, Button, Icon, } from "app/components"
 import { colors, spacing } from "app/theme"
-import { LoadingSpinner } from "../LoadingSpinner"
+import { LoadingSpinner } from "../../components/LoadingSpinner"
 import { useState } from "react"
 import { PhotoUploadModal } from "app/components/PhotoUploadModal"
 import { ImagePickerResult } from "expo-image-picker"
