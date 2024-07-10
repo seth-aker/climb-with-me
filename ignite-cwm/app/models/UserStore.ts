@@ -2,6 +2,7 @@ import { Instance, SnapshotIn, SnapshotOut, flow, types } from "mobx-state-tree"
 import { ClimbingStyleModel, IClimbingStyle } from "./ClimbingStyleModel";
 import { api } from "app/services/api";
 import { ApiResponse } from "apisauce";
+import { withSetPropAction } from "./helpers/withSetPropAction";
 
 
 export const UserStoreModel = types
@@ -51,43 +52,8 @@ export const UserStoreModel = types
 
         state: types.optional(types.enumeration("State", ["pending", "success", "error"]), "pending"),
 
-    }).actions((store) => ({
-        setName(name?: string) {
-            store.name = name;
-        },
-        setGivenName(givenName?: string) {
-            store.givenName = givenName;
-        },
-        setFamilyName(familyName?: string) {
-            store.familyName = familyName;
-        },
-        setDoB(dob?: Date) {
-            store.dob = dob;
-        },
-        setEmail(email?: string) {
-            store.email = email;
-        },
-        setEmailVerified(emailVerified: boolean) {
-            store.emailVerified = emailVerified;
-        },
-        setPhoneNumber(phoneNumber?: string) {
-            store.phoneNumber = phoneNumber;
-        },
-        setPhoneVerified(phoneVerified: boolean) {
-            store.phoneVerified = phoneVerified;
-        },
-        setGender(gender?: string) {
-            store.gender = gender;
-        },
-        setProfileImg(uri?: string) {
-            store.profileImg = uri;
-        },
-        setBackgroundImg(uri?: string) {
-            store.backgroundImg = uri;
-        },
-        setAboutMeText(aboutMeText?: string) {
-            store.aboutMeText = aboutMeText;
-        },
+    }).actions(withSetPropAction)
+    .actions((store) => ({
         addClimbingStyle(climbingStyle: IClimbingStyle) {
             store.climbingStyles.push(climbingStyle);
         },
@@ -158,7 +124,6 @@ export interface IUser {
     dob: Date | undefined,
     profileImg: string | undefined,
     backgroundImg: string | undefined,
-    weightRange: string | undefined,
     aboutMeText: string | undefined,
     gender: string | undefined,
     climbingStyles: IClimbingStyle[],

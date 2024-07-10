@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { ImageStyle, Modal, ModalProps, Pressable, View, ViewStyle } from "react-native";
 import { Text } from "./Text";
@@ -18,12 +17,13 @@ export const NewClimbModal = (props: NewClimbModalProps) => {
     const { visible, setVisible } = props;
     const [postTitle, setPostTitle] = useState("");
     const [postDetails, setPostDetails] = useState("");
-    const [date, setDate] = useState(new Date());
+    const [tripDate, setTripDate] = useState(new Date());
     const [dateTimePickerVis, setDateTimePickerVis] = useState(false);
     const [loading, setLoading] = useState(false);
     
     const handlePostForm = async () => {
         setLoading(true);
+        // Change this to an api call
         await delay(2500);
         setLoading(false);
         handleCloseModal();
@@ -32,7 +32,7 @@ export const NewClimbModal = (props: NewClimbModalProps) => {
     const handleCloseModal = () => {
         setPostTitle("");
         setPostDetails("");
-        setDate(new Date());
+        setTripDate(new Date());
         setVisible(false);
     }
     return (
@@ -72,18 +72,18 @@ export const NewClimbModal = (props: NewClimbModalProps) => {
                         />
                         <TextField      
                             label="Date"
-                            value={formatDate(date.toISOString(), "MM/dd/yyyy")}
+                            value={formatDate(tripDate.toISOString(), "MM/dd/yyyy")}
                             onPressIn={() => setDateTimePickerVis(true)}
                             
                         />
                         {dateTimePickerVis && <DateTimePicker
                             minimumDate={new Date()}
                             mode="date"
-                            value={date}
+                            value={tripDate}
                             onChange={(event, date) => {
                                 if(event.type === "set" && date) {
                                     setDateTimePickerVis(false);
-                                    setDate(date);
+                                    setTripDate(date);
                                 }
                             }}
                         />}
@@ -92,6 +92,7 @@ export const NewClimbModal = (props: NewClimbModalProps) => {
                             style={$postClimbBtnStyle}
                             onPress={handlePostForm}
                         >
+                        {/* For whatever reason I cannot get this to be centered in the button. Todo: Get this centered */}
                             {loading && <LoadingSpinner
                                 stroke={colors.palette.neutral100}
                                 strokeWidth={3}

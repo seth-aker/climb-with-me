@@ -17,7 +17,7 @@ export type HomeTabParamList = {
     Messages: undefined
     Friends: undefined
     Profile: undefined
-    NewClimb: undefined
+
 }
 
 
