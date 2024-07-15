@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useState } from "react"
-import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
-import { Button, Screen, Text } from "app/components"
+import { View, ViewStyle } from "react-native"
+import { Button, ListView, Screen, Text } from "app/components"
 import { HomeTabScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
 import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
@@ -10,8 +10,10 @@ import { useAuth0 } from "react-native-auth0"
 import { useStores } from "app/models"
 import * as Location from "expo-location"
 import { NewClimbModal } from "app/components/NewClimbModal"
+import { Post } from "app/models/Post"
+import { PostCard } from "app/components/PostCard"
 
-const welcomeLogo = require("../../assets/images/logo.png")
+// const welcomeLogo = require("../../assets/images/logo.png")
 
 
 interface HomeScreenProps extends HomeTabScreenProps<"Home"> {
@@ -22,11 +24,12 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
   const { navigation } = _props;
   const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
   const { clearSession } = useAuth0();
-  const { authenticationStore: { logout, tokenLoading } } = useStores();
+  const { authenticationStore: { logout, tokenLoading }, postStore } = useStores();
   const [location, setLocation] = useState<Location.LocationObject | undefined>(undefined)
   const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
   
   const [newPostModalVis, setNewPostModalVis] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // TODO: make this into a hook that can be used anywhere
   useEffect(() => {
@@ -56,6 +59,12 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
   }
 }
 
+const manualRefresh = async () => {
+  setRefreshing(true);
+  await postStore.fetchPosts();
+  setRefreshing(false)
+}
+
   return (
     tokenLoading ? 
     <>
@@ -63,14 +72,17 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
     </> : (
     <Screen style={$container}>
       <View style={$topContainer}>
-        <Image style={$welcomeLogo} source={welcomeLogo} resizeMode="contain" />
-        <Text
-          testID="welcome-heading"
-          style={$welcomeHeading}
-          tx="welcomeScreen.readyForLaunch"
-          preset="heading"
+         <ListView<Post>
+          data={postStore.posts}
+          estimatedItemSize={100}
+          onRefresh={manualRefresh}
+          refreshing={refreshing}
+          renderItem={({ item }) => (
+            <PostCard 
+              post={item}
+            />
+          )}
         />
-        <Text tx="welcomeScreen.exciting" preset="subheading" /> 
       </View>
 
     <View style={[$bottomContainer, $bottomContainerInsets]}>
@@ -111,12 +123,12 @@ const $bottomContainer: ViewStyle = {
   paddingHorizontal: spacing.lg,
   justifyContent: "space-around",
 }
-const $welcomeLogo: ImageStyle = {
-  height: 88,
-  width: "100%",
-  marginBottom: spacing.xxl,
-}
+// const $welcomeLogo: ImageStyle = {
+//   height: 88,
+//   width: "100%",
+//   marginBottom: spacing.xxl,
+// }
 
-const $welcomeHeading: TextStyle = {
-  marginBottom: spacing.md,
-}
+// const $welcomeHeading: TextStyle = {
+//   marginBottom: spacing.md,
+// }

@@ -9,22 +9,38 @@ import { formatDate } from "app/utils/formatDate";
 import { Button } from "./Button";
 import { LoadingSpinner } from "app/screens";
 import { delay } from "app/utils/delay";
+import { useStores } from "app/models";
+import uuid from "react-native-uuid"
+import { PostModel } from "app/models/Post";
 interface NewClimbModalProps extends ModalProps {
     setVisible: (isVis: boolean) => void
 }
 
 export const NewClimbModal = (props: NewClimbModalProps) => {
     const { visible, setVisible } = props;
+    const {userStore, postStore: {posts}} = useStores();
     const [postTitle, setPostTitle] = useState("");
     const [postDetails, setPostDetails] = useState("");
     const [tripDate, setTripDate] = useState(new Date());
     const [dateTimePickerVis, setDateTimePickerVis] = useState(false);
     const [loading, setLoading] = useState(false);
-    
+    const guid = uuid.v4().toString();
     const handlePostForm = async () => {
         setLoading(true);
         // Change this to an api call
-        await delay(2500);
+        const post = PostModel.create( {
+            guid,
+            title: postTitle,
+            postDetails,
+            tripDate,
+            postDate: Date.now(),
+            postUser: userStore.name,
+            postUserId: userStore.authId,
+            postUserImg: userStore.profileImg,
+            postComments: []
+        })
+        posts.push(post)
+        await delay(750);
         setLoading(false);
         handleCloseModal();
     }

@@ -1,5 +1,6 @@
 import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree";
 import { withSetPropAction } from "./helpers/withSetPropAction";
+import { CommentModel } from "./CommentModel";
 
 
 export const PostModel = types
@@ -11,6 +12,8 @@ export const PostModel = types
     postDate: types.Date,
     postUser: "",
     postUserId: "",
+    postUserImg: "",
+    postComments: types.array(CommentModel)
     // tripLocation: "",
 })
 .actions(withSetPropAction)
