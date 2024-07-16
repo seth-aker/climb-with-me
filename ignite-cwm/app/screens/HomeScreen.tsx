@@ -12,6 +12,7 @@ import * as Location from "expo-location"
 import { NewClimbModal } from "app/components/NewClimbModal"
 import { Post } from "app/models/Post"
 import { PostCard } from "app/components/PostCard"
+import { ContentStyle } from "@shopify/flash-list"
 
 // const welcomeLogo = require("../../assets/images/logo.png")
 
@@ -70,9 +71,10 @@ const manualRefresh = async () => {
     <>
       <LoadingSpinner />
     </> : (
-    <Screen style={$container}>
+    <Screen preset="fixed" style={$container}>
       <View style={$topContainer}>
          <ListView<Post>
+          contentContainerStyle={$listContentContainer}
           data={postStore.posts}
           estimatedItemSize={100}
           onRefresh={manualRefresh}
@@ -86,11 +88,11 @@ const manualRefresh = async () => {
       </View>
 
     <View style={[$bottomContainer, $bottomContainerInsets]}>
-        <Text text="Location Data:" size="md" />
+        {/* <Text text="Location Data:" size="md" />
         {!errorMsg && !location && 
           <LoadingSpinner />
         }
-        <Text text={errorMsg || JSON.stringify(location)}></Text>
+        <Text text={errorMsg || JSON.stringify(location)}></Text> */}
         <Button text="Create New Post" onPress={() => setNewPostModalVis(true)} />
         <NewClimbModal visible={newPostModalVis} setVisible={setNewPostModalVis}/>
         <Button text="Logout" onPress={handleLogout} />
@@ -108,15 +110,21 @@ const $container: ViewStyle = {
 const $topContainer: ViewStyle = {
   flexShrink: 1,
   flexGrow: 1,
-  flexBasis: "57%",
+  flexBasis: "75%",
   justifyContent: "center",
+  
+}
+
+const $listContentContainer: ContentStyle = {
   paddingHorizontal: spacing.lg,
+  paddingTop: spacing.lg + spacing.xl,
+  paddingBottom: spacing.lg,
 }
 
 const $bottomContainer: ViewStyle = {
   flexShrink: 1,
   flexGrow: 0,
-  flexBasis: "43%",
+  flexBasis: "25%",
   backgroundColor: colors.palette.neutral100,
   borderTopLeftRadius: 16,
   borderTopRightRadius: 16,

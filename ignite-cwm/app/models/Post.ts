@@ -7,7 +7,7 @@ export const PostModel = types
 .model("Post", {
     guid: types.identifier,
     title: "",
-    postDetails: "",
+    body: "",
     tripDate: types.Date,
     postDate: types.Date,
     postUser: "",

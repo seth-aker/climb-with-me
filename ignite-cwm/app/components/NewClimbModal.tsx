@@ -18,9 +18,9 @@ interface NewClimbModalProps extends ModalProps {
 
 export const NewClimbModal = (props: NewClimbModalProps) => {
     const { visible, setVisible } = props;
-    const {userStore, postStore: {posts}} = useStores();
+    const {userStore, postStore} = useStores();
     const [postTitle, setPostTitle] = useState("");
-    const [postDetails, setPostDetails] = useState("");
+    const [body, setPostDetails] = useState("");
     const [tripDate, setTripDate] = useState(new Date());
     const [dateTimePickerVis, setDateTimePickerVis] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -31,7 +31,7 @@ export const NewClimbModal = (props: NewClimbModalProps) => {
         const post = PostModel.create( {
             guid,
             title: postTitle,
-            postDetails,
+            body,
             tripDate,
             postDate: Date.now(),
             postUser: userStore.name,
@@ -39,7 +39,10 @@ export const NewClimbModal = (props: NewClimbModalProps) => {
             postUserImg: userStore.profileImg,
             postComments: []
         })
-        posts.push(post)
+        await postStore.createPost(post)
+        postStore.posts.forEach(post => {
+            console.log(post.title)
+        })
         await delay(750);
         setLoading(false);
         handleCloseModal();
@@ -82,9 +85,9 @@ export const NewClimbModal = (props: NewClimbModalProps) => {
                             label="Details"
                             multiline
                             placeholder="Where are you going? What are you doing?"
-                            value={postDetails}
+                            value={body}
                             onChangeText={(input) => setPostDetails(input)}
-                            status={postDetails ? undefined : "error"}
+                            status={body ? undefined : "error"}
                         />
                         <TextField      
                             label="Date"
