@@ -6,7 +6,18 @@ import { Post, PostModel } from "./Post";
 export const PostStoreModel = types
 .model("PostStore", {
     posts: types.array(PostModel),
-})
+}).views((store) => ({
+     getPostById(guid: string) {
+        return store.posts.find(post => post.guid === guid)
+    }
+})).actions(( store ) => ({
+    addPost(post: Post) {
+        store.posts.push(post);
+    },
+    deletePost(post: Post) {
+        return store.posts.remove(post);
+    }
+}))
 .actions(( store ) => ({
     async fetchPosts() {
       // implement api call here 
@@ -19,14 +30,12 @@ export const PostStoreModel = types
         store.posts.push(post)
         return true
     },
-    async deletePost(postGuid: string) {
+    async deletePostAsync(post: Post) {
         // implement api call here
-        store.posts.filter(posts => {
-            return posts.guid !== postGuid;
-        })
-        return true
+        store.deletePost(post); 
     }
 }))
+
 
 export interface IPostStore extends Instance<typeof PostStoreModel>{}
 export interface IPostStoreSnapshot extends SnapshotOut<typeof PostStoreModel> {}

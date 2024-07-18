@@ -33,11 +33,11 @@ export const NewClimbModal = (props: NewClimbModalProps) => {
             title: postTitle,
             body,
             tripDate,
-            postDate: Date.now(),
+            createdAt: Date.now(),
             postUser: userStore.name,
             postUserId: userStore.authId,
             postUserImg: userStore.profileImg,
-            postComments: []
+            comments: []
         })
         await postStore.createPost(post)
         postStore.posts.forEach(post => {

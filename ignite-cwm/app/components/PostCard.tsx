@@ -3,12 +3,14 @@ import { Card } from "./Card"
 import { Text } from "./Text"
 import { observer } from "mobx-react-lite"
 import { Post } from "app/models/Post"
-import { ImageStyle, TextStyle, View, ViewStyle } from "react-native"
+import { ImageStyle, TextStyle, View, ViewStyle} from "react-native"
 import { AutoImage } from "./AutoImage"
 import { formatTimeSince } from "app/utils/formatTime"
 import { colors, spacing } from "app/theme"
 import { Button } from "./Button"
 import { Icon } from "./Icon"
+import Animated, { Extrapolation, interpolate, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
+import { useStores } from "app/models"
 
 
 
@@ -17,27 +19,60 @@ export interface PostCardProps {
 }
 export const PostCard = observer(function PostCard(props: PostCardProps) {
     const { post } = props;
-    const timeSincePost = Date.now() - post.postDate.getTime();
+    const {userStore: {authId} } = useStores();
+    const timeSincePost = Date.now() - post.createdAt.getTime();
+    const userGuid = authId || "";
+    const liked = useSharedValue(post.isLikedByUser(userGuid) ? 1 : 0);
+    const animatedRegularLikeButtonStyles = useAnimatedStyle(() => {
+        return {
+            transform: [
+                {
+                    scale: interpolate(liked.value, [0,1], [1,0], Extrapolation.EXTEND)
+                },
+            ],
+            opacity: interpolate(liked.value, [0,1], [1,0], Extrapolation.CLAMP)
+        }
+    })
+    const animatedFilledLikeButtonStyles = useAnimatedStyle(() => {
+        return {
+        transform: [
+            {
+            scale: liked.value,
+            },
+        ],
+        opacity: liked.value,
+        }
+    })
+
+    const handlePressLike = () => {
+        post.toggleLiked(userGuid)
+        liked.value = withSpring(liked.value ? 0 : 1);
+    }
     return (
         <Card
             style={$item}
             HeadingComponent={
                 <View style={$itemHeader}>
-                    <AutoImage 
-                        style={$itemThumbnail}
-                        src={post.postUserImg}
-                    />
-                    <View style={$headerTextContainer}>
-                        <Text 
-                            size="xs"
-                            text={post.postUser}
+                    <View style={flexRow}>
+                        <AutoImage 
+                            style={$itemThumbnail}
+                            src={post.postUserImg}
                             />
-                        <Text
-                            size="xxs"
-                            weight="light" 
-                            text={`${formatTimeSince(timeSincePost)}`}
-                            />
+                        <View style={$headerTextContainer}>
+                            <Text 
+                                size="xs"
+                                text={post.postUser}
+                                />
+                            <Text
+                                size="xxs"
+                                weight="light" 
+                                text={`${formatTimeSince(timeSincePost)}`}
+                                />
+                        </View>
                     </View>
+                    <Button style={$headerButtonStyle} pressedStyle={$headerButtonPressed}>
+                        <Icon icon={"ellipsis-v"} />
+                    </Button>
                 </View>
             }
             ContentComponent={
@@ -60,11 +95,28 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
                         pressedStyle={$footerButtonPressed}
                         text="Like"
                         textStyle={$buttonTextStyle}
-                        LeftAccessory={() => 
-                            <Icon 
-                                icon={"thumbs-up"} 
-                        />}
-                    />
+                        onPress={handlePressLike}
+                        LeftAccessory={() =>( 
+                            <View>
+                                <Animated.View
+                                    style={[$iconContainer,animatedRegularLikeButtonStyles]}
+                                >
+                                    <Icon 
+                                        icon={["far", "thumbs-up"]}
+                                        containerStyle={$iconStyle} 
+                                    />
+                                </Animated.View>
+                                 <Animated.View
+                                    style={[$iconContainer,animatedFilledLikeButtonStyles]}
+                                >
+                                    <Icon 
+                                        icon={["fas", "thumbs-up"]}
+                                        containerStyle={$iconStyle} 
+                                    />
+                                </Animated.View>
+                            </View>)}
+                    >
+                    </Button> 
                     <Button 
                         style={$footerButtonStyle}
                         pressedStyle={$footerButtonPressed}
@@ -98,9 +150,23 @@ const $item: ViewStyle = {
 }
 
 const $itemHeader: ViewStyle = {
-    flexDirection: "row"
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignContent: "center"
 }
-
+const $headerButtonStyle: ViewStyle = {
+    backgroundColor: colors.palette.neutral100,
+    borderWidth: 0,
+    borderRadius: 5,
+    minHeight: 0,
+    height: 40,
+    width: 30,
+    paddingVertical: 0,
+    paddingHorizontal: 0
+}
+const $headerButtonPressed: ViewStyle = {
+    backgroundColor: colors.palette.neutral200
+}
 const $itemThumbnail: ImageStyle = {
   height: 40,
   width: 40,
@@ -118,6 +184,7 @@ const $footerContainer: ViewStyle = {
     justifyContent: "space-between"
 }
 const $footerButtonStyle: ViewStyle = {
+    flexGrow: 1,
     backgroundColor: colors.palette.neutral100,
     borderWidth: 0,
     borderRadius: 5
@@ -128,4 +195,16 @@ const $footerButtonPressed: ViewStyle = {
 const $buttonTextStyle: TextStyle = {
     color: colors.text,
     paddingHorizontal: spacing.xxxs
+}
+const $iconContainer: ViewStyle = {
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    marginEnd: spacing.sm,
+}
+const $iconStyle: ViewStyle = {
+    position: "absolute"
+}
+const flexRow: ViewStyle = {
+    flexDirection: "row"
 }

@@ -34,8 +34,9 @@ import { Auth0Provider, } from "react-native-auth0"
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
+import { far } from "@fortawesome/free-regular-svg-icons"
 
-library.add(fas);
+library.add(fas, far);
 
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"

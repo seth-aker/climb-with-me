@@ -24,8 +24,8 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
 ) {
   const { navigation } = _props;
   const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
-  const { clearSession } = useAuth0();
-  const { authenticationStore: { logout, tokenLoading }, postStore } = useStores();
+  const { clearSession, user } = useAuth0();
+  const { authenticationStore: { logout, tokenLoading }, postStore, userStore } = useStores();
   const [location, setLocation] = useState<Location.LocationObject | undefined>(undefined)
   const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
   
@@ -50,6 +50,24 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
     })();
   }, [])
 
+  // Use effect runs when the "user" object from Auth0 gets changed
+  useEffect(() => {
+    userStore.setProp("name", user?.name)
+    userStore.setProp("authId", user?.sub)
+    userStore.setProp("givenName", user?.givenName)
+    userStore.setProp("familyName", user?.familyName)
+    userStore.setProp("email", user?.email)
+    userStore.setProp("emailVerified", user?.emailVerified)
+    if(user?.birthdate){
+      userStore.setProp("dob", Date.parse(user.birthdate))
+    }
+    userStore.setProp("phoneNumber", user?.phoneNumber)
+    userStore.setProp("phoneVerified", user?.phoneNumberVerified)
+    userStore.setProp("gender", user?.gender)
+    userStore.setProp("profileImg", user?.picture)
+    
+  },[user])
+
   const handleLogout = async () => {
     try {
       logout();
@@ -65,6 +83,11 @@ const manualRefresh = async () => {
   await postStore.fetchPosts();
   setRefreshing(false)
 }
+const handleDeleteAllPosts = () => {
+  postStore.posts.forEach(post => {
+    postStore.deletePost(post)
+  })
+}
 
   return (
     tokenLoading ? 
@@ -75,7 +98,7 @@ const manualRefresh = async () => {
       <View style={$topContainer}>
          <ListView<Post>
           contentContainerStyle={$listContentContainer}
-          data={postStore.posts}
+          data={postStore.posts.slice()} // Using slice to create a copy of the array that is then used for the cards. Breaks if you don't do this
           estimatedItemSize={100}
           onRefresh={manualRefresh}
           refreshing={refreshing}
@@ -92,11 +115,12 @@ const manualRefresh = async () => {
         {!errorMsg && !location && 
           <LoadingSpinner />
         }
-        <Text text={errorMsg || JSON.stringify(location)}></Text> */}
+        <Text text={errorMsg || "Location found!"}></Text> */}
         <Button text="Create New Post" onPress={() => setNewPostModalVis(true)} />
-        <NewClimbModal visible={newPostModalVis} setVisible={setNewPostModalVis}/>
         <Button text="Logout" onPress={handleLogout} />
+        <Button text="Delete all posts" onPress={handleDeleteAllPosts} />
       </View>
+        <NewClimbModal visible={newPostModalVis} setVisible={setNewPostModalVis}/>
     </Screen>
   )
 )

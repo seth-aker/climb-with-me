@@ -1,5 +1,6 @@
 import { Instance, SnapshotOut, flow, types } from "mobx-state-tree"
-import { Credentials } from "react-native-auth0";
+import { Credentials, User } from "react-native-auth0";
+
 
 
 export const AuthenticationStoreModel = types
@@ -39,10 +40,12 @@ export const AuthenticationStoreModel = types
       // store.authEmail = ""
     }
 
+  
     return {
       setAuthToken,
       updateAndValidateToken,
-      logout
+      logout,
+      
     }
   });
 
