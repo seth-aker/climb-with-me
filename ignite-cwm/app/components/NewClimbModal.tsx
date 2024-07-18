@@ -90,7 +90,7 @@ export const NewClimbModal = (props: NewClimbModalProps) => {
                             status={body ? undefined : "error"}
                         />
                         <TextField      
-                            label="Date"
+                            label="When are you going?"
                             value={formatDate(tripDate.toISOString(), "MM/dd/yyyy")}
                             onPressIn={() => setDateTimePickerVis(true)}
                             
