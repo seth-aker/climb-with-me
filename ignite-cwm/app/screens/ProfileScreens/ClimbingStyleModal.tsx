@@ -2,20 +2,20 @@
 import { Button, Header, Icon } from "app/components"
 import { ModalPicker } from "app/components/ModalPicker/ModalPicker"
 import { colors, spacing } from "app/theme"
-import { Option, climbingGrades as CGOptions, yearsExpOptions, climbingStyles } from "../../../data/ModalPickerOptions"
+import { climbingGrades as CGOptions, yearsExpOptions, climbingStyles } from "../../../data/ModalPickerOptions"
 import React, { useEffect, useState } from "react"
 import { Modal, ModalProps, TextStyle, View, ViewStyle } from "react-native"
 
 export interface ClimbingStyleModalProps extends ModalProps {
     setVisible: (input: boolean) => void,
-    climbingStyle?: Option
-    setClimbingStyle: (input: Option | undefined) => void
-    maxGradeIndoor?: Option
-    setMaxGradeIndoor: (input: Option | undefined) => void
-    maxGradeOutdoor?: Option
-    setMaxGradeOutdoor: (input: Option | undefined) => void
-    yearsExp?: Option
-    setYearsExp: (input: Option | undefined) => void
+    climbingStyle?: string
+    setClimbingStyle: (input: string | undefined) => void
+    maxGradeIndoor?: string
+    setMaxGradeIndoor: (input: string | undefined) => void
+    maxGradeOutdoor?: string
+    setMaxGradeOutdoor: (input: string | undefined) => void
+    yearsExp?: string
+    setYearsExp: (input: string | undefined) => void
     submitNewClimbingStyle: () => void
 }
 
@@ -39,10 +39,10 @@ export const ClimbingStyleModal = (props: ClimbingStyleModalProps) => {
 
 
     useEffect(() => {
-            if(climbingStyle?.value === "sport" || climbingStyle?.value === "top rope"){
+            if(climbingStyle === "sport" || climbingStyle === "top rope"){
                 setClimbingGrades(CGOptions.sport);
                 
-            } else if(climbingStyle?.value === "bouldering") {
+            } else if(climbingStyle === "bouldering") {
                 setClimbingGrades((CGOptions.bouldering))
             } 
             setMaxGradeIndoor(undefined);

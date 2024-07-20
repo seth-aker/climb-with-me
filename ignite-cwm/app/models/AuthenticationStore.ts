@@ -1,5 +1,5 @@
 import { Instance, SnapshotOut, flow, types } from "mobx-state-tree"
-import { Credentials, User } from "react-native-auth0";
+import { Credentials } from "react-native-auth0";
 
 
 

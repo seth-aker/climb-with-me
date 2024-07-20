@@ -1,4 +1,3 @@
-import { Option } from "data/ModalPickerOptions"
 import React from "react"
 import { Pressable, TextStyle, View, ViewStyle } from "react-native"
 import { Text } from "../Text"
@@ -6,8 +5,8 @@ import { isRTL } from "app/i18n"
 import { colors, spacing } from "app/theme"
 
 export interface PickerListItemProps {
-    item: Option
-    handleItemOnPress: (item: Option) => void
+    item: any
+    handleItemOnPress: (item: string) => void
     listTextStyle?: TextStyle 
     itemSeparatorStyle?: ViewStyle
 }
@@ -30,7 +29,7 @@ export const PickerListItem = (props: PickerListItemProps) => {
             >
                 <View style={$listItemView}>
                     <Text style={[$textStyle, $listTextStyle]} 
-                        text={item.label}
+                        text={item}
                     />
                 </View>
                 <View style={$dividerStyles} />

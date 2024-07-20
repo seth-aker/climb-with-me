@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useState } from "react"
 import { View, ViewStyle } from "react-native"
-import { Button, ListView, Screen, Text } from "app/components"
+import { Button, Header, ListView, Screen, Text } from "app/components"
 import { HomeTabScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
 import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
@@ -24,8 +24,8 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
 ) {
   const { navigation } = _props;
   const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
-  const { clearSession, user } = useAuth0();
-  const { authenticationStore: { logout, tokenLoading }, postStore, userStore } = useStores();
+  const { clearSession } = useAuth0();
+  const { authenticationStore: { logout, tokenLoading }, postStore} = useStores();
   const [location, setLocation] = useState<Location.LocationObject | undefined>(undefined)
   const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
   
@@ -50,23 +50,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
     })();
   }, [])
 
-  // Use effect runs when the "user" object from Auth0 gets changed
-  useEffect(() => {
-    userStore.setProp("name", user?.name)
-    userStore.setProp("authId", user?.sub)
-    userStore.setProp("givenName", user?.givenName)
-    userStore.setProp("familyName", user?.familyName)
-    userStore.setProp("email", user?.email)
-    userStore.setProp("emailVerified", user?.emailVerified)
-    if(user?.birthdate){
-      userStore.setProp("dob", Date.parse(user.birthdate))
-    }
-    userStore.setProp("phoneNumber", user?.phoneNumber)
-    userStore.setProp("phoneVerified", user?.phoneNumberVerified)
-    userStore.setProp("gender", user?.gender)
-    userStore.setProp("profileImg", user?.picture)
-    
-  },[user])
+
 
   const handleLogout = async () => {
     try {
@@ -83,11 +67,6 @@ const manualRefresh = async () => {
   await postStore.fetchPosts();
   setRefreshing(false)
 }
-const handleDeleteAllPosts = () => {
-  postStore.posts.forEach(post => {
-    postStore.deletePost(post)
-  })
-}
 
   return (
     tokenLoading ? 
@@ -95,6 +74,9 @@ const handleDeleteAllPosts = () => {
       <LoadingSpinner />
     </> : (
     <Screen preset="fixed" style={$container}>
+      <Header 
+        containerStyle={$headerStyle}
+        backgroundColor={colors.palette.primary500}/>
       <View style={$topContainer}>
          <ListView<Post>
           contentContainerStyle={$listContentContainer}
@@ -108,6 +90,7 @@ const handleDeleteAllPosts = () => {
             />
           )}
         />
+      <NewClimbModal visible={newPostModalVis} setVisible={setNewPostModalVis}/>
       </View>
 
     <View style={[$bottomContainer, $bottomContainerInsets]}>
@@ -118,9 +101,7 @@ const handleDeleteAllPosts = () => {
         <Text text={errorMsg || "Location found!"}></Text> */}
         <Button text="Create New Post" onPress={() => setNewPostModalVis(true)} />
         <Button text="Logout" onPress={handleLogout} />
-        <Button text="Delete all posts" onPress={handleDeleteAllPosts} />
       </View>
-        <NewClimbModal visible={newPostModalVis} setVisible={setNewPostModalVis}/>
     </Screen>
   )
 )
@@ -130,8 +111,11 @@ const $container: ViewStyle = {
   flex: 1,
   backgroundColor: colors.background,
 }
-
+const $headerStyle: ViewStyle ={
+  marginBottom: 0
+}
 const $topContainer: ViewStyle = {
+  marginTop: 0,
   flexShrink: 1,
   flexGrow: 1,
   flexBasis: "75%",
@@ -140,8 +124,7 @@ const $topContainer: ViewStyle = {
 }
 
 const $listContentContainer: ContentStyle = {
-  paddingHorizontal: spacing.lg,
-  paddingTop: spacing.lg + spacing.xl,
+  paddingTop: spacing.sm,
   paddingBottom: spacing.lg,
 }
 
@@ -152,7 +135,6 @@ const $bottomContainer: ViewStyle = {
   backgroundColor: colors.palette.neutral100,
   borderTopLeftRadius: 16,
   borderTopRightRadius: 16,
-  paddingHorizontal: spacing.lg,
   justifyContent: "space-around",
 }
 // const $welcomeLogo: ImageStyle = {

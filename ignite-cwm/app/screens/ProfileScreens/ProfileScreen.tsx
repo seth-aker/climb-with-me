@@ -5,7 +5,7 @@ import { colors, spacing } from "app/theme";
 import { observer } from "mobx-react-lite";
 import React, { FC, useEffect, useState } from "react";
 import { ImageStyle, ScrollView, TextStyle, View, ViewStyle } from "react-native";
-import { genderOptions, Option } from "../../../data/ModalPickerOptions"
+import { genderOptions} from "../../../data/ModalPickerOptions"
 import { formatPhoneNumber } from "app/utils/formatPhoneNumber";
 import { ProfileHeader } from "./ProfileHeader";
 import { ModalPicker } from "app/components/ModalPicker/ModalPicker";
@@ -26,11 +26,11 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
 
     
     const handlePhoneNumberChange = (input: string) => {       
-        user.setPhoneNumber(formatPhoneNumber(input, user.phoneNumber ? user.phoneNumber : ""))
+        user.setProp("phoneNumber",formatPhoneNumber(input, user.phoneNumber ? user.phoneNumber : ""))
     }
 
     const handleAboutMeTextChange = (input: string) => {
-        user.setAboutMeText(input);
+        user.setProp("aboutMeText", input);
     }
 
     const handleAddClimbingStyleOnPress = () => {
@@ -44,24 +44,24 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
     const submitNewClimbingStyle = () => {
         if(climbingStyle && yearsExp) {
             const newUserStyle: IClimbingStyle = {
-                style: climbingStyle.label,
-                maxGradeIndoor: maxGradeIndoor?.label,
-                maxGradeOutdoor: maxGradeOutdoor?.label,
-                yearsExp: yearsExp.label
+                style: climbingStyle,
+                maxGradeIndoor,
+                maxGradeOutdoor,
+                yearsExp
             }
             user.addClimbingStyle(newUserStyle)
             setClimbingStyleModalVisible(false)
         }
     }
     
-    const [gender, setGender] = useState<Option>()
+    const [gender, setGender] = useState<string>()
 
-    const [climbingStyle, setClimbingStyle] = useState<Option>();
+    const [climbingStyle, setClimbingStyle] = useState<string>();
 
-    const [maxGradeIndoor, setMaxGradeIndoor] = useState<Option>();
-    const [maxGradeOutdoor, setMaxGradeOutdoor] = useState<Option>();
+    const [maxGradeIndoor, setMaxGradeIndoor] = useState<string>();
+    const [maxGradeOutdoor, setMaxGradeOutdoor] = useState<string>();
 
-    const [yearsExp, setYearsExp] = useState<Option>()
+    const [yearsExp, setYearsExp] = useState<string>()
     const [userStylesEmpty, setUserStylesEmpty] = useState(true);
 
     

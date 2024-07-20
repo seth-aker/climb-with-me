@@ -17,7 +17,7 @@ interface NewClimbModalProps extends ModalProps {
 }
 
 export const NewClimbModal = (props: NewClimbModalProps) => {
-    const { visible, setVisible } = props;
+    const { visible, setVisible, onRequestClose } = props;
     const {userStore, postStore} = useStores();
     const [postTitle, setPostTitle] = useState("");
     const [body, setPostDetails] = useState("");
@@ -40,9 +40,6 @@ export const NewClimbModal = (props: NewClimbModalProps) => {
             comments: []
         })
         await postStore.createPost(post)
-        postStore.posts.forEach(post => {
-            console.log(post.title)
-        })
         await delay(750);
         setLoading(false);
         handleCloseModal();
@@ -58,7 +55,9 @@ export const NewClimbModal = (props: NewClimbModalProps) => {
        <Modal 
         visible={visible}     
         animationType="none" 
-        transparent>
+        transparent
+        onRequestClose={onRequestClose}
+        >
             <View style={$modalContainerStyle}>
                 <View style={$uploadPhotoCard}>
                     <Pressable style={$cardHeaderStyle}

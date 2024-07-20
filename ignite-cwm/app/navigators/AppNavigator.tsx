@@ -21,8 +21,6 @@ import { colors } from "app/theme"
 import { useStores } from "app/models"
 import { useAuth0 } from "react-native-auth0"
 import { HomeTabNavigator, HomeTabParamList } from "./HomeTabsNavigator"
-import { IUser } from "app/models/UserStore"
-import { IClimbingStyle } from "app/models/ClimbingStyleModel"
 
 
 
@@ -64,8 +62,7 @@ const AppStack = observer(function AppStack(_props) {
 
 const { 
   authenticationStore: {isAuthenticated, updateAndValidateToken},
-  userStore: { setUser },
-
+  userStore
 } = useStores();
   const { getCredentials, user } = useAuth0(); 
 
@@ -73,29 +70,27 @@ const {
 
   // Used to sync the authentication store with Auth0's SDK and determine what screen to load first.
   useEffect(() => {
-    updateAndValidateToken(getCredentials)
-    if(user) {
-      const userObj: IUser = {
-        name: user.name,
-        authId: user.sub,
-        familyName: user.familyName,
-        givenName: user.givenName,
-        email: user.email,
-        emailVerified: user.emailVerified ? user.emailVerified : false,
-        phoneNumber: user.phoneNumber,
-        phoneVerified: user.phoneNumberVerified ? user.phoneNumberVerified : false,
-        dob: user.birthdate ? new Date(user.birthdate) : undefined,
-        profileImg: user.picture,
-        backgroundImg: undefined,
-        weightRange: undefined,
-        aboutMeText: undefined,
-        gender: undefined,
-        climbingStyles: [] as IClimbingStyle[],
-        state: "success"
-      }
-      setUser(userObj)
+   (async () => {
+    await updateAndValidateToken(getCredentials)
+    userStore.setProp("name", user?.name)
+    userStore.setProp("authId", user?.sub)
+    userStore.setProp("givenName", user?.givenName)
+    userStore.setProp("familyName", user?.familyName)
+    userStore.setProp("email", user?.email)
+    userStore.setProp("emailVerified", user?.emailVerified)
+    if(user?.birthdate){
+      userStore.setProp("dob", Date.parse(user.birthdate))
     }
-  },[])
+    userStore.setProp("phoneNumber", user?.phoneNumber)
+    userStore.setProp("phoneVerified", user?.phoneNumberVerified)
+    userStore.setProp("gender", user?.gender)
+    userStore.setProp("profileImg", user?.picture)
+    // If the user 
+    if(user?.sub) {
+      userStore.setProp("state", "success")
+    }
+    })()
+  },[user])
   
   return (
   
