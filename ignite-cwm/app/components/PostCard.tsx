@@ -1,9 +1,9 @@
-import React from "react"
+import React, { useState } from "react"
 import { Card } from "./Card"
 import { Text } from "./Text"
 import { observer } from "mobx-react-lite"
 import { Post } from "app/models/Post"
-import { ImageStyle, TextStyle, View, ViewStyle} from "react-native"
+import { ImageStyle, Modal, TextStyle, View, ViewStyle} from "react-native"
 import { AutoImage } from "./AutoImage"
 import { formatTimeSince } from "app/utils/formatTime"
 import { colors, spacing } from "app/theme"
@@ -11,18 +11,23 @@ import { Button } from "./Button"
 import { Icon } from "./Icon"
 import Animated, { Extrapolation, interpolate, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
 import { useStores } from "app/models"
-
+import { Header } from "./Header"
 
 
 export interface PostCardProps {
     post: Post
+
 }
 export const PostCard = observer(function PostCard(props: PostCardProps) {
-    const { post } = props;
-    const {userStore: {authId} } = useStores();
+    const { post, } = props;
+    const {userStore: {authId}, postStore } = useStores();
     const timeSincePost = Date.now() - post.createdAt.getTime();
     const userGuid = authId || "";
     const liked = useSharedValue(post.isLikedByUser(userGuid) ? 1 : 0);
+    const postOwned = userGuid === post.postUserId;
+
+    const [cardSettingOpen, setCardSettingOpen] = useState(false);
+
     const animatedRegularLikeButtonStyles = useAnimatedStyle(() => {
         return {
             transform: [
@@ -48,6 +53,17 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
         post.toggleLiked(userGuid)
         liked.value = withSpring(liked.value ? 0 : 1);
     }
+    
+    const handledSettingBtnPressed = () => {
+        setCardSettingOpen(true);
+    }
+
+    const handleDeletePost = () => {
+        postStore.deletePost(post);
+        setCardSettingOpen(false);
+    }
+
+    
     return (
         <Card
             style={$item}
@@ -70,9 +86,38 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
                                 />
                         </View>
                     </View>
-                    <Button style={$headerButtonStyle} pressedStyle={$headerButtonPressed}>
-                        <Icon icon={"ellipsis-v"} />
+                    <Button onPress={handledSettingBtnPressed} style={$headerButtonStyle} pressedStyle={$headerButtonPressed}>
+                        <Icon icon={"ellipsis-v"} color={colors.palette.neutral600} />
                     </Button>
+                    <Modal 
+                        transparent
+                        visible={cardSettingOpen} 
+                        animationType="slide" 
+                        onRequestClose={() => setCardSettingOpen(false)}
+
+                    >
+                        <View style={$modalEmptySpace}/>
+                        <View style={$modalStyle}>
+                            <Header 
+                                title="Close"
+                                containerStyle={$modalHeader}
+                                rightIcon={"x"}
+                                rightIconColor={colors.text}
+                                onRightPress={()=> setCardSettingOpen(false)}
+                                backgroundColor={colors.palette.neutral100}
+                            />
+                            {postOwned ? <Button 
+                                style={$postModalButtonStyle}
+                                textStyle={$postButtonTextStyle}
+                                pressedStyle={$footerButtonPressed}
+                                text="Delete" 
+                                LeftAccessory={() => <Icon icon={"xmark"} color={colors.palette.neutral700}/>}
+                                onPress={handleDeletePost}
+                                
+                            /> : <Button text="Hide" />
+                            }
+                        </View>
+                    </Modal>
                 </View>
             }
             ContentComponent={
@@ -103,7 +148,8 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
                                 >
                                     <Icon 
                                         icon={["far", "thumbs-up"]}
-                                        containerStyle={$iconStyle} 
+                                        containerStyle={$iconStyle}
+                                        color={colors.palette.neutral600} 
                                     />
                                 </Animated.View>
                                  <Animated.View
@@ -112,6 +158,7 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
                                     <Icon 
                                         icon={["fas", "thumbs-up"]}
                                         containerStyle={$iconStyle} 
+                                        color={colors.palette.neutral600}
                                     />
                                 </Animated.View>
                             </View>)}
@@ -125,6 +172,7 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
                         LeftAccessory={() => 
                             <Icon 
                                 icon={"comment"} 
+                                color={colors.palette.neutral600}
                         />}/> 
                     <Button 
                         style={$footerButtonStyle}
@@ -133,7 +181,8 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
                         textStyle={$buttonTextStyle}
                         LeftAccessory={() => 
                             <Icon 
-                                icon={"share"} 
+                                icon={ "share"} 
+                                color={colors.palette.neutral600}
                         />}
                     />
                 </View>
@@ -144,9 +193,11 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
     )
 })
 const $item: ViewStyle = {
-  padding: spacing.md,
-  marginTop: spacing.md,
-  minHeight: 120,
+    borderRadius: 0,
+    padding: spacing.md,
+    paddingBottom: 0,
+    marginTop: spacing.md,
+    minHeight: 120,
 }
 
 const $itemHeader: ViewStyle = {
@@ -193,7 +244,7 @@ const $footerButtonPressed: ViewStyle = {
     backgroundColor: colors.palette.neutral200
 }
 const $buttonTextStyle: TextStyle = {
-    color: colors.text,
+    color: colors.palette.neutral600,
     paddingHorizontal: spacing.xxxs
 }
 const $iconContainer: ViewStyle = {
@@ -207,4 +258,32 @@ const $iconStyle: ViewStyle = {
 }
 const flexRow: ViewStyle = {
     flexDirection: "row"
+}
+
+const $modalStyle: ViewStyle = {
+    borderTopWidth: 1,
+    borderTopColor: colors.palette.neutral200,
+    height: "85%",
+    backgroundColor: colors.palette.neutral200
+}
+
+const $postButtonTextStyle: TextStyle = {
+    color: colors.palette.neutral700
+
+}
+const $postModalButtonStyle: ViewStyle = {
+    margin: 8,
+    backgroundColor: colors.palette.neutral100,
+    borderRadius: 5,
+    justifyContent: "flex-start"
+}
+
+const $modalEmptySpace: ViewStyle = {
+    height: "15%",
+    backgroundColor: colors.transparent
+}
+
+const $modalHeader: ViewStyle = {
+    paddingTop: 0,
+    marginTop: 0
 }
