@@ -9,7 +9,7 @@ import { formatTimeSince } from "app/utils/formatTime"
 import { colors, spacing } from "app/theme"
 import { Button } from "./Button"
 import { Icon } from "./Icon"
-import Animated, { Extrapolation, interpolate, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
+import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
 import { useStores } from "app/models"
 import { Header } from "./Header"
 
@@ -28,26 +28,7 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
 
     const [cardSettingOpen, setCardSettingOpen] = useState(false);
 
-    const animatedRegularLikeButtonStyles = useAnimatedStyle(() => {
-        return {
-            transform: [
-                {
-                    scale: interpolate(liked.value, [0,1], [1,0], Extrapolation.EXTEND)
-                },
-            ],
-            opacity: interpolate(liked.value, [0,1], [1,0], Extrapolation.CLAMP)
-        }
-    })
-    const animatedFilledLikeButtonStyles = useAnimatedStyle(() => {
-        return {
-        transform: [
-            {
-            scale: liked.value,
-            },
-        ],
-        opacity: liked.value,
-        }
-    })
+    
 
     const handlePressLike = () => {
         post.toggleLiked(userGuid)
@@ -134,64 +115,102 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
                 </View>
             }
             FooterComponent={
-                <View style={$footerContainer}>
-                    <Button 
-                        style={$footerButtonStyle}
-                        pressedStyle={$footerButtonPressed}
-                        text="Like"
-                        textStyle={$buttonTextStyle}
-                        onPress={handlePressLike}
-                        LeftAccessory={() =>( 
-                            <View>
-                                <Animated.View
-                                    style={[$iconContainer,animatedRegularLikeButtonStyles]}
-                                >
-                                    <Icon 
-                                        icon={["far", "thumbs-up"]}
-                                        containerStyle={$iconStyle}
-                                        color={colors.palette.neutral600} 
-                                    />
-                                </Animated.View>
-                                 <Animated.View
-                                    style={[$iconContainer,animatedFilledLikeButtonStyles]}
-                                >
-                                    <Icon 
-                                        icon={["fas", "thumbs-up"]}
-                                        containerStyle={$iconStyle} 
-                                        color={colors.palette.neutral600}
-                                    />
-                                </Animated.View>
-                            </View>)}
-                    >
-                    </Button> 
-                    <Button 
-                        style={$footerButtonStyle}
-                        pressedStyle={$footerButtonPressed}
-                        text="Comments"
-                        textStyle={$buttonTextStyle}
-                        LeftAccessory={() => 
-                            <Icon 
-                                icon={"comment"} 
-                                color={colors.palette.neutral600}
-                        />}/> 
-                    <Button 
-                        style={$footerButtonStyle}
-                        pressedStyle={$footerButtonPressed}
-                        text="Message"
-                        textStyle={$buttonTextStyle}
-                        LeftAccessory={() => 
-                            <Icon 
-                                icon={ "share"} 
-                                color={colors.palette.neutral600}
-                        />}
-                    />
-                </View>
+                <CardFooter 
+                    liked={liked} 
+                    handlePressLike={handlePressLike} 
+                />
             }
         />
 
         
     )
 })
+
+export interface CardFooterProps {
+    liked: SharedValue<number>
+    handlePressLike: () => void
+}
+export const CardFooter = (props: CardFooterProps) => {
+    const { liked, handlePressLike } = props
+
+    const animatedRegularLikeButtonStyles = useAnimatedStyle(() => {
+        return {
+            transform: [
+                {
+                    scale: interpolate(liked.value, [0,1], [1,0], Extrapolation.EXTEND)
+                },
+            ],
+            opacity: interpolate(liked.value, [0,1], [1,0], Extrapolation.CLAMP)
+        }
+    })
+    const animatedFilledLikeButtonStyles = useAnimatedStyle(() => {
+        return {
+        transform: [
+            {
+            scale: liked.value,
+            },
+        ],
+        opacity: liked.value,
+        }
+    })
+
+    return (
+        <View style={$footerContainer}>
+            <Button 
+                style={$footerButtonStyle}
+                pressedStyle={$footerButtonPressed}
+                text="Like"
+                textStyle={$buttonTextStyle}
+                onPress={handlePressLike}
+                LeftAccessory={() =>( 
+                    <View>
+                        <Animated.View
+                            style={[$iconContainer,animatedRegularLikeButtonStyles]}
+                        >
+                            <Icon 
+                                icon={["far", "thumbs-up"]}
+                                containerStyle={$iconStyle}
+                                color={colors.palette.neutral600} 
+                            />
+                        </Animated.View>
+                            <Animated.View
+                            style={[$iconContainer,animatedFilledLikeButtonStyles]}
+                        >
+                            <Icon 
+                                icon={["fas", "thumbs-up"]}
+                                containerStyle={$iconStyle} 
+                                color={colors.palette.neutral600}
+                            />
+                        </Animated.View>
+                    </View>)}
+            >
+            </Button> 
+            <Button 
+                style={$footerButtonStyle}
+                pressedStyle={$footerButtonPressed}
+                text="Comments"
+                textStyle={$buttonTextStyle}
+                LeftAccessory={() => 
+                    <Icon 
+                        icon={"comment"} 
+                        color={colors.palette.neutral600}
+                />}/> 
+            <Button 
+                style={$footerButtonStyle}
+                pressedStyle={$footerButtonPressed}
+                text="Message"
+                textStyle={$buttonTextStyle}
+                LeftAccessory={() => 
+                    <Icon 
+                        icon={ "share"} 
+                        color={colors.palette.neutral600}
+                />}
+            />
+        </View>
+    )
+}
+
+
 const $item: ViewStyle = {
     borderRadius: 0,
     padding: spacing.md,
