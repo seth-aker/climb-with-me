@@ -1,6 +1,6 @@
 import React from "react";
 import { ImageStyle, View, ViewStyle } from "react-native";
-import { Comment } from "app/models/CommentModel";
+import { IComment } from "app/models/CommentModel";
 import { ListView } from "./ListView";
 import { AutoImage } from "./AutoImage";
 import { Text } from "./Text";
@@ -8,22 +8,22 @@ import { CardFooter } from "./PostCard";
 import { useSharedValue, withSpring } from "react-native-reanimated";
 import { useStores } from "app/models";
 export interface CommentSectionProps {
-    comments: Comment[]
+    comments: IComment[],
+    handlePressComment: () => void
 }
 export const CommentSection = (props: CommentSectionProps) => {
-    const { comments } = props;
+    const { comments, handlePressComment } = props;
     const { userStore } = useStores();
-    const sortedComments = comments.toSorted((a, b) => {
-        return a.createdAt.getMilliseconds() - b.createdAt.getMilliseconds()
-    });
     return (
         <View style={$containerView}>
             <ListView 
-                data={sortedComments}
+                data={comments}
+                estimatedItemSize={50}
                 renderItem={(item) => (
                     <CommentCard 
                         comment={item.item}
                         viewingUser={userStore.authId || ""}
+                        handlePressComment={handlePressComment}
                         />
                 )}
             />
@@ -32,16 +32,16 @@ export const CommentSection = (props: CommentSectionProps) => {
 }
 
 export interface CommentCardProps {
-    comment: Comment
+    comment: IComment
     viewingUser: string
+    handlePressComment: () => void
 }
-const CommentCard = (props: CommentCardProps) => {
-    const { comment, viewingUser } = props;
+export const CommentCard = (props: CommentCardProps) => {
+    const { comment, viewingUser, handlePressComment } = props;
     const liked = useSharedValue(comment.likedByUser(viewingUser) ? 1 : 0)
 
     const handlePressLike = () => {
         liked.value = withSpring(liked.value ? 0 : 1);
-
     }
     return (
         <View>
@@ -59,7 +59,10 @@ const CommentCard = (props: CommentCardProps) => {
                 />
             </View>
             <View>
-                <CardFooter liked={liked} handlePressLike={handlePressLike} />
+                <CardFooter 
+                    liked={liked} 
+                    handlePressLike={handlePressLike} 
+                    handlePressComments={handlePressComment}/>
             </View>
         </View>
     )

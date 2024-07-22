@@ -1,6 +1,4 @@
-
 import { Icon, Screen,  TextField, Button, Card, ListView, Text} from "app/components";
-import { HomeTabScreenProps } from "app/navigators";
 import { colors, spacing } from "app/theme";
 import { observer } from "mobx-react-lite";
 import React, { FC, useEffect, useState } from "react";
@@ -12,6 +10,7 @@ import { ModalPicker } from "app/components/ModalPicker/ModalPicker";
 import { ClimbingStyleModal } from "./ClimbingStyleModal";
 import { useStores } from "app/models";
 import { IClimbingStyle } from "app/models/ClimbingStyleModel";
+import { HomeTabScreenProps } from "app/navigators/types";
 
 interface ProfileScreenProps extends HomeTabScreenProps<"Profile"> {
 }

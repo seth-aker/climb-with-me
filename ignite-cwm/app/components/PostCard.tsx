@@ -12,14 +12,16 @@ import { Icon } from "./Icon"
 import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
 import { useStores } from "app/models"
 import { Header } from "./Header"
-
+import { useNavigation } from "@react-navigation/native"
+import { RootStackNavigation } from "app/navigators/types"
 
 export interface PostCardProps {
     post: Post
-
+    showComments?: boolean
 }
 export const PostCard = observer(function PostCard(props: PostCardProps) {
-    const { post, } = props;
+    const navigation = useNavigation<RootStackNavigation>();
+    const { post, showComments = false } = props;
     const {userStore: {authId}, postStore } = useStores();
     const timeSincePost = Date.now() - post.createdAt.getTime();
     const userGuid = authId || "";
@@ -28,11 +30,14 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
 
     const [cardSettingOpen, setCardSettingOpen] = useState(false);
 
-    
-
     const handlePressLike = () => {
         post.toggleLiked(userGuid)
         liked.value = withSpring(liked.value ? 0 : 1);
+    }
+
+    const handlePressComments = () => {
+        postStore.setSelectedPostId(post.guid);
+        navigation.navigate("PostScreen")
     }
     
     const handledSettingBtnPressed = () => {
@@ -117,7 +122,9 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
             FooterComponent={
                 <CardFooter 
                     liked={liked} 
-                    handlePressLike={handlePressLike} 
+                    handlePressLike={handlePressLike}
+                    handlePressComments={handlePressComments} 
+                    handleCommentsDisabled={showComments}
                 />
             }
         />
@@ -129,9 +136,11 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
 export interface CardFooterProps {
     liked: SharedValue<number>
     handlePressLike: () => void
+    handlePressComments: () => void
+    handleCommentsDisabled?: boolean 
 }
 export const CardFooter = (props: CardFooterProps) => {
-    const { liked, handlePressLike } = props
+    const { liked, handlePressLike, handlePressComments, handleCommentsDisabled = false} = props
 
     const animatedRegularLikeButtonStyles = useAnimatedStyle(() => {
         return {
@@ -190,6 +199,8 @@ export const CardFooter = (props: CardFooterProps) => {
                 pressedStyle={$footerButtonPressed}
                 text="Comments"
                 textStyle={$buttonTextStyle}
+                onPress={handlePressComments}
+                disabled={handleCommentsDisabled}
                 LeftAccessory={() => 
                     <Icon 
                         icon={"comment"} 

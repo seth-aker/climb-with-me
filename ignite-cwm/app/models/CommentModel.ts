@@ -17,7 +17,7 @@ export const CommentModel = types.model("Comment", {
     }
 }))
 
-export interface Comment extends Instance<typeof CommentModel> {}
+export interface IComment extends Instance<typeof CommentModel> {}
 export interface CommentSnapshotIn extends SnapshotIn<typeof CommentModel>{}
 export interface CommentSnapshotOut extends SnapshotOut<typeof CommentModel>{}
 

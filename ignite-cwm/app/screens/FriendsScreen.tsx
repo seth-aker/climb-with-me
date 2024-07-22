@@ -1,5 +1,5 @@
 import { Screen, Text } from "app/components";
-import { HomeTabScreenProps } from "app/navigators";
+import { HomeTabScreenProps } from "app/navigators/types";
 import { spacing } from "app/theme";
 import { observer } from "mobx-react-lite";
 import React, { FC } from "react";
