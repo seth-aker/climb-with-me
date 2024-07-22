@@ -112,7 +112,8 @@ const $container: ViewStyle = {
   backgroundColor: colors.background,
 }
 const $headerStyle: ViewStyle ={
-  marginBottom: 0
+  marginBottom: 0,
+
 }
 const $topContainer: ViewStyle = {
   marginTop: 0,

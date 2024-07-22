@@ -140,7 +140,7 @@ export interface CardFooterProps {
     handleCommentsDisabled?: boolean 
 }
 export const CardFooter = (props: CardFooterProps) => {
-    const { liked, handlePressLike, handlePressComments, handleCommentsDisabled = false} = props
+    const {  liked, handlePressLike, handlePressComments, handleCommentsDisabled = false} = props
 
     const animatedRegularLikeButtonStyles = useAnimatedStyle(() => {
         return {

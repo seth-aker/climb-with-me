@@ -92,8 +92,13 @@ const {
 
         {isAuthenticated ? (
           <>
-            <Stack.Screen name="HomeTabs" component={HomeTabNavigator} />
-            <Stack.Screen name="PostScreen" component={Screens.PostScreen} />
+            <Stack.Screen 
+              name="HomeTabs" 
+              component={HomeTabNavigator} />
+            <Stack.Screen 
+              name="PostScreen" 
+              component={Screens.PostScreen} 
+              options={{animation: "slide_from_right"}}/>
              
           </>
         ) : (

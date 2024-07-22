@@ -18,7 +18,7 @@ export const PostStoreModel = types
     deletePost(post: Post) {
         return store.posts.remove(post);
     },
-    setSelectedPostId(postId: string) {
+    setSelectedPostId(postId: string | null) {
         store.selectedPostId = postId;
     }
 }))
