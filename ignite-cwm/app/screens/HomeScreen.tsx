@@ -2,7 +2,6 @@ import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useState } from "react"
 import { View, ViewStyle } from "react-native"
 import { Button, Header, ListView, Screen, Text } from "app/components"
-import { HomeTabScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
 import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
 import { LoadingSpinner } from "../components/LoadingSpinner"
@@ -13,6 +12,7 @@ import { NewClimbModal } from "app/components/NewClimbModal"
 import { Post } from "app/models/Post"
 import { PostCard } from "app/components/PostCard"
 import { ContentStyle } from "@shopify/flash-list"
+import { HomeTabScreenProps } from "app/navigators/types"
 
 // const welcomeLogo = require("../../assets/images/logo.png")
 
@@ -73,7 +73,7 @@ const manualRefresh = async () => {
     <>
       <LoadingSpinner />
     </> : (
-    <Screen preset="fixed" style={$container}>
+    <Screen preset="fixed" style={$container} safeAreaEdges={[ "bottom"]}>
       <Header 
         containerStyle={$headerStyle}
         backgroundColor={colors.palette.primary500}/>
@@ -112,7 +112,8 @@ const $container: ViewStyle = {
   backgroundColor: colors.background,
 }
 const $headerStyle: ViewStyle ={
-  marginBottom: 0
+  marginBottom: 0,
+
 }
 const $topContainer: ViewStyle = {
   marginTop: 0,

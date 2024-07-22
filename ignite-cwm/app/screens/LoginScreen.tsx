@@ -1,4 +1,4 @@
-import { AppStackScreenProps } from "app/navigators";
+import { AppStackScreenProps } from "app/navigators/types";
 import { observer } from "mobx-react-lite";
 import React, { FC } from "react";
 import { Button, Screen, Text } from "../components"
@@ -7,7 +7,7 @@ import { spacing, colors } from "app/theme";
 import { useAuth0 } from "react-native-auth0";
 import { useStores } from "app/models";
 
-interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
+type LoginScreenProps = AppStackScreenProps<"Login">
 const LOGO_URI = require("../../assets/images/logo.png");
 
 export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_props) {

@@ -1,4 +1,4 @@
-import { HomeTabScreenProps } from "app/navigators";
+import { HomeTabScreenProps } from "app/navigators/types";
 // import { useSafeAreaInsetsStyle } from "app/utils/useSafeAreaInsetsStyle";
 import { observer } from "mobx-react-lite";
 import React, { FC } from "react";

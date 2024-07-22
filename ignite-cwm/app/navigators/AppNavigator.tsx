@@ -8,9 +8,8 @@ import {
   DarkTheme,
   DefaultTheme,
   NavigationContainer,
-  NavigatorScreenParams,
 } from "@react-navigation/native"
-import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
+import { createNativeStackNavigator} from "@react-navigation/native-stack"
 import { observer } from "mobx-react-lite"
 import React, { useEffect } from "react"
 import { useColorScheme } from "react-native"
@@ -20,7 +19,8 @@ import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { colors } from "app/theme"
 import { useStores } from "app/models"
 import { useAuth0 } from "react-native-auth0"
-import { HomeTabNavigator, HomeTabParamList } from "./HomeTabsNavigator"
+import { HomeTabNavigator } from "./HomeTabsNavigator"
+import { AppStackParamList } from "./types"
 
 
 
@@ -37,12 +37,6 @@ import { HomeTabNavigator, HomeTabParamList } from "./HomeTabsNavigator"
  *   https://reactnavigation.org/docs/typescript#type-checking-the-navigator
  *   https://reactnavigation.org/docs/typescript/#organizing-types
  */
-export type AppStackParamList = {
-  HomeTabs: NavigatorScreenParams<HomeTabParamList>
-  Login: undefined
-  // 🔥 Your screens go here
-  // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
-}
 
 /**
  * This is a list of all the route names that will exit the app if the back button
@@ -50,10 +44,7 @@ export type AppStackParamList = {
  */
 const exitRoutes = Config.exitRoutes
 
-export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStackScreenProps<
-  AppStackParamList,
-  T
->
+
 
 // Documentation: https://reactnavigation.org/docs/stack-navigator/
 const Stack = createNativeStackNavigator<AppStackParamList>()
@@ -101,8 +92,13 @@ const {
 
         {isAuthenticated ? (
           <>
-            <Stack.Screen name="HomeTabs" component={HomeTabNavigator} />
-             
+            <Stack.Screen 
+              name="HomeTabs" 
+              component={HomeTabNavigator} />
+            <Stack.Screen 
+              name="PostScreen" 
+              component={Screens.PostScreen} 
+              options={{animation: "slide_from_right"}}/>
              
           </>
         ) : (
@@ -111,8 +107,7 @@ const {
           </>
         )}
             
-        {/** 🔥 Your screens go here */}
-        {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
+        
       </Stack.Navigator>
     )
 })

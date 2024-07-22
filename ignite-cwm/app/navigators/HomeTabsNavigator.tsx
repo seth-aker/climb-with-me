@@ -1,8 +1,6 @@
-import { CompositeScreenProps } from "@react-navigation/native"
-import { BottomTabScreenProps, createBottomTabNavigator } from "@react-navigation/bottom-tabs"
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import React from "react"
 import { TextStyle, ViewStyle } from "react-native"
-import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { colors, spacing, typography } from "app/theme"
 import { HomeScreen, ProfileScreen } from "app/screens"
@@ -11,20 +9,7 @@ import en from "app/i18n/en"
 import { Icon } from "app/components"
 import { MessageScreen } from "app/screens/MessageScreen"
 import { FriendsScreen } from "app/screens/FriendsScreen"
-
-export type HomeTabParamList = {
-    Home: undefined
-    Messages: undefined
-    Friends: undefined
-    Profile: undefined
-
-}
-
-
-export type HomeTabScreenProps<T extends keyof HomeTabParamList> = CompositeScreenProps<
-    BottomTabScreenProps<HomeTabParamList, T>,
-    AppStackScreenProps<keyof AppStackParamList>
-    >
+import { HomeTabParamList } from "./types"
 
 const Tab = createBottomTabNavigator<HomeTabParamList>();
 

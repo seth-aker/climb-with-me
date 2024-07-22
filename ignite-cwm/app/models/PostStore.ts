@@ -6,6 +6,7 @@ import { Post, PostModel } from "./Post";
 export const PostStoreModel = types
 .model("PostStore", {
     posts: types.array(PostModel),
+    selectedPostId: types.maybeNull(types.string)
 }).views((store) => ({
      getPostById(guid: string) {
         return store.posts.find(post => post.guid === guid)
@@ -16,6 +17,9 @@ export const PostStoreModel = types
     },
     deletePost(post: Post) {
         return store.posts.remove(post);
+    },
+    setSelectedPostId(postId: string | null) {
+        store.selectedPostId = postId;
     }
 }))
 .actions(( store ) => ({

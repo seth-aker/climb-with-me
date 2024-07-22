@@ -5,4 +5,5 @@ export * from "../components/LoadingSpinner"
 export * from "./FriendsScreen"
 export * from "./MessageScreen"
 export * from "./ProfileScreens/ProfileScreen"
+export * from "./PostScreen"
 // export other screens here

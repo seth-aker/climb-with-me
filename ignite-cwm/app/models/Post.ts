@@ -1,5 +1,5 @@
 import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree";
-import { CommentModel } from "./CommentModel";
+import { CommentModel, IComment } from "./CommentModel";
 
 
 export const PostModel = types
@@ -23,6 +23,9 @@ export const PostModel = types
     removedLiked(guid: string) {
         post.likes.remove(guid);
     },
+    addComment(comment: IComment) {
+        post.comments.push(comment)
+    }
 }))
 .views((post) => ({
     isLikedByUser(guid: string) {
