@@ -33,6 +33,9 @@ export const PostModel = types
             return false
         }
         return post.likes.includes(guid);
+    },
+    timeSincePost() {
+        return Date.now() - post.createdAt.getTime()
     }
 }) )
 .actions((post) => ({

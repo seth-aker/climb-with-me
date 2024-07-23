@@ -22,22 +22,6 @@ import { useAuth0 } from "react-native-auth0"
 import { HomeTabNavigator } from "./HomeTabsNavigator"
 import { AppStackParamList } from "./types"
 
-
-
-/**
- * This type allows TypeScript to know what routes are defined in this navigator
- * as well as what properties (if any) they might take when navigating to them.
- *
- * If no params are allowed, pass through `undefined`. Generally speaking, we
- * recommend using your MobX-State-Tree store(s) to keep application state
- * rather than passing state through navigation params.
- *
- * For more information, see this documentation:
- *   https://reactnavigation.org/docs/params/
- *   https://reactnavigation.org/docs/typescript#type-checking-the-navigator
- *   https://reactnavigation.org/docs/typescript/#organizing-types
- */
-
 /**
  * This is a list of all the route names that will exit the app if the back button
  * is pressed while in that screen. Only affects Android.
@@ -56,8 +40,6 @@ const {
   userStore
 } = useStores();
   const { getCredentials, user } = useAuth0(); 
-
-  
 
   // Used to sync the authentication store with Auth0's SDK and determine what screen to load first.
   useEffect(() => {
@@ -106,8 +88,6 @@ const {
             <Stack.Screen name="Login" component={Screens.LoginScreen} />
           </>
         )}
-            
-        
       </Stack.Navigator>
     )
 })

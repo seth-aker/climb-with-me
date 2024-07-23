@@ -1,13 +1,13 @@
 import { observer } from "mobx-react-lite"
-import React, { FC, useEffect, useState } from "react"
+import React, { FC, useState } from "react"
 import { View, ViewStyle } from "react-native"
-import { Button, Header, ListView, Screen, Text } from "app/components"
+import { Button, Header, ListView, Screen} from "app/components"
 import { colors, spacing } from "../theme"
 import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
 import { LoadingSpinner } from "../components/LoadingSpinner"
 import { useAuth0 } from "react-native-auth0"
 import { useStores } from "app/models"
-import * as Location from "expo-location"
+// import * as Location from "expo-location"
 import { NewClimbModal } from "app/components/NewClimbModal"
 import { Post } from "app/models/Post"
 import { PostCard } from "app/components/PostCard"
@@ -26,29 +26,29 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
   const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
   const { clearSession } = useAuth0();
   const { authenticationStore: { logout, tokenLoading }, postStore} = useStores();
-  const [location, setLocation] = useState<Location.LocationObject | undefined>(undefined)
-  const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
+  // const [location, setLocation] = useState<Location.LocationObject | undefined>(undefined)
+  // const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
   
   const [newPostModalVis, setNewPostModalVis] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   // TODO: make this into a hook that can be used anywhere
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.getForegroundPermissionsAsync();
-      // checks current permission status and if not granted yet, requests permission 
-      if(status !== "granted") {
-        status = (await Location.requestForegroundPermissionsAsync()).status
-      }
-      // checks permission status again if the user granted permission from the Location.requestForegroundPermissionsAsync() function. 
-      if(status !== "granted") {
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
-      const location = await Location.getCurrentPositionAsync();
-      setLocation(location);
-    })();
-  }, [])
+  // useEffect(() => {
+  //   (async () => {
+  //     let { status } = await Location.getForegroundPermissionsAsync();
+  //     // checks current permission status and if not granted yet, requests permission 
+  //     if(status !== "granted") {
+  //       status = (await Location.requestForegroundPermissionsAsync()).status
+  //     }
+  //     // checks permission status again if the user granted permission from the Location.requestForegroundPermissionsAsync() function. 
+  //     if(status !== "granted") {
+  //       setErrorMsg('Permission to access location was denied');
+  //       return;
+  //     }
+  //     const location = await Location.getCurrentPositionAsync();
+  //     setLocation(location);
+  //   })();
+  // }, [])
 
 
 
@@ -80,7 +80,7 @@ const manualRefresh = async () => {
       <View style={$topContainer}>
          <ListView<Post>
           contentContainerStyle={$listContentContainer}
-          data={postStore.posts.slice()} // Using slice to create a copy of the array that is then used for the cards. Breaks if you don't do this
+          data={postStore.posts.slice()} // Using slice to create a copy of the array that is then used for the cards. Breaks if you don't do this         
           estimatedItemSize={100}
           onRefresh={manualRefresh}
           refreshing={refreshing}

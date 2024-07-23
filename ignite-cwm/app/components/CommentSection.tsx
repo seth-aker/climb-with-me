@@ -39,7 +39,7 @@ export const CommentSection = (props: CommentSectionProps) => {
 
 const $containerView: ViewStyle = {
     minHeight: 50,
-    marginBottom: spacing.sm
+
 }
 const $commentListStyle: ViewStyle = {
     
@@ -61,7 +61,7 @@ export const CommentCard = observer((props: CommentCardProps) => {
             comment.removeLike(viewingUser);
         } else {
             comment.addLike(viewingUser);
-            likedFontSize.value = withSequence(withSpring(16, {duration: 600}), withSpring(12, {duration: 500}))
+            likedFontSize.value = withSequence(withSpring(15, {duration: 600}), withSpring(12, {duration: 500}))
         }
     }
 
@@ -164,7 +164,7 @@ const $likeButtonText: TextStyle = {
     color: colors.palette.neutral600
 }
 const $likedButtonText: TextStyle = {
-    color: colors.palette.primary500
+    color: colors.palette.primary600
 }
 
 const $numOfLikesContainer: ViewStyle = {

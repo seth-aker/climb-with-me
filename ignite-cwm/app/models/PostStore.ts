@@ -8,7 +8,7 @@ export const PostStoreModel = types
     posts: types.array(PostModel),
     selectedPostId: types.maybeNull(types.string)
 }).views((store) => ({
-     getPostById(guid: string) {
+    getPostById(guid: string) {
         return store.posts.find(post => post.guid === guid)
     }
 })).actions(( store ) => ({

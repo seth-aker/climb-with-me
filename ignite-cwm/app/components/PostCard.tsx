@@ -3,13 +3,13 @@ import { Card } from "./Card"
 import { Text } from "./Text"
 import { observer } from "mobx-react-lite"
 import { Post } from "app/models/Post"
-import { ImageStyle, Modal, TextStyle, View, ViewStyle} from "react-native"
+import { ImageStyle, Modal, StyleProp, TextStyle, View, ViewStyle} from "react-native"
 import { AutoImage } from "./AutoImage"
 import { formatTimeSince } from "app/utils/formatTime"
 import { colors, spacing } from "app/theme"
 import { Button } from "./Button"
 import { Icon } from "./Icon"
-import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
+import Animated, { Extrapolation, interpolate, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
 import { useStores } from "app/models"
 import { Header } from "./Header"
 import { useNavigation } from "@react-navigation/native"
@@ -17,23 +17,19 @@ import { RootStackNavigation } from "app/navigators/types"
 
 export interface PostCardProps {
     post: Post
-    showComments?: boolean
 }
 export const PostCard = observer(function PostCard(props: PostCardProps) {
     const navigation = useNavigation<RootStackNavigation>();
-    const { post, showComments = false } = props;
+    const { post } = props;
     const {userStore: {authId}, postStore } = useStores();
-    const timeSincePost = Date.now() - post.createdAt.getTime();
+  
     const userGuid = authId || "";
-    const liked = useSharedValue(post.isLikedByUser(userGuid) ? 1 : 0);
+    
     const postOwned = userGuid === post.postUserId;
 
     const [cardSettingOpen, setCardSettingOpen] = useState(false);
 
-    const handlePressLike = () => {
-        post.toggleLiked(userGuid)
-        liked.value = withSpring(liked.value ? 0 : 1);
-    }
+    
 
     const handlePressComments = () => {
         postStore.setSelectedPostId(post.guid);
@@ -68,7 +64,7 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
                             <Text
                                 size="xxs"
                                 weight="light" 
-                                text={`${formatTimeSince(timeSincePost)}`}
+                                text={`${formatTimeSince(post.timeSincePost())}`}
                                 />
                         </View>
                     </View>
@@ -95,7 +91,7 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
                             {postOwned ? <Button 
                                 style={$postModalButtonStyle}
                                 textStyle={$postButtonTextStyle}
-                                pressedStyle={$footerButtonPressed}
+                                pressedStyle={$defaultButtonPressed}
                                 text="Delete" 
                                 LeftAccessory={() => <Icon icon={"xmark"} color={colors.palette.neutral700}/>}
                                 onPress={handleDeletePost}
@@ -121,10 +117,9 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
             }
             FooterComponent={
                 <CardFooter 
-                    liked={liked} 
-                    handlePressLike={handlePressLike}
+                    post={post}
                     handlePressComments={handlePressComments} 
-                    handleCommentsDisabled={showComments}
+                    
                 />
             }
         />
@@ -134,13 +129,29 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
 })
 
 export interface CardFooterProps {
-    liked: SharedValue<number>
-    handlePressLike: () => void
+    post: Post
     handlePressComments: () => void
-    handleCommentsDisabled?: boolean 
+    containerStyle?: StyleProp<ViewStyle> | undefined 
+    buttonStyle?: StyleProp<ViewStyle> | undefined
+    pressedButtonStyle?: StyleProp<ViewStyle> | undefined 
 }
-export const CardFooter = (props: CardFooterProps) => {
-    const {  liked, handlePressLike, handlePressComments, handleCommentsDisabled = false} = props
+
+export const CardFooter = observer((props: CardFooterProps) => {
+    const { 
+        post,
+        containerStyle: $containerStyleOverride,
+        buttonStyle: $buttonStyleOverride,
+        pressedButtonStyle: $pressedButtonStyleOverride, 
+        handlePressComments
+    } = props
+
+    const {userStore} = useStores();
+    const liked = useSharedValue(post.isLikedByUser(userStore.authId || "") ? 1 : 0)
+
+    const handlePressLike = () => {
+        post.toggleLiked(userStore.authId || "")
+        liked.value = withSpring(liked.value ? 0 : 1);
+    }
 
     const animatedRegularLikeButtonStyles = useAnimatedStyle(() => {
         return {
@@ -162,6 +173,9 @@ export const CardFooter = (props: CardFooterProps) => {
         opacity: liked.value,
         }
     })
+    const $footerContainer = [$containerDefault, $containerStyleOverride]
+    const $footerButtonStyle = [$buttonDefault, $buttonStyleOverride]
+    const $footerButtonPressed = [$defaultButtonPressed, $pressedButtonStyleOverride]
 
     return (
         <View style={$footerContainer}>
@@ -197,10 +211,9 @@ export const CardFooter = (props: CardFooterProps) => {
             <Button 
                 style={$footerButtonStyle}
                 pressedStyle={$footerButtonPressed}
-                text="Comments"
+                text="Comment"
                 textStyle={$buttonTextStyle}
                 onPress={handlePressComments}
-                disabled={handleCommentsDisabled}
                 LeftAccessory={() => 
                     <Icon 
                         icon={"comment"} 
@@ -219,7 +232,7 @@ export const CardFooter = (props: CardFooterProps) => {
             />
         </View>
     )
-}
+})
 
 
 const $item: ViewStyle = {
@@ -260,17 +273,17 @@ const $headerTextContainer: ViewStyle = {
 const $contentContainer: ViewStyle = {
     marginTop: spacing.xxs
 }
-const $footerContainer: ViewStyle = {
+const $containerDefault: ViewStyle = {
     flexDirection: "row",
     justifyContent: "space-between"
 }
-const $footerButtonStyle: ViewStyle = {
+const $buttonDefault: ViewStyle = {
     flexGrow: 1,
     backgroundColor: colors.palette.neutral100,
     borderWidth: 0,
     borderRadius: 5
 }
-const $footerButtonPressed: ViewStyle = {
+const $defaultButtonPressed: ViewStyle = {
     backgroundColor: colors.palette.neutral200
 }
 const $buttonTextStyle: TextStyle = {
