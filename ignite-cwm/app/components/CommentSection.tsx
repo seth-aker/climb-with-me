@@ -1,14 +1,17 @@
 import React from "react";
-import { ImageStyle, View, ViewStyle } from "react-native";
+import { ImageStyle, TextStyle, View, ViewStyle } from "react-native";
 import { IComment } from "app/models/CommentModel";
 import { ListView } from "./ListView";
 import { AutoImage } from "./AutoImage";
 import { Text } from "./Text";
-import { useSharedValue, withSpring } from "react-native-reanimated";
+import Animated, { useAnimatedProps, useSharedValue, withSequence, withSpring } from "react-native-reanimated";
 import { useStores } from "app/models";
 import { formatTimeSince } from "app/utils/formatTime";
-import { spacing } from "app/theme";
+import { colors, spacing } from "app/theme";
 import { Card } from "./Card";
+import { Button } from "./Button";
+import { observer } from "mobx-react-lite";
+
 export interface CommentSectionProps {
     comments: IComment[],
     handlePressComment: () => void
@@ -35,7 +38,8 @@ export const CommentSection = (props: CommentSectionProps) => {
 }
 
 const $containerView: ViewStyle = {
-    minHeight: 50
+    minHeight: 50,
+    marginBottom: spacing.sm
 }
 const $commentListStyle: ViewStyle = {
     
@@ -47,13 +51,26 @@ export interface CommentCardProps {
     viewingUser: string
     handlePressComment: () => void
 }
-export const CommentCard = (props: CommentCardProps) => {
-    const { comment, viewingUser, handlePressComment } = props;
-    const liked = useSharedValue(comment.likedByUser(viewingUser) ? 1 : 0)
+export const CommentCard = observer((props: CommentCardProps) => {
+    const { comment, viewingUser } = props;
+    const liked = comment.likedByUser(viewingUser);
+    const likedFontSize = useSharedValue(12);
     const timeSinceComment = Date.now() - comment.createdAt.getTime();
     const handlePressLike = () => {
-        liked.value = withSpring(liked.value ? 0 : 1);
+        if(liked) {
+            comment.removeLike(viewingUser);
+        } else {
+            comment.addLike(viewingUser);
+            likedFontSize.value = withSequence(withSpring(16, {duration: 600}), withSpring(12, {duration: 500}))
+        }
     }
+
+    const animatedLikedText = useAnimatedProps(() => {
+        return {
+            fontSize: likedFontSize.value
+        }
+    })
+    const likeTextStyle = liked ? $likedButtonText : $likeButtonText
     return (
         <View style={$container}>
             <AutoImage 
@@ -72,9 +89,7 @@ export const CommentCard = (props: CommentCardProps) => {
                                 size="xxs"
                                 weight="light" 
                                 text={`${formatTimeSince(timeSinceComment)}`}
-                                />
-                    
-                       
+                                />                       
                     </View>
                 }
                 ContentComponent={      
@@ -83,11 +98,29 @@ export const CommentCard = (props: CommentCardProps) => {
                     text={comment.text}
                     />
                 }
+                FooterComponent={
+                    <View style={$footerContainer}>
+                        <Button
+                            style={$likeButton}
+                            pressedStyle={$pressedLikeButton}
+                            onPress={handlePressLike}>
+                            <Animated.Text style={[likeTextStyle, animatedLikedText]} >
+                                {"Like"}
+                            </Animated.Text>
+                        </Button>
+                        <View style={$numOfLikesContainer}>
+                            <Text 
+                                text={`${comment.likes.length} like${comment.likes.length === 1 ? " " : "s"}`}
+                                size="xs"
+                            />
+                        </View>
+                    </View>
+                }
                 />     
       
         </View>
     )
-}
+})
 const $container: ViewStyle ={
     flexDirection: "row",
     marginHorizontal: spacing.sm,
@@ -104,8 +137,6 @@ const $itemThumbnail: ImageStyle = {
     borderRadius: spacing.md,
     alignSelf: "flex-start",
 }
-
-
 const $commentHeading: ViewStyle = {
     alignContent: "center",
     marginHorizontal: spacing.sm,
@@ -114,4 +145,29 @@ const $commentHeading: ViewStyle = {
 const $commentTextStyle: ViewStyle = {
     marginHorizontal: spacing.sm,
     paddingLeft: 0
+}
+const $footerContainer: ViewStyle = {
+    flexDirection: "row",
+    justifyContent: "space-between"
+}
+const $likeButton: ViewStyle = {
+    backgroundColor: colors.palette.neutral100,
+    borderWidth: 0,
+    borderRadius: 5,
+    justifyContent: "flex-start",
+} 
+const $pressedLikeButton: ViewStyle = {
+    backgroundColor: colors.palette.neutral200
+}
+
+const $likeButtonText: TextStyle = {
+    color: colors.palette.neutral600
+}
+const $likedButtonText: TextStyle = {
+    color: colors.palette.primary500
+}
+
+const $numOfLikesContainer: ViewStyle = {
+    flexDirection: "row",
+    alignItems: "center"
 }
