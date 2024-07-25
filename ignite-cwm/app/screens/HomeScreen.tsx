@@ -1,18 +1,19 @@
 import { observer } from "mobx-react-lite"
 import React, { FC, useState } from "react"
 import { View, ViewStyle } from "react-native"
-import { Button, Header, ListView, Screen} from "app/components"
+import { Header, ListView, Screen, Text} from "app/components"
 import { colors, spacing } from "../theme"
-import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
 import { LoadingSpinner } from "../components/LoadingSpinner"
 import { useAuth0 } from "react-native-auth0"
 import { useStores } from "app/models"
 // import * as Location from "expo-location"
-import { NewClimbModal } from "app/components/NewClimbModal"
 import { Post } from "app/models/Post"
 import { PostCard } from "app/components/PostCard"
 import { ContentStyle } from "@shopify/flash-list"
 import { HomeTabScreenProps } from "app/navigators/types"
+import { NewPostBar } from "app/components/NewPostBar"
+import { Logo } from "app/components/Logo"
+
 
 // const welcomeLogo = require("../../assets/images/logo.png")
 
@@ -23,13 +24,11 @@ interface HomeScreenProps extends HomeTabScreenProps<"Home"> {
 export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_props
 ) {
   const { navigation } = _props;
-  const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
+  // const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
   const { clearSession } = useAuth0();
   const { authenticationStore: { logout, tokenLoading }, postStore} = useStores();
   // const [location, setLocation] = useState<Location.LocationObject | undefined>(undefined)
   // const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
-  
-  const [newPostModalVis, setNewPostModalVis] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   // TODO: make this into a hook that can be used anywhere
@@ -75,33 +74,38 @@ const manualRefresh = async () => {
     </> : (
     <Screen preset="fixed" style={$container} safeAreaEdges={[ "bottom"]}>
       <Header 
+        LeftActionComponent={<Logo width={30} height={30} fill={colors.palette.neutral100}/>}
+        RightActionComponent={<Text text="Logout" preset="bold" textColor={colors.palette.neutral100} onPress={handleLogout}/>}
+        leftIconColor={colors.palette.neutral100}
+        onRightPress={handleLogout}
         containerStyle={$headerStyle}
         backgroundColor={colors.palette.primary500}/>
+
       <View style={$topContainer}>
+        <NewPostBar />
          <ListView<Post>
           contentContainerStyle={$listContentContainer}
           data={postStore.posts.slice()} // Using slice to create a copy of the array that is then used for the cards. Breaks if you don't do this         
-          estimatedItemSize={100}
+          estimatedItemSize={162}
           onRefresh={manualRefresh}
           refreshing={refreshing}
           renderItem={({ item }) => (
             <PostCard 
-              post={item}
+              post={item} 
             />
           )}
         />
-      <NewClimbModal visible={newPostModalVis} setVisible={setNewPostModalVis}/>
+      
       </View>
 
-    <View style={[$bottomContainer, $bottomContainerInsets]}>
-        {/* <Text text="Location Data:" size="md" />
+    {/* <View style={[$bottomContainer, $bottomContainerInsets]}>
+         <Text text="Location Data:" size="md" />
         {!errorMsg && !location && 
           <LoadingSpinner />
         }
-        <Text text={errorMsg || "Location found!"}></Text> */}
-        <Button text="Create New Post" onPress={() => setNewPostModalVis(true)} />
+        <Text text={errorMsg || "Location found!"}></Text> 
         <Button text="Logout" onPress={handleLogout} />
-      </View>
+      </View> */}
     </Screen>
   )
 )
@@ -113,13 +117,12 @@ const $container: ViewStyle = {
 }
 const $headerStyle: ViewStyle ={
   marginBottom: 0,
-
+  paddingHorizontal: spacing.sm
 }
 const $topContainer: ViewStyle = {
+  height: "100%",
   marginTop: 0,
-  flexShrink: 1,
   flexGrow: 1,
-  flexBasis: "75%",
   justifyContent: "center",
   
 }
@@ -129,15 +132,15 @@ const $listContentContainer: ContentStyle = {
   paddingBottom: spacing.lg,
 }
 
-const $bottomContainer: ViewStyle = {
-  flexShrink: 1,
-  flexGrow: 0,
-  flexBasis: "25%",
-  backgroundColor: colors.palette.neutral100,
-  borderTopLeftRadius: 16,
-  borderTopRightRadius: 16,
-  justifyContent: "space-around",
-}
+
+// const $bottomContainer: ViewStyle = {
+  
+  
+//   backgroundColor: colors.palette.neutral100,
+//   borderTopLeftRadius: 16,
+//   borderTopRightRadius: 16,
+//   justifyContent: "space-around",
+// }
 // const $welcomeLogo: ImageStyle = {
 //   height: 88,
 //   width: "100%",

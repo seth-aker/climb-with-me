@@ -18,6 +18,10 @@ export interface TextProps extends RNTextProps {
    */
   text?: string
   /**
+   * The color of the text
+   */
+  textColor?: string
+  /**
    * Optional options to pass to i18n. Useful for interpolation
    * as well as explicitly setting locale or translation fallbacks.
    */
@@ -52,17 +56,23 @@ export interface TextProps extends RNTextProps {
  * @returns {JSX.Element} The rendered `Text` component.
  */
 export function Text(props: TextProps) {
-  const { weight, size, tx, txOptions, text, children, style: $styleOverride, ...rest } = props
+  const { weight, size, tx, txOptions, text, children, style: $styleOverride, textColor, ...rest } = props
 
   const i18nText = tx && translate(tx, txOptions)
   const content = i18nText || text || children
 
   const preset: Presets = props.preset ?? "default"
+  
+  const $textColorOverride: TextStyle = {
+    color: textColor
+  }
+  
   const $styles: StyleProp<TextStyle> = [
     $rtlStyle,
     $presets[preset],
     weight && $fontWeightStyles[weight],
     size && $sizeStyles[size],
+    $textColorOverride,
     $styleOverride,
   ]
 

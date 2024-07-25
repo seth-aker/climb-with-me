@@ -10,6 +10,13 @@ export const PostStoreModel = types
 }).views((store) => ({
     getPostById(guid: string) {
         return store.posts.find(post => post.guid === guid)
+    },
+    get totalLikes() {
+        let totalLikes = 0;
+        store.posts.forEach((post) => {
+            totalLikes += post.likes.length
+        })
+        return totalLikes
     }
 })).actions(( store ) => ({
     addPost(post: Post) {

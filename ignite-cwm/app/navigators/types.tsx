@@ -16,7 +16,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack"
  */
 export type AppStackParamList = {
   HomeTabs: NavigatorScreenParams<HomeTabParamList>
-  PostScreen: undefined
+  PostScreen: {newComment?: boolean}
   Login: undefined
   // 🔥 Your screens go here
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST

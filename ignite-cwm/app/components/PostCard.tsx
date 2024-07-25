@@ -3,7 +3,7 @@ import { Card } from "./Card"
 import { Text } from "./Text"
 import { observer } from "mobx-react-lite"
 import { Post } from "app/models/Post"
-import { ImageStyle, Modal, StyleProp, TextStyle, View, ViewStyle} from "react-native"
+import { ImageStyle, Modal, Pressable, StyleProp, TextStyle, View, ViewStyle} from "react-native"
 import { AutoImage } from "./AutoImage"
 import { formatTimeSince } from "app/utils/formatTime"
 import { colors, spacing } from "app/theme"
@@ -31,11 +31,14 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
 
     
 
-    const handlePressComments = () => {
+    const handlePressComment = () => {
         postStore.setSelectedPostId(post.guid);
-        navigation.navigate("PostScreen")
+        navigation.navigate("PostScreen", {newComment: true})
     }
-    
+    const handlePressViewComments = () => {
+        postStore.setSelectedPostId(post.guid);
+        navigation.navigate("PostScreen", {newComment: false})
+    }
     const handledSettingBtnPressed = () => {
         setCardSettingOpen(true);
     }
@@ -98,6 +101,12 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
                                 
                             /> : <Button text="Hide" />
                             }
+                            <Button 
+                                style={$postModalButtonStyle}
+                                textStyle={$postButtonTextStyle}
+                                pressedStyle={$defaultButtonPressed}
+                                LeftAccessory={() => <Icon icon={"exclamation"} color={colors.palette.neutral700}/>}
+                                text="Report"/>
                         </View>
                     </Modal>
                 </View>
@@ -113,13 +122,23 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
                         size="sm"
                         text={post.body}
                     />
+                    <View>
+                        <Pressable style={$numOfCommentsButton} onPress={handlePressViewComments}>
+                            <Text 
+                                size="xxs"
+                                weight="light"
+                                style={$numOfCommentsText}
+                                text={`${post.comments.length} comment${post.comments.length === 1 ? "" : "s"}`}
+                            />
+                        </Pressable>
+                    </View>
                 </View>
             }
             FooterComponent={
                 <CardFooter 
                     post={post}
-                    handlePressComments={handlePressComments} 
-                    
+                    handlePressComments={handlePressComment} 
+
                 />
             }
         />
@@ -127,6 +146,12 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
         
     )
 })
+const $numOfCommentsButton: ViewStyle = {
+    alignItems: "flex-end",
+}
+const $numOfCommentsText: TextStyle = {
+    textDecorationLine: "underline"
+}
 
 export interface CardFooterProps {
     post: Post
@@ -146,31 +171,33 @@ export const CardFooter = observer((props: CardFooterProps) => {
     } = props
 
     const {userStore} = useStores();
-    const liked = useSharedValue(post.isLikedByUser(userStore.authId || "") ? 1 : 0)
+    const userGuid = userStore.authId || ""
+    const liked = post.isLikedByUser(userGuid);
+    const animValue = useSharedValue(liked ? 1 : 0)
 
     const handlePressLike = () => {
         post.toggleLiked(userStore.authId || "")
-        liked.value = withSpring(liked.value ? 0 : 1);
+        animValue.value = withSpring(liked ? 0 : 1);
     }
 
-    const animatedRegularLikeButtonStyles = useAnimatedStyle(() => {
+    const animatedEmptyLikeButtonStyle = useAnimatedStyle(() => {
         return {
             transform: [
                 {
-                    scale: interpolate(liked.value, [0,1], [1,0], Extrapolation.EXTEND)
+                    scale: interpolate(animValue.value, [0,1], [1,0], Extrapolation.EXTEND)
                 },
             ],
-            opacity: interpolate(liked.value, [0,1], [1,0], Extrapolation.CLAMP)
+            opacity: interpolate(animValue.value, [0,1], [1,0], Extrapolation.CLAMP)
         }
     })
     const animatedFilledLikeButtonStyles = useAnimatedStyle(() => {
         return {
         transform: [
             {
-            scale: liked.value,
+            scale: animValue.value,
             },
         ],
-        opacity: liked.value,
+        opacity: animValue.value,
         }
     })
     const $footerContainer = [$containerDefault, $containerStyleOverride]
@@ -188,7 +215,7 @@ export const CardFooter = observer((props: CardFooterProps) => {
                 LeftAccessory={() =>( 
                     <View>
                         <Animated.View
-                            style={[$iconContainer,animatedRegularLikeButtonStyles]}
+                            style={[$iconContainer,animatedEmptyLikeButtonStyle]}
                         >
                             <Icon 
                                 icon={["far", "thumbs-up"]}
@@ -239,7 +266,7 @@ const $item: ViewStyle = {
     borderRadius: 0,
     padding: spacing.md,
     paddingBottom: 0,
-    marginTop: spacing.md,
+    marginBottom: spacing.md,
     minHeight: 120,
 }
 
@@ -315,7 +342,7 @@ const $postButtonTextStyle: TextStyle = {
 
 }
 const $postModalButtonStyle: ViewStyle = {
-    margin: 8,
+    marginTop: 8,
     backgroundColor: colors.palette.neutral100,
     borderRadius: 5,
     justifyContent: "flex-start"

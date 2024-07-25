@@ -1,15 +1,14 @@
 import { AutoImage, Button, Header, Icon, Screen, Text } from "app/components";
 import { CommentSection } from "app/components/CommentSection";
 import { CardFooter } from "app/components/PostCard";
-
 import { useStores } from "app/models";
-import { CommentModel } from "app/models/CommentModel";
+import { CommentModel, } from "app/models/CommentModel";
 import { AppStackScreenProps } from "app/navigators/types";
 import { colors, spacing } from "app/theme";
 import { formatTimeSince } from "app/utils/formatTime";
 import { observer } from "mobx-react-lite";
-import React, { FC, useRef, useState } from "react";
-import { ImageStyle, ScrollView, TextInput, View, ViewStyle } from "react-native";
+import React, { FC, useEffect, useRef, useState } from "react";
+import { ImageStyle, Modal, ScrollView, TextInput, TextStyle, View, ViewStyle } from "react-native";
 
 import uuid from "react-native-uuid"
 
@@ -17,51 +16,76 @@ export type PostScreenProps = AppStackScreenProps<"PostScreen">
 export const PostScreen: FC<PostScreenProps> = observer(function PostScreen(_props) {
  
     const {postStore, userStore} = useStores();
-    const {navigation} = _props
+    const {navigation, route} = _props
 
     const post = postStore.getPostById(postStore.selectedPostId || "");
     if(!post) {
         navigation.goBack()
         throw new Error("Cannot navigate to Post Screen without post selected");
     }
+
+
     const insertCommentRef = useRef<TextInput>(null);
+    const scrollViewRef = useRef<ScrollView>(null);
     const sortedComments = post.comments.slice().sort((a, b) => {
         return a.createdAt.getTime() - b.createdAt.getTime()
     });
+    const postOwned = post.postUserId === userStore.authId;
     const [commentText, setCommentText] = useState<string>("");
+    const [cardSettingOpen, setCardSettingOpen] = useState(false);
+
+    const handledSettingBtnPressed = () => {
+        setCardSettingOpen(true)
+    }
+
+    const handleDeletePost = () => {
+        postStore.deletePost(post);
+        postStore.setSelectedPostId(null);
+        navigation.goBack();
+    }
 
     const handlePressComment = () => {
+        scrollViewRef.current?.scrollToEnd();
         insertCommentRef.current?.focus();
     }
 
     const onSubmitComment = () => {
-        const comment = CommentModel.create({
+        if(commentText) {
+            const comment = CommentModel.create({
                 guid: uuid.v4().toString(),
                 createdAt: Date.now(),
                 text: commentText,
                 user: userStore.name || "",
                 userId: userStore.authId || "",
                 userProfImg: userStore.profileImg || ""
-             });
-        post.addComment(comment);
-        setCommentText("");
-        insertCommentRef.current?.blur();
+            });
+            post.addComment(comment);
+            setCommentText("");
+            insertCommentRef.current?.blur();
+        }
     }
 
     const handlePressBack = () => {
         postStore.setSelectedPostId(null);
         navigation.goBack()
     }
+
+    useEffect(() => {
+        if(route.params.newComment) {
+            handlePressComment()
+        }
+    }, [])
+
     return (
         <Screen preset="fixed" safeAreaEdges={["bottom"]}>
-            <ScrollView style={$scrollViewStyle} >
+            <ScrollView ref={scrollViewRef} style={$scrollViewStyle} >
                 <Header       
                     containerStyle={$headerStyle}
                     backgroundColor={colors.palette.primary500}
                     leftIcon={"arrow-left"} 
                     onLeftPress={handlePressBack}
                     leftIconColor={colors.background}
-                    />
+                />
                     <View style={$postHeader}>
                     { /* eslint-disable-next-line react-native/no-inline-styles */}
                     <View style={{flexDirection: "row"}}>
@@ -80,7 +104,46 @@ export const PostScreen: FC<PostScreenProps> = observer(function PostScreen(_pro
                                 text={`${formatTimeSince(post.timeSincePost())}`}
                                 />
                         </View>
-                    </View>
+                        </View>
+                        <Button onPress={handledSettingBtnPressed} style={$headerButtonStyle} pressedStyle={$headerButtonPressed}>
+                            <Icon icon={"ellipsis-v"} color={colors.palette.neutral600} />
+                        </Button>
+                    <Modal 
+                        transparent
+                        visible={cardSettingOpen} 
+                        animationType="slide" 
+                        onRequestClose={() => setCardSettingOpen(false)}
+
+                    >
+                        <View style={$modalEmptySpace}/>
+                        <View style={$modalStyle}>
+                            <Header 
+                                title="Close"
+                                containerStyle={$modalHeader}
+                                rightIcon={"x"}
+                                rightIconColor={colors.text}
+                                onRightPress={()=> setCardSettingOpen(false)}
+                                backgroundColor={colors.palette.neutral100}
+                            />
+                            {postOwned ? <Button 
+                                style={$postModalButtonStyle}
+                                textStyle={$postButtonTextStyle}
+                                pressedStyle={$defaultButtonPressed}
+                                text="Delete" 
+                                LeftAccessory={() => <Icon icon={"xmark"} color={colors.palette.neutral700}/>}
+                                onPress={handleDeletePost}
+                                
+                            /> : <Button text="Hide" />
+                            }
+                            <Button 
+                                style={$postModalButtonStyle}
+                                textStyle={$postButtonTextStyle}
+                                pressedStyle={$defaultButtonPressed}
+                                LeftAccessory={() => <Icon icon={"exclamation"} color={colors.palette.neutral700}/>}
+                                text="Report"/>
+                        </View>
+                    </Modal>
+                    
                     </View>
                     <View style={$postContent}>
                         <Text 
@@ -122,7 +185,8 @@ export const PostScreen: FC<PostScreenProps> = observer(function PostScreen(_pro
 })
 
 const $scrollViewStyle: ViewStyle = {
-    height: "90%"
+    height: "90%",
+    paddingBottom: spacing.sm
 }
 const $headerStyle: ViewStyle = {
     marginBottom: 0
@@ -143,7 +207,19 @@ const $postThumbnail: ImageStyle = {
 const $postHeaderTextContainer: ViewStyle = {
     paddingHorizontal: spacing.sm
 }
-
+const $headerButtonStyle: ViewStyle = {
+    backgroundColor: colors.palette.neutral100,
+    borderWidth: 0,
+    borderRadius: 5,
+    minHeight: 0,
+    height: 40,
+    width: 30,
+    paddingVertical: 0,
+    paddingHorizontal: 0
+}
+const $headerButtonPressed: ViewStyle = {
+    backgroundColor: colors.palette.neutral200
+}
 const $postContent: ViewStyle = {
     paddingHorizontal: spacing.md,
     backgroundColor: colors.palette.neutral100
@@ -183,4 +259,29 @@ const $submitCommentBtn: ViewStyle = {
     height: 38,
     width: 56,
 }
-
+const $modalStyle: ViewStyle = {
+    borderTopWidth: 1,
+    borderTopColor: colors.palette.neutral200,
+    height: "85%",
+    backgroundColor: colors.palette.neutral200
+}
+const $modalEmptySpace: ViewStyle = {
+    height: "15%",
+    backgroundColor: colors.transparent
+}
+const $modalHeader: ViewStyle = {
+    paddingTop: 0,
+    marginTop: 0
+}
+const $postModalButtonStyle: ViewStyle = {
+    marginTop: 8,
+    backgroundColor: colors.palette.neutral100,
+    borderRadius: 5,
+    justifyContent: "flex-start"
+}
+const $postButtonTextStyle: TextStyle = {
+    color: colors.palette.neutral700
+}
+const $defaultButtonPressed: ViewStyle = {
+    backgroundColor: colors.palette.neutral200
+}

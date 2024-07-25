@@ -8,9 +8,24 @@ import { colors } from "app/theme";
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 interface LoadingSpinnerProps {
+    /**
+     * RN View Style Props
+     */
     style?: ViewStyle
+    /**
+     * Color of the spinner stroke
+     * @default colors.tint
+     */
     stroke?: string,
+    /**
+     * Width in pixels of the spinner
+     * @default 5
+     */
     strokeWidth?: number
+    /**
+     * Circumference of the spinner
+     * @default 250
+     */
     circumference?: number
 }
 export const LoadingSpinner = (props: LoadingSpinnerProps ) => {

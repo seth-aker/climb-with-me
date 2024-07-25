@@ -1,26 +1,30 @@
 import { AppStackScreenProps } from "app/navigators/types";
 import { observer } from "mobx-react-lite";
-import React, { FC } from "react";
+import React, { FC, useState }  from "react";
 import { Button, Screen, Text } from "../components"
-import { ViewStyle, Image, ImageStyle, TextStyle, View } from "react-native";
+import { ViewStyle, TextStyle, View } from "react-native";
 import { spacing, colors } from "app/theme";
 import { useAuth0 } from "react-native-auth0";
 import { useStores } from "app/models";
+import { LoadingSpinner } from "app/components/LoadingSpinner";
 
+import { Logo } from "app/components/Logo";
 type LoginScreenProps = AppStackScreenProps<"Login">
-const LOGO_URI = require("../../assets/images/logo.png");
+
 
 export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_props) {
     const { authorize } = useAuth0();
     const {authenticationStore : { setAuthToken }} = useStores()
-
+    const [isLoading, setIsLoading] = useState(false);
     const handleLogin = async () => {
+        setIsLoading(true)
         try {
             const credentials = await authorize();
             setAuthToken(credentials?.accessToken)
         } catch (e) {
             console.log(e)
         }
+        setIsLoading(false)
     }
 
     const handleRegister = async () => {
@@ -38,10 +42,11 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
             safeAreaEdges={["top", "bottom"]}
         >
             <View>
-                <Image
+                <Logo style={$logoStyle} height={200} fill={colors.tint} />
+                {/* <Image
                     source={LOGO_URI}
                     style={$logoStyle}
-                />
+                /> */}
                 <Text
                     tx="loginScreen.welcomeText"
                     preset="heading"
@@ -51,11 +56,18 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
             <View>
                 <Button
                     testID="login-button"
-                    tx="loginScreen.login"
                     style={$tapButton}
                     preset="default"
+                    disabled={isLoading}
                     onPress={handleLogin}
-                    />
+                    text={!isLoading ? "Login" : undefined}
+                    >
+                    {isLoading && <LoadingSpinner 
+                        style={$loadingSpinnerStyle} 
+                        circumference={60} 
+                        strokeWidth={3} 
+                        stroke={colors.palette.neutral200} />}
+                </Button>
 
             
                 <Button
@@ -63,6 +75,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                     tx="loginScreen.create"
                     style={$tapButton}
                     preset="reversed"
+                    disabled={isLoading}
                     onPress={handleRegister}
                     >
 
@@ -82,19 +95,21 @@ const $screenContentContainer: ViewStyle = {
 }
 
 const $tapButton: ViewStyle = {
+    alignItems: "center",
   marginTop: spacing.xs,
+  height: 52
 }
 
-
-
 const $welcomeText: TextStyle = {
+    margin: spacing.lg,
     alignSelf: 'center',
     color: colors.tint
 }
 
-const $logoStyle: ImageStyle = {
-    resizeMode: 'center', 
+const $logoStyle: ViewStyle = {
     width: '100%',
-    height: 250
 }
-
+const $loadingSpinnerStyle: ViewStyle = {
+    width: 30,
+    height: 30
+}

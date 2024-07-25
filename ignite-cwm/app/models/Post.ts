@@ -29,9 +29,6 @@ export const PostModel = types
 }))
 .views((post) => ({
     isLikedByUser(guid: string) {
-        if(guid === "") { // this should probably throw an error in the future 
-            return false
-        }
         return post.likes.includes(guid);
     },
     timeSincePost() {

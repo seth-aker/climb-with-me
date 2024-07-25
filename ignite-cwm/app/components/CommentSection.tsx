@@ -15,16 +15,19 @@ import { observer } from "mobx-react-lite";
 export interface CommentSectionProps {
     comments: IComment[],
     handlePressComment: () => void
+    
 }
-export const CommentSection = (props: CommentSectionProps) => {
-    const { comments, handlePressComment } = props;
+export const CommentSection = observer((props: CommentSectionProps) => {
+    const { comments, handlePressComment} = props;
     const { userStore } = useStores();
+    
+    
     return (
         <View style={$containerView}>
             <ListView
                 contentContainerStyle={$commentListStyle} 
                 data={comments}
-                estimatedItemSize={50}
+                estimatedItemSize={145}
                 renderItem={(item) => (
                     <CommentCard 
                         comment={item.item}
@@ -35,7 +38,7 @@ export const CommentSection = (props: CommentSectionProps) => {
             />
         </View>
     )
-}
+})
 
 const $containerView: ViewStyle = {
     minHeight: 50,
@@ -124,7 +127,8 @@ export const CommentCard = observer((props: CommentCardProps) => {
 const $container: ViewStyle ={
     flexDirection: "row",
     marginHorizontal: spacing.sm,
-    marginTop: spacing.sm,
+    marginTop: spacing.xs,
+    marginBottom: spacing.xs
 }
 const $cardContainer: ViewStyle = {
     flexGrow: 1

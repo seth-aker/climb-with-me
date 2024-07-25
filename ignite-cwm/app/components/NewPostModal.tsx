@@ -12,11 +12,13 @@ import { delay } from "app/utils/delay";
 import { useStores } from "app/models";
 import uuid from "react-native-uuid"
 import { PostModel } from "app/models/Post";
-interface NewClimbModalProps extends ModalProps {
+import { Header } from "./Header";
+
+interface NewPostModalProps extends ModalProps {
     setVisible: (isVis: boolean) => void
 }
 
-export const NewClimbModal = (props: NewClimbModalProps) => {
+export const NewPostModal = (props: NewPostModalProps) => {
     const { visible, setVisible, onRequestClose } = props;
     const {userStore, postStore} = useStores();
     const [postTitle, setPostTitle] = useState("");
@@ -25,6 +27,7 @@ export const NewClimbModal = (props: NewClimbModalProps) => {
     const [dateTimePickerVis, setDateTimePickerVis] = useState(false);
     const [loading, setLoading] = useState(false);
     const guid = uuid.v4().toString();
+
     const handlePostForm = async () => {
         setLoading(true);
         // Change this to an api call
@@ -54,25 +57,29 @@ export const NewClimbModal = (props: NewClimbModalProps) => {
     return (
        <Modal 
         visible={visible}     
-        animationType="none" 
-        transparent
+        animationType="slide" 
         onRequestClose={onRequestClose}
         >
             <View style={$modalContainerStyle}>
-                <View style={$uploadPhotoCard}>
-                    <Pressable style={$cardHeaderStyle}
-                        onPress={handleCloseModal}
-                    >
-                        <Text 
-                            text="Cancel"
-                        />
-                        <Icon 
-                            icon={"x"}
-                            onPress={handleCloseModal}
-                            size={20}
-                            style={$buttonIconStyle}
+                <Header
+                    containerStyle={$modalHeader}
+                    RightActionComponent={ 
+                        <Pressable style={$cardHeaderStyle}
+                            onPress={handleCloseModal}>
+                            <Text 
+                                text="Cancel"
                             />
-                    </Pressable>
+                            <Icon 
+                                icon={"x"}
+                                onPress={handleCloseModal}
+                                size={20}
+                                style={$buttonIconStyle}
+                                />
+                        </Pressable>}
+                    backgroundColor={colors.palette.neutral100}
+                />
+                <View style={$uploadPhotoCard}>
+                   
                     <View style={$formContainerStyle}>
                         <TextField 
                             label="Post Title"
@@ -124,17 +131,20 @@ export const NewClimbModal = (props: NewClimbModalProps) => {
     )
 }
 const $modalContainerStyle: ViewStyle = {
-    backgroundColor: `${colors.palette.neutral800}bf`,
+    backgroundColor: `${colors.background}`,
     height: "100%",
     width: "100%",
     flex: 1,
     alignItems: "center",
-    justifyContent: "center"
-    
+}
+const $modalHeader: ViewStyle = {
+    backgroundColor: colors.palette.primary500,
+    paddingTop: 0,
+    marginTop: 0
 }
 const $uploadPhotoCard: ViewStyle = {
     width: "90%",
-    // height: 250,
+
     padding: spacing.xs,
     backgroundColor: colors.background,
     borderRadius: spacing.md,
