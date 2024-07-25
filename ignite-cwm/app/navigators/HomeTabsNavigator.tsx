@@ -11,74 +11,72 @@ import { MessageScreen } from "app/screens/MessageScreen"
 import { FriendsScreen } from "app/screens/FriendsScreen"
 import { HomeTabParamList } from "./types"
 
-const Tab = createBottomTabNavigator<HomeTabParamList>();
-
+const Tab = createBottomTabNavigator<HomeTabParamList>()
 
 export function HomeTabNavigator() {
-    const { bottom } = useSafeAreaInsets();
+  const { bottom } = useSafeAreaInsets()
 
-    return (
-        <Tab.Navigator
-            screenOptions={{
-                headerShown: false,
-                tabBarHideOnKeyboard: true,
-                tabBarStyle: [$tabBar, { height: bottom + 70}],
-                tabBarActiveTintColor: colors.tint,
-                tabBarInactiveTintColor: colors.textDim,
-                tabBarLabelStyle: $tabBarLabel,
-                tabBarItemStyle: $tabBarItem,
-            }}
-        >
-            <Tab.Screen
-                name="Home"
-                component={HomeScreen}
-                options={{
-                    // TODO: Create Translation Options for the Label
-                    // Ex: tabBarLabel: translate("homeNavigator.homeTab")
-                    tabBarLabel: en.homeNavigator.homeTab,
-                    tabBarIcon: ({ focused }) => (
-                        // TODO: create real home icon
-                        <Icon icon="house" color={focused ? colors.tint : colors.textDim} size={30} />
-                    ),
-                }}
-            />
-            <Tab.Screen
-                name="Messages"
-                component={MessageScreen}
-                options={{
-                    // TODO: Create Translation Options for the Label
-                    // Ex: tabBarLabel: translate("homeNavigator.homeTab")
-                    tabBarLabel: en.homeNavigator.messagesTab,
-                    tabBarIcon: ({ focused }) => (
-                        // TODO: create real home icon
-                        <Icon icon="message" color={focused ? colors.tint : colors.textDim} size={30} />
-                    ),
-                }}
-            />
-            <Tab.Screen 
-                name="Friends"
-                component={FriendsScreen}
-                options={{
-                    tabBarLabel: en.homeNavigator.friendsTab,
-                    tabBarIcon: ({ focused }) => (
-                        <Icon icon="user-group" color={focused ? colors.tint : colors.textDim} size={30} />
-                    )
-                }}
-            />
-            <Tab.Screen 
-                name="Profile"
-                component={ProfileScreen}
-                options={{
-                    tabBarLabel: en.homeNavigator.profileTab,
-                    tabBarIcon: ({ focused }) => (
-                        <Icon icon="user" color={focused ? colors.tint : colors.textDim} size={30} />
-                    )
-                }}
-            />
-        </Tab.Navigator>
-    )
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarHideOnKeyboard: true,
+        tabBarStyle: [$tabBar, { height: bottom + 70 }],
+        tabBarActiveTintColor: colors.tint,
+        tabBarInactiveTintColor: colors.textDim,
+        tabBarLabelStyle: $tabBarLabel,
+        tabBarItemStyle: $tabBarItem,
+      }}
+    >
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{
+          // TODO: Create Translation Options for the Label
+          // Ex: tabBarLabel: translate("homeNavigator.homeTab")
+          tabBarLabel: en.homeNavigator.homeTab,
+          tabBarIcon: ({ focused }) => (
+            // TODO: create real home icon
+            <Icon icon="house" color={focused ? colors.tint : colors.textDim} size={30} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Messages"
+        component={MessageScreen}
+        options={{
+          // TODO: Create Translation Options for the Label
+          // Ex: tabBarLabel: translate("homeNavigator.homeTab")
+          tabBarLabel: en.homeNavigator.messagesTab,
+          tabBarIcon: ({ focused }) => (
+            // TODO: create real home icon
+            <Icon icon="message" color={focused ? colors.tint : colors.textDim} size={30} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Friends"
+        component={FriendsScreen}
+        options={{
+          tabBarLabel: en.homeNavigator.friendsTab,
+          tabBarIcon: ({ focused }) => (
+            <Icon icon="user-group" color={focused ? colors.tint : colors.textDim} size={30} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          tabBarLabel: en.homeNavigator.profileTab,
+          tabBarIcon: ({ focused }) => (
+            <Icon icon="user" color={focused ? colors.tint : colors.textDim} size={30} />
+          ),
+        }}
+      />
+    </Tab.Navigator>
+  )
 }
-
 
 const $tabBar: ViewStyle = {
   backgroundColor: colors.background,
