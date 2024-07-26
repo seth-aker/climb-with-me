@@ -29,6 +29,10 @@ export const NewPostModal = (props: NewPostModalProps) => {
   const guid = uuid.v4().toString()
 
   const handlePostForm = async () => {
+    if (!postTitle || !body || !tripDate) {
+      alert("Please fill in all required fields")
+      return
+    }
     setLoading(true)
     // Change this to an api call
     const post = PostModel.create({
