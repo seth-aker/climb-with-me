@@ -18,6 +18,7 @@ import { HomeTabNavigator } from "./HomeTabsNavigator"
 import { AppStackParamList } from "./types"
 import { ChatScreen } from "app/screens/ChatScreen"
 import { LoginScreen, PostScreen } from "app/screens"
+import { FriendModel } from "app/models/Friend"
 
 /**
  * This is a list of all the route names that will exit the app if the back button
@@ -32,9 +33,28 @@ const AppStack = observer(function AppStack(_props) {
   const {
     authenticationStore: { isAuthenticated, updateAndValidateToken },
     userStore,
+    friendStore,
   } = useStores()
   const { getCredentials, user } = useAuth0()
-
+  if (__DEV__) {
+    friendStore.clearStore()
+    const fakeFriends = [
+      { guid: "1", name: "Joe", profImg: "https://placehold.co/200x200.png" },
+      { guid: "2", name: "Paul Bergeron", profImg: "https://placehold.co/200x200.png" },
+      { guid: "3", name: "Ellie Bergeron Aker", profImg: "https://placehold.co/200x200.png" },
+      { guid: "4", name: "David Bergeron", profImg: "https://placehold.co/200x200.png" },
+      { guid: "5", name: "Michael Normand", profImg: "https://placehold.co/200x200.png" },
+      { guid: "6", name: "Jane Bergeron", profImg: "https://placehold.co/200x200.png" },
+      { guid: "7", name: "Chip Aker", profImg: "https://placehold.co/200x200.png" },
+      { guid: "8", name: "Amy Aker", profImg: "https://placehold.co/200x200.png" },
+      { guid: "9", name: "Joel", profImg: "https://placehold.co/200x200.png" },
+      { guid: "10", name: "Sam Aker", profImg: "https://placehold.co/200x200.png" },
+      { guid: "11", name: "Will Aker", profImg: "https://placehold.co/200x200.png" },
+    ]
+    fakeFriends.forEach((friend) => {
+      friendStore.addFriend(FriendModel.create(friend))
+    })
+  }
   // Used to sync the authentication store with Auth0's SDK and determine what screen to load first.
   useEffect(() => {
     ;(async () => {
