@@ -1,5 +1,9 @@
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs"
-import { CompositeScreenProps, NavigationProp, NavigatorScreenParams } from "@react-navigation/native"
+import {
+  CompositeScreenProps,
+  NavigationProp,
+  NavigatorScreenParams,
+} from "@react-navigation/native"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -16,18 +20,18 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack"
  */
 export type AppStackParamList = {
   HomeTabs: NavigatorScreenParams<HomeTabParamList>
-  PostScreen: {newComment?: boolean}
+  PostScreen: { newComment?: boolean }
   Login: undefined
+  ChatScreen: undefined
   // 🔥 Your screens go here
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
 export type HomeTabParamList = {
-    Home: undefined
-    Messages: undefined
-    Friends: undefined
-    Profile: undefined
-
+  Home: undefined
+  Messages: undefined
+  Friends: undefined
+  Profile: undefined
 }
 
 export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStackScreenProps<
@@ -36,9 +40,8 @@ export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStack
 >
 
 export type HomeTabScreenProps<T extends keyof HomeTabParamList> = CompositeScreenProps<
-    BottomTabScreenProps<HomeTabParamList, T>,
-    AppStackScreenProps<keyof AppStackParamList>
-    >
+  BottomTabScreenProps<HomeTabParamList, T>,
+  AppStackScreenProps<keyof AppStackParamList>
+>
 
 export type RootStackNavigation = NavigationProp<AppStackParamList>
-

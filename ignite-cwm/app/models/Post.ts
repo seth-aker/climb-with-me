@@ -5,15 +5,39 @@ import { CommentModel, IComment } from "./CommentModel";
 export const PostModel = types
 .model("Post", {
     guid: types.identifier,
+    /**
+     * Header title for the post
+     */
     title: "",
+    /**
+     * Body of the post
+     */
     body: "",
+    /**
+     * When the poster plans to go climbing
+     */
     tripDate: types.Date,
     createdAt: types.Date,
+    /**
+     * Name of the user who posted the message
+     */
     postUser: "",
+    /**
+     * Guid of the user who posted the message
+     */
     postUserId: "",
+    /**
+     * Profile img uri of the user who posted the message
+     */
     postUserImg: "",
+    /**
+     * List of comments related to the post. 
+     */    
     comments: types.array(CommentModel),
-    likes: types.array(types.string) // Array of GUIDs of the other users who have liked the post
+    /**
+     * Array of GUIDs of the other users who have liked the post
+     */
+    likes: types.array(types.string) 
     // tripLocation: "",
 })
 .actions((post) => ({
@@ -25,6 +49,9 @@ export const PostModel = types
     },
     addComment(comment: IComment) {
         post.comments.push(comment)
+    },
+    deleteComment(comment: IComment) {
+        post.comments.remove(comment);
     }
 }))
 .views((post) => ({

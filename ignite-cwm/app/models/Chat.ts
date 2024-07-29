@@ -1,7 +1,7 @@
 import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree";
 import { IMessage, MessageModel } from "./Message";
 
-const ChatUser = types.model("ChatUser", {
+export const ChatUserModel = types.model("ChatUser", {
   /**
    * Guid of chat user
    */
@@ -9,45 +9,51 @@ const ChatUser = types.model("ChatUser", {
   /**
    * Name of the chat user.
    */
-  name: types.string
+  name: types.maybe(types.string),
+  /**
+   * Easy access to the profile image of the user
+   */
+  userImg: types.maybe(types.string),
+  /**
+   * The date and time the user joined the chat
+   */
+  joinedOn: types.Date, 
 })
 
-interface IChatUser extends Instance<typeof ChatUser> {};
+export interface IChatUser extends Instance<typeof ChatUserModel> {};
 
 export const ChatModel = types.model("Chat", {
+  chatId: types.identifier,
   messages: types.array(MessageModel),
-  users: types.map(ChatUser),
+  users: types.array(ChatUserModel),
   chatName: types.maybeNull(types.string)
 
 }).views((chat) => ({
-  chatName(userId: string) {
+  getChatName(viewingUserId: string) {
     if(chat.chatName) {
       return chat.chatName
     }
-    let returnString = "";
-    if(chat.users.size === 2) {
-      chat.users.forEach((user) => {
-        if(user.guid !== userId) {
-          returnString = user.name
-      }})
-      return returnString;
-    }
+    const names = chat.users.filter((user) => user.guid !== viewingUserId)
+      .map((user) => user.name) 
     
-    chat.users.forEach((user) => {
-      returnString += user.name + ", "
-    })
-    return returnString;
+    return names.join(names.length === 2 ? " & " : ", ")
   }
 }))
 .actions((chat) => ({
   addUser(user: IChatUser) {
-    chat.users.put(user);
+    chat.users.push(user);
   },
   removeUser(user: IChatUser) {
-    chat.users.delete(user.guid);
+    chat.users.remove(user);
   },
   addMessage(message: IMessage) {
     chat.messages.push(message);
+  },
+  setChatName(text: string) {
+    chat.chatName = text
+  },
+  deleteChatName() {
+    chat.chatName = null
   }
 }))
 

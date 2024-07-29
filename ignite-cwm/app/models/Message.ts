@@ -21,9 +21,9 @@ export const MessageModel = types
    */
   sentOn: types.Date,
   /**
-   * Indicator of whether the message has been opened by the receiver
+   * List of Guids of the users who have viewed the message
    */
-  read: types.boolean
+  readBy: types.array(types.string) 
 
 }).actions(withSetPropAction)
 

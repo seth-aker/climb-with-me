@@ -75,7 +75,7 @@ export const PostScreen: FC<PostScreenProps> = observer(function PostScreen(_pro
 
   return (
     <Screen preset="fixed" contentContainerStyle={$container} safeAreaEdges={["bottom"]}>
-      <ScrollView ref={scrollViewRef} style={$scrollViewStyle}>
+      <ScrollView ref={scrollViewRef} style={$scrollViewStyle} automaticallyAdjustKeyboardInsets>
         <Header
           containerStyle={$headerStyle}
           backgroundColor={colors.palette.primary500}

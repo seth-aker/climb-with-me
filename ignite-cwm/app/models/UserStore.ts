@@ -15,7 +15,7 @@ export const UserStoreModel = types
          * Users auth id 
          * AKA: sub
          */
-        authId: types.maybe(types.string),
+        authId: "",
         /**
          * First Name
          */

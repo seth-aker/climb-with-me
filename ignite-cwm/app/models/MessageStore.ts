@@ -3,7 +3,8 @@ import { ChatModel, IChat } from "./Chat";
 
 export const MessageStoreModel = types
 .model("MessageStore", {
-  chats: types.array(ChatModel)
+  chats: types.array(ChatModel),
+  selectedChatId: types.maybeNull(types.string)
 }).actions((store) => ({
   addChat(chat: IChat) {
     store.chats.push(chat);
@@ -11,10 +12,12 @@ export const MessageStoreModel = types
   deleteChat(chat: IChat) {
     store.chats.remove(chat);
   },
-  
+  setSelectedChatId(value: string | null) {
+    store.selectedChatId = value;
+  }
 }))
 
-export interface MessageStore extends Instance<typeof MessageStoreModel> {};
-export interface MessageStoreSnapshotIn extends SnapshotIn<typeof MessageStoreModel> {};
-export interface MessageStoreSnapshotOut extends SnapshotOut<typeof MessageStoreModel> {};
+export interface IMessageStore extends Instance<typeof MessageStoreModel> {};
+export interface IMessageStoreSnapshotIn extends SnapshotIn<typeof MessageStoreModel> {};
+export interface IMessageStoreSnapshotOut extends SnapshotOut<typeof MessageStoreModel> {};
 
