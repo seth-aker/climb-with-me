@@ -7,7 +7,7 @@ import { HomeScreen, ProfileScreen } from "app/screens"
 import en from "app/i18n/en"
 // import { translate } from "i18n-js"
 import { Icon } from "app/components"
-import { MessageScreen } from "app/screens/MessageScreen"
+import { MessagesScreen } from "app/screens/MessagesScreen"
 import { FriendsScreen } from "app/screens/FriendsScreen"
 import { HomeTabParamList } from "./types"
 
@@ -43,7 +43,7 @@ export function HomeTabNavigator() {
       />
       <Tab.Screen
         name="Messages"
-        component={MessageScreen}
+        component={MessagesScreen}
         options={{
           // TODO: Create Translation Options for the Label
           // Ex: tabBarLabel: translate("homeNavigator.homeTab")

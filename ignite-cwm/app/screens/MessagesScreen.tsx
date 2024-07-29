@@ -1,9 +1,9 @@
 import { HomeTabScreenProps } from "app/navigators/types"
 // import { useSafeAreaInsetsStyle } from "app/utils/useSafeAreaInsetsStyle";
 import { observer } from "mobx-react-lite"
-import React, { FC } from "react"
-import { Header, Icon, ListView, Screen } from "app/components"
-import { ViewStyle } from "react-native"
+import React, { FC, useEffect, useState } from "react"
+import { Button, Header, Icon, ListView, Screen } from "app/components"
+import { Dimensions, Modal, ViewStyle } from "react-native"
 import { colors, spacing } from "app/theme"
 import { Logo } from "app/components/Logo"
 import { useStores } from "app/models"
@@ -13,10 +13,10 @@ import uuid from "react-native-uuid"
 
 interface MessagesScreenProps extends HomeTabScreenProps<"Messages"> {}
 
-export const MessageScreen: FC<MessagesScreenProps> = observer(function MessageScreen(_props) {
-  // const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
+export const MessagesScreen: FC<MessagesScreenProps> = observer(function MessageScreen(_props) {
   const { navigation } = _props
   const { messageStore, userStore } = useStores()
+  const [modalVis, setModalVis] = useState(false)
 
   const handleCreateNewChat = () => {
     const chatUser = ChatUserModel.create({
@@ -36,6 +36,10 @@ export const MessageScreen: FC<MessagesScreenProps> = observer(function MessageS
     messageStore.setSelectedChatId(newChat.chatId)
     navigation.push("ChatScreen")
   }
+
+  const handleGoBack = () => {
+    navigation.goBack()
+  }
   return (
     <Screen preset="fixed" contentContainerStyle={$screenContainer}>
       <Header
@@ -44,17 +48,23 @@ export const MessageScreen: FC<MessagesScreenProps> = observer(function MessageS
           <Icon
             icon={"pen-to-square"}
             color={colors.palette.neutral100}
-            onPress={handleCreateNewChat}
+            onPress={() => setModalVis(true)}
           />
         }
         leftIconColor={colors.palette.neutral100}
         containerStyle={$headerStyle}
         backgroundColor={colors.palette.primary500}
+        onLeftPress={handleGoBack}
       />
       <ListView<IChat>
         data={messageStore.chats}
+        estimatedItemSize={80}
         renderItem={({ item }) => <ChatCard chat={item} />}
       />
+      <Modal visible={modalVis} style={$modalStyle} animationType="slide">
+        <Header containerStyle={$headerStyle} backgroundColor={colors.palette.primary500} />
+        <Button text="Toggle" onPress={() => setModalVis(false)} />
+      </Modal>
     </Screen>
   )
 })
@@ -66,3 +76,4 @@ const $headerStyle: ViewStyle = {
   marginBottom: 0,
   paddingHorizontal: spacing.sm,
 }
+const $modalStyle: ViewStyle = {}

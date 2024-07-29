@@ -1,6 +1,5 @@
 {
-  "name": "ignite-cwm",
-  "displayName": "ignite-cwm",
+
   "expo": {
     "name": "ignite-cwm",
     "slug": "ignite-cwm",
@@ -84,8 +83,6 @@
     "experiments": {
       "tsconfigPaths": true
     }
-  },
-  "ignite": {
-    "version": "9.6.3"
   }
+ 
 }

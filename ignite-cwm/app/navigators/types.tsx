@@ -1,10 +1,6 @@
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs"
-import {
-  CompositeScreenProps,
-  NavigationProp,
-  NavigatorScreenParams,
-} from "@react-navigation/native"
-import { NativeStackScreenProps } from "@react-navigation/native-stack"
+import { CompositeScreenProps, NavigatorScreenParams } from "@react-navigation/native"
+import { NativeStackNavigationProp, NativeStackScreenProps } from "@react-navigation/native-stack"
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
  * as well as what properties (if any) they might take when navigating to them.
@@ -44,4 +40,8 @@ export type HomeTabScreenProps<T extends keyof HomeTabParamList> = CompositeScre
   AppStackScreenProps<keyof AppStackParamList>
 >
 
-export type RootStackNavigation = NavigationProp<AppStackParamList>
+export type RootStackNavigation = NativeStackNavigationProp<
+  AppStackParamList,
+  keyof AppStackParamList,
+  undefined
+>

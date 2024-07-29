@@ -14,7 +14,7 @@ const ONE_DAY = ONE_HOUR * 24;
 export function formatTimeSince(timeDifferenceMs: number) {
     if(timeDifferenceMs < ONE_HOUR) {
         const timeDifInMins = Math.floor(timeDifferenceMs / ONE_MINUTE) 
-        return `${timeDifInMins} minute${timeDifInMins > 1 ? "s": ""} ago`
+        return `${timeDifInMins} minute${timeDifInMins !== 1 ? "s": ""} ago`
     } else if (timeDifferenceMs < ONE_DAY) {
         const timeDifInHours = Math.floor(timeDifferenceMs / ONE_HOUR)
         return `${timeDifInHours} hour${timeDifInHours > 1 ? "s": ""} ago`
