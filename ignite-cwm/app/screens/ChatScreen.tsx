@@ -31,7 +31,7 @@ export const ChatScreen = observer((props: ChatScreenProps) => {
       }),
     )
     setMessageText("")
-    setTextInputHeight(35)
+    // setTextInputHeight(35)
     messageListRef.current?.scrollToEnd()
     inputRef.current?.blur()
   }
@@ -41,8 +41,8 @@ export const ChatScreen = observer((props: ChatScreenProps) => {
     navigation.goBack()
   }
 
-  const [textInputHeight, setTextInputHeight] = useState(35)
-  const $textInputHeight: ViewStyle = { height: textInputHeight }
+  // const [textInputHeight, setTextInputHeight] = useState(35)
+  // const $textInputHeight: ViewStyle = { height: textInputHeight }
 
   return (
     <Screen preset="fixed" contentContainerStyle={$screenContainer} safeAreaEdges={["bottom"]}>
@@ -70,14 +70,18 @@ export const ChatScreen = observer((props: ChatScreenProps) => {
       <View style={$bottomContainer}>
         <View style={$textInputContainer}>
           <TextInput
-            style={[$textInputStyle, $textInputHeight]}
+            style={$textInputStyle}
             multiline
             value={messageText}
-            onFocus={() => messageListRef.current?.scrollToEnd({ animated: true })}
-            onChangeText={(value) => setMessageText(value)}
-            onContentSizeChange={(e) => {
-              setTextInputHeight(e.nativeEvent.contentSize.height)
+            onFocus={() => {
+              if (
+                messageStore.selectedChat?.messages &&
+                messageStore.selectedChat?.messages.length > 0
+              ) {
+                messageListRef.current?.scrollToEnd({ animated: true })
+              }
             }}
+            onChangeText={(value) => setMessageText(value)}
             ref={inputRef}
           />
           <Button
@@ -126,6 +130,7 @@ const $textInputContainer: ViewStyle = {
 const $textInputStyle: TextStyle = {
   flexGrow: 1,
   maxWidth: "92%",
+  alignSelf: "center",
 }
 const $sendMessageButton: ViewStyle = {
   width: 30,

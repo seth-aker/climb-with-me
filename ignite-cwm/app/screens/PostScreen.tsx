@@ -2,6 +2,7 @@ import { AutoImage, Button, Header, Icon, Screen, Text } from "app/components"
 import { CommentSection } from "app/components/CommentSection"
 import { CardFooter } from "app/components/PostCard"
 import { useStores } from "app/models"
+import { ChatModel, ChatUserModel } from "app/models/Chat"
 import { CommentModel } from "app/models/CommentModel"
 import { AppStackScreenProps } from "app/navigators/types"
 import { colors, spacing } from "app/theme"
@@ -14,7 +15,7 @@ import uuid from "react-native-uuid"
 
 export type PostScreenProps = AppStackScreenProps<"PostScreen">
 export const PostScreen: FC<PostScreenProps> = observer(function PostScreen(_props) {
-  const { postStore, userStore } = useStores()
+  const { postStore, userStore, messageStore } = useStores()
   const { navigation, route } = _props
   const post = postStore.getPostById(postStore.selectedPostId || "")
   if (!post) {
@@ -66,7 +67,38 @@ export const PostScreen: FC<PostScreenProps> = observer(function PostScreen(_pro
     postStore.setSelectedPostId(null)
     navigation.goBack()
   }
+  const handlePressMessage = () => {
+    if (post.postUserId === userStore.authId) {
+      return
+    }
+    const chatIdWithUsers = messageStore.chatWithUsersExists([userStore.authId, post.postUserId])
+    if (chatIdWithUsers) {
+      messageStore.setSelectedChatId(chatIdWithUsers)
+      navigation.push("ChatScreen")
+    } else {
+      const currentUser = ChatUserModel.create({
+        guid: userStore.authId,
+        name: userStore.name,
+        userImg: userStore.profileImg,
+        joinedOn: new Date(),
+      })
+      const userToMessage = ChatUserModel.create({
+        guid: post.postUserId,
+        name: post.postUser,
+        userImg: post.postUserImg,
+        joinedOn: new Date(),
+      })
+      const newChat = ChatModel.create({
+        chatId: uuid.v4().toString(),
+        users: [currentUser, userToMessage],
+        messages: [],
+      })
 
+      messageStore.addChat(newChat)
+      messageStore.setSelectedChatId(newChat.chatId)
+      navigation.push("ChatScreen")
+    }
+  }
   useEffect(() => {
     if (route.params.newComment) {
       handlePressComment()
@@ -143,24 +175,30 @@ export const PostScreen: FC<PostScreenProps> = observer(function PostScreen(_pro
           <Text size="lg" weight="bold" text={post.title} />
           <Text size="sm" text={post.body} />
         </View>
-        <CardFooter post={post} handlePressComments={handlePressComment} />
+        <CardFooter
+          post={post}
+          onPressComments={handlePressComment}
+          onPressMessage={handlePressMessage}
+        />
         {/* <PostCard post={post} /> */}
         <CommentSection comments={sortedComments} handlePressComment={handlePressComment} />
       </ScrollView>
-      <View style={$footerContainer}>
-        <View style={$textInputContainer}>
-          <AutoImage style={$commentThumbnail} src={userStore.profileImg} />
-          <TextInput
-            style={$textInputStyle}
-            multiline
-            value={commentText}
-            onChangeText={(value) => setCommentText(value)}
-            ref={insertCommentRef}
-          />
+      <View style={$bottomContainer}>
+        <View style={$footerContainer}>
+          <View style={$textInputContainer}>
+            <AutoImage style={$commentThumbnail} src={userStore.profileImg} />
+            <TextInput
+              ref={insertCommentRef}
+              style={$textInputStyle}
+              multiline
+              value={commentText}
+              onChangeText={(value) => setCommentText(value)}
+            />
+          </View>
+          <Button style={$submitCommentBtn} onPress={onSubmitComment}>
+            <Icon icon={"arrow-up"} color={colors.palette.neutral100} />
+          </Button>
         </View>
-        <Button style={$submitCommentBtn} onPress={onSubmitComment}>
-          <Icon icon={"arrow-up"} color={colors.palette.neutral100} />
-        </Button>
       </View>
     </Screen>
   )
@@ -170,9 +208,10 @@ const $container: ViewStyle = {
 }
 
 const $scrollViewStyle: ViewStyle = {
-  flexBasis: "95%",
+  flexBasis: "93%",
   paddingBottom: spacing.sm,
   flexShrink: 1,
+  flexGrow: 1,
 }
 const $headerStyle: ViewStyle = {
   marginBottom: 0,
@@ -210,11 +249,16 @@ const $postContent: ViewStyle = {
   paddingHorizontal: spacing.md,
   backgroundColor: colors.palette.neutral100,
 }
+const $bottomContainer: ViewStyle = {
+  flexGrow: 1,
+  flexShrink: 0,
+  padding: spacing.xs,
+  alignItems: "center",
+  backgroundColor: colors.palette.neutral400,
+  justifyContent: "flex-end",
+}
 const $footerContainer: ViewStyle = {
   flexDirection: "row",
-  flexBasis: 55,
-
-  padding: spacing.xs,
   justifyContent: "space-between",
   width: "100%",
   backgroundColor: colors.palette.neutral400,
@@ -238,7 +282,6 @@ const $textInputStyle: ViewStyle = {
   borderRadius: 20,
   backgroundColor: colors.palette.neutral100,
   flexGrow: 1,
-  height: "auto",
   maxWidth: "87%",
   paddingHorizontal: spacing.sm,
 }

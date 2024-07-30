@@ -1,14 +1,23 @@
 import { HomeTabScreenProps } from "app/navigators/types"
 // import { useSafeAreaInsetsStyle } from "app/utils/useSafeAreaInsetsStyle";
 import { observer } from "mobx-react-lite"
-import React, { FC, useState } from "react"
-import { AutoImage, Header, Icon, ListView, Screen, Text } from "app/components"
-import { ImageStyle, Modal, Pressable, TextInput, View, ViewStyle } from "react-native"
+import React, { FC, useRef, useState } from "react"
+import { AutoImage, Button, Header, Icon, ListView, Screen, Text } from "app/components"
+import {
+  FlatList,
+  ImageStyle,
+  Modal,
+  Pressable,
+  TextInput,
+  TextStyle,
+  View,
+  ViewStyle,
+} from "react-native"
 import { colors, spacing } from "app/theme"
 import { Logo } from "app/components/Logo"
 import { useStores } from "app/models"
 import { ChatCard } from "app/components/ChatCard"
-import { ChatUserModel, IChat, ChatModel } from "app/models/Chat"
+import { ChatUserModel, IChat, ChatModel, IChatUser } from "app/models/Chat"
 import uuid from "react-native-uuid"
 import { IFriend } from "app/models/Friend"
 
@@ -21,28 +30,36 @@ export const MessagesScreen: FC<MessagesScreenProps> = observer(function Message
   const [toUserSearchText, setToUserText] = useState("")
   const [toUsers, setToUsers] = useState<IFriend[]>([] as IFriend[])
   const [friendSearchResults, setFriendSearchResults] = useState<IFriend[]>([] as IFriend[])
+  const textInputRef = useRef<TextInput>(null)
 
   const handleCreateNewChat = () => {
-    const chatUser = ChatUserModel.create({
+    const currentUser = ChatUserModel.create({
       guid: userStore.authId,
       name: userStore.name,
       userImg: userStore.profileImg,
       joinedOn: new Date(),
     })
+    const chatUsers: IChatUser[] = [currentUser]
+    toUsers.forEach((user) => {
+      chatUsers.push(
+        ChatUserModel.create({
+          guid: user.guid,
+          name: user.name,
+          userImg: user.profImg,
+          joinedOn: new Date(),
+        }),
+      )
+    })
 
     const newChat = ChatModel.create({
       chatId: uuid.v4().toString(),
-      users: [chatUser],
+      users: chatUsers,
       messages: [],
     })
 
     messageStore.addChat(newChat)
     messageStore.setSelectedChatId(newChat.chatId)
     navigation.push("ChatScreen")
-  }
-
-  const handleGoBack = () => {
-    navigation.goBack()
   }
 
   const handleTextChange = (text: string) => {
@@ -52,7 +69,12 @@ export const MessagesScreen: FC<MessagesScreenProps> = observer(function Message
 
   const addToUserList = (friend: IFriend) => {
     setToUsers((toUsers) => [...toUsers, friend])
+    textInputRef.current?.clear()
   }
+  const handleOpenModal = () => {
+    setModalVis(true)
+  }
+
   return (
     <Screen preset="fixed" contentContainerStyle={$screenContainer}>
       <Header
@@ -61,20 +83,24 @@ export const MessagesScreen: FC<MessagesScreenProps> = observer(function Message
           <Icon
             icon={"pen-to-square"}
             color={colors.palette.neutral100}
-            onPress={() => setModalVis(true)}
+            onPress={handleOpenModal}
           />
         }
         leftIconColor={colors.palette.neutral100}
         containerStyle={$headerStyle}
         backgroundColor={colors.palette.primary500}
-        onLeftPress={handleGoBack}
       />
       <ListView<IChat>
         data={messageStore.chats}
         estimatedItemSize={80}
         renderItem={({ item }) => <ChatCard chat={item} />}
       />
-      <Modal visible={modalVis} style={$modalStyle} animationType="slide">
+      <Modal
+        onShow={() => textInputRef.current?.focus()}
+        visible={modalVis}
+        style={$modalStyle}
+        animationType="slide"
+      >
         <Header
           containerStyle={$headerStyle}
           title="New Message"
@@ -85,23 +111,36 @@ export const MessagesScreen: FC<MessagesScreenProps> = observer(function Message
         />
         <View style={$textInputContainer}>
           <Text text={"To: "} />
-          {toUsers.length > 0 && (
-            <ListView<IFriend>
-              contentContainerStyle={$toFriendList}
-              data={toUsers}
-              horizontal
-              renderItem={({ item }) => <Text text={item.name} style={$toFriendListItem} />}
-              estimatedItemSize={20}
+          <View style={$textInputItems}>
+            {toUsers.length > 0 && (
+              <FlatList
+                columnWrapperStyle={$toFriendList}
+                scrollEnabled={false}
+                data={toUsers}
+                numColumns={99}
+                renderItem={({ item }) => <Text text={item.name} style={$toFriendListItem} />}
+              />
+            )}
+            <TextInput
+              ref={textInputRef}
+              style={$textInputStyle}
+              value={toUserSearchText}
+              onChangeText={handleTextChange}
+              onFocus={() => handleTextChange(toUserSearchText)}
+              onKeyPress={(e) => {
+                if (e.nativeEvent.key === "Backspace" && toUserSearchText === "") {
+                  setToUsers((prevToUsers) => prevToUsers.slice(0, -1))
+                }
+              }}
             />
-          )}
-          <TextInput
-            value={toUserSearchText}
-            onChangeText={handleTextChange}
-            onFocus={() => handleTextChange(toUserSearchText)}
-          />
+          </View>
+          <Button onPress={handleCreateNewChat} style={$createButton}>
+            <Icon icon={"arrow-right"} color={colors.palette.neutral100} />
+          </Button>
         </View>
         <ListView<IFriend>
           data={friendSearchResults}
+          keyboardShouldPersistTaps={"always"}
           estimatedItemSize={40}
           renderItem={({ item }) => (
             <FriendInfoCard friend={item} onPress={() => addToUserList(item)} />
@@ -121,23 +160,44 @@ const $headerStyle: ViewStyle = {
 }
 const $modalStyle: ViewStyle = {}
 const $textInputContainer: ViewStyle = {
+  width: "100%",
   paddingHorizontal: spacing.sm,
   flexDirection: "row",
+  flexWrap: "wrap",
+  alignItems: "center",
   borderTopColor: colors.border,
   borderBottomColor: colors.border,
   borderTopWidth: 1,
   borderBottomWidth: 1,
 }
-const $toFriendList: ViewStyle = {}
-const $toFriendListItem: ViewStyle = {
+const $textInputItems: ViewStyle = {
+  flex: 1,
+}
+const $textInputStyle: TextStyle = {
+  width: "90%",
+}
+
+const $toFriendList: ViewStyle = {
+  flexWrap: "wrap",
+}
+
+const $toFriendListItem: TextStyle = {
+  color: colors.palette.neutral100,
+  maxHeight: 30,
   width: "auto",
   marginHorizontal: spacing.xxxs,
   paddingHorizontal: spacing.xxxs,
-  flex: 1,
+  marginVertical: spacing.xxxs,
   backgroundColor: colors.palette.primary500,
   borderRadius: 2,
 }
-
+const $createButton: ViewStyle = {
+  marginVertical: spacing.xxxs,
+  width: 30,
+  height: 30,
+  borderRadius: 15,
+  alignSelf: "flex-end",
+}
 interface FriendInfoCardProps {
   friend: IFriend
   onPress: () => void
@@ -159,7 +219,7 @@ const $friendCardContainer: ViewStyle = {
   flexDirection: "row",
   borderTopColor: colors.border,
   borderBottomColor: colors.border,
-  borderTopWidth: 1,
+  borderBottomWidth: 1,
   alignItems: "center",
   justifyContent: "space-between",
 }

@@ -37,6 +37,9 @@ export const ChatModel = types.model("Chat", {
       .map((user) => user.name) 
     
     return names.join(names.length === 2 ? " & " : ", ")
+  },
+  get chatUserIds() {
+    return chat.users.map((user) => user.guid)
   }
 }))
 .actions((chat) => ({
