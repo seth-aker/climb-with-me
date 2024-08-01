@@ -3,28 +3,31 @@ import { HomeTabScreenProps } from "app/navigators/types"
 import { colors, spacing } from "app/theme"
 import { observer } from "mobx-react-lite"
 import React, { FC } from "react"
-import { ViewStyle } from "react-native"
-import { FriendCard } from "app/components/FriendCard"
-import { IFriend } from "app/models/Friend"
+import { View, ViewStyle } from "react-native"
+
 import { useStores } from "app/models"
+import { IFriendRequest } from "app/models/FriendRequest"
+import { FriendRequestCard } from "app/components/FriendRequestCard"
 
 interface FriendsScreenProps extends HomeTabScreenProps<"Friends"> {}
 
 export const FriendsScreen: FC<FriendsScreenProps> = observer(function FriendsScreen(_props) {
   const { friendStore } = useStores()
   return (
-    <Screen preset="fixed" contentContainerStyle={$screenContainer}>
+    <Screen preset="fixed" contentContainerStyle={$screenContainer} safeAreaEdges={["bottom"]}>
       <Header
         title="Friends"
         containerStyle={$headerStyle}
         backgroundColor={colors.palette.primary500}
       />
-
-      <ListView<IFriend>
-        data={friendStore.friends.slice()}
-        contentContainerStyle={$listContentContainer}
-        renderItem={({ item }) => <FriendCard friend={item} />}
-      />
+      <View style={$listContainer}>
+        <ListView<IFriendRequest>
+          data={friendStore.friendRequests.slice()}
+          contentContainerStyle={$listContentContainer}
+          estimatedItemSize={200}
+          renderItem={({ item }) => <FriendRequestCard friendRequest={item} />}
+        />
+      </View>
     </Screen>
   )
 })
@@ -32,11 +35,14 @@ export const FriendsScreen: FC<FriendsScreenProps> = observer(function FriendsSc
 const $screenContainer: ViewStyle = {
   flex: 1,
   alignItems: "center",
+}
+const $listContainer: ViewStyle = {
   width: "100%",
 }
-
 const $headerStyle: ViewStyle = {
   marginBottom: 0,
   paddingHorizontal: spacing.sm,
 }
-const $listContentContainer: ViewStyle = {}
+const $listContentContainer: ViewStyle = {
+  paddingBottom: spacing.xxxs,
+}

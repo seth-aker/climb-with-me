@@ -8,6 +8,7 @@ import { useStores } from "app/models"
 import { IMessage, MessageModel } from "app/models/Message"
 import uuid from "react-native-uuid"
 import { MessageCard } from "app/components/MessageCard"
+import { EmptyListComponent } from "app/components/EmptyListComponent"
 
 interface ChatScreenProps extends AppStackScreenProps<"ChatScreen"> {}
 export const ChatScreen = observer((props: ChatScreenProps) => {
@@ -31,8 +32,6 @@ export const ChatScreen = observer((props: ChatScreenProps) => {
       }),
     )
     setMessageText("")
-    // setTextInputHeight(35)
-    messageListRef.current?.scrollToEnd()
     inputRef.current?.blur()
   }
 
@@ -72,6 +71,7 @@ export const ChatScreen = observer((props: ChatScreenProps) => {
           renderItem={({ item }) => {
             return <MessageCard message={item} viewerId={userStore.authId} />
           }}
+          ListEmptyComponent={<EmptyListComponent />}
           onLoad={() => messageListRef.current?.scrollToEnd()}
         />
       </View>

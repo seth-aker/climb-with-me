@@ -1,10 +1,13 @@
 import { Instance, types } from "mobx-state-tree";
-import { FriendModel} from "./Friend";
 import { withSetPropAction } from "./helpers/withSetPropAction";
 export const FriendRequestModel = types.model("FriendRequest", {
   requestId: types.identifier,
-  friend: types.frozen(FriendModel),
-  accepted: types.boolean
+  friendId: types.string,
+  friendName: types.string,
+  friendProfImg: types.string,
+  accepted: types.boolean,
+  requestedOn: types.Date,
 }).actions(withSetPropAction)
+
 
 export interface IFriendRequest extends Instance<typeof FriendRequestModel> {};
