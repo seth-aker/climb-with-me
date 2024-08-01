@@ -1,3 +1,5 @@
+import { formatDate } from "./formatDate";
+
 const ONE_SECOND = 1000;
 const ONE_MINUTE = ONE_SECOND * 60;
 const ONE_HOUR = ONE_MINUTE * 60;
@@ -21,5 +23,16 @@ export function formatTimeSince(timeDifferenceMs: number) {
     } else {
         const timeDifInDays = Math.floor(timeDifferenceMs / ONE_DAY)
         return `${timeDifInDays} day${timeDifInDays > 1? "s": ""} ago`
+    }
+}
+/**
+ * 
+ */
+export function formatLastMessageSentOn(time: Date) {
+    if(Date.now() - time.getTime() < ONE_DAY) {
+        return time.toLocaleTimeString("en-US", {hour: "numeric", minute: "2-digit", hour12: true})
+    }
+    else {
+        return formatDate(time.toISOString(), "MM/dd/yy")
     }
 }

@@ -43,12 +43,20 @@ export const ChatScreen = observer((props: ChatScreenProps) => {
 
   // const [textInputHeight, setTextInputHeight] = useState(35)
   // const $textInputHeight: ViewStyle = { height: textInputHeight }
-
+  if (!messageStore.selectedChat) {
+    return null
+  }
   return (
     <Screen preset="fixed" contentContainerStyle={$screenContainer} safeAreaEdges={["bottom"]}>
       <View style={$topContainer}>
         <Header
-          title={messageStore.selectedChat?.getChatName(userStore.authId)}
+          title={
+            // If the number of users is more than 2 return title text is {number} people
+            // Else it is the chat name
+            !messageStore.selectedChat.chatName && messageStore.selectedChat.userCount > 2
+              ? `${messageStore.selectedChat.userCount - 1} people`
+              : messageStore.selectedChat.getChatName(userStore.authId)
+          }
           titleStyle={{ color: colors.palette.neutral100 }}
           LeftActionComponent={
             <Icon icon={"angle-left"} onPress={handleGoBack} color={colors.palette.neutral100} />

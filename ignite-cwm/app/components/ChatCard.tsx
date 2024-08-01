@@ -1,13 +1,13 @@
 import React from "react"
 import { observer } from "mobx-react-lite"
-import { ImageStyle, Pressable, View, ViewStyle } from "react-native"
+import { ImageStyle, Pressable, TextStyle, View, ViewStyle } from "react-native"
 import { AutoImage } from "./AutoImage"
 import { IChat } from "app/models/Chat"
 import { useNavigation } from "@react-navigation/native"
 import { RootStackNavigation } from "app/navigators/types"
 import { useStores } from "app/models"
 import { Text } from "./Text"
-import { formatTimeSince } from "app/utils/formatTime"
+import { formatLastMessageSentOn } from "app/utils/formatTime"
 import { IMessage } from "app/models/Message"
 import { Icon } from "./Icon"
 import { spacing } from "app/theme"
@@ -28,27 +28,28 @@ export const ChatCard = observer((props: ChatCardProps) => {
   const messageBody = lastMessage.body
   let lastSent
   if (lastMessage.sentOn) {
-    lastSent = formatTimeSince(Date.now() - lastMessage.sentOn.getTime())
+    lastSent = formatLastMessageSentOn(lastMessage.sentOn)
   }
   const formatMessageBody = (body: string) => {
-    if (body.length > 80) {
-      return body.substring(0, 80).trimEnd() + "..."
+    if (body.length > 70) {
+      return body.substring(0, 70).trimEnd() + "..."
     } else {
       return body
     }
   }
+  const chatNameDisplay = chat.getChatName(userStore.authId, 3)
   return (
     <Pressable style={$container} onPress={onPress}>
       <AutoImage src={chat.users.at(0)?.userImg} style={$chatImg} />
       <View style={$textContainer}>
         <View style={$topTextContainer}>
-          <Text text={chat.getChatName(userStore.authId)} preset="bold" />
-          <Text>
+          <Text size="xs" style={$chatTitle} text={chatNameDisplay} preset="bold" />
+          <Text weight="light" size="xxs" style={$lastSentStyle}>
             {lastSent || ""}
-            <Icon icon={"angle-right"} />
           </Text>
+          <Icon icon={"angle-right"} size={12} />
         </View>
-        <Text text={formatMessageBody(messageBody)} />
+        <Text size="xxs" text={formatMessageBody(messageBody)} />
       </View>
     </Pressable>
   )
@@ -71,4 +72,10 @@ const $textContainer: ViewStyle = {
 const $topTextContainer: ViewStyle = {
   flexDirection: "row",
   alignContent: "center",
+  justifyContent: "space-between",
 }
+const $chatTitle: TextStyle = {
+  flexGrow: 0,
+  width: "75%",
+}
+const $lastSentStyle: ViewStyle = {}

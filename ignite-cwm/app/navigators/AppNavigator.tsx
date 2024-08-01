@@ -50,6 +50,36 @@ const AppStack = observer(function AppStack(_props) {
       { guid: "9", name: "Joel", profImg: "https://placehold.co/200x200.png" },
       { guid: "10", name: "Sam Aker", profImg: "https://placehold.co/200x200.png" },
       { guid: "11", name: "Will Aker", profImg: "https://placehold.co/200x200.png" },
+      {
+        guid: "12",
+        name: "Ellie",
+        profImg:
+          "https://static.wikia.nocookie.net/thelastofus/images/3/34/Part_II_Ellie_infobox.png/revision/latest/scale-to-width-down/1200?cb=20230215221019",
+      },
+      {
+        guid: "13",
+        name: "David",
+        proImg:
+          "https://static.wikia.nocookie.net/thelastofus/images/3/3c/Part_I_David_infobox.png/revision/latest?cb=20230222041515",
+      },
+      {
+        guid: "14",
+        name: "Jess",
+        profImg:
+          "https://static.wikia.nocookie.net/thelastofus/images/9/92/Part_II_Jesse_infobox.png/revision/latest?cb=20230215214214",
+      },
+      {
+        guid: "15",
+        name: "Jane",
+        profImg:
+          "https://static.wikia.nocookie.net/thelastofus/images/f/f0/Part_II_Tommy_infobox.png/revision/latest?cb=20230216035810",
+      },
+      {
+        guid: "16",
+        name: "Normande",
+        profImg:
+          "https://static.wikia.nocookie.net/thelastofus/images/2/2f/Part_I_Bill_infobox.png/revision/latest?cb=20230215182523",
+      },
     ]
     fakeFriends.forEach((friend) => {
       friendStore.addFriend(FriendModel.create(friend))

@@ -1,54 +1,59 @@
-import React, { FC } from "react";
-import { View, Image, ViewStyle, TextStyle, ImageStyle } from "react-native";
-import { Text } from "app/components";
-import { faComment, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
-import { Icon } from "app/components/Icon"; // Update this path based on your project structure
-import { spacing } from "app/theme";
+import React, { FC } from "react"
+import { View, Image, ViewStyle, TextStyle, ImageStyle } from "react-native"
+import { Text } from "app/components"
+import { faComment, faInfoCircle } from "@fortawesome/free-solid-svg-icons"
+import { Icon } from "app/components/Icon" // Update this path based on your project structure
+import { spacing } from "app/theme"
+import { IFriend } from "app/models/Friend"
 
 interface FriendCardProps {
-  name: string;
-  avatar: string;
-  numberOfClimbs: string;
+  friend: IFriend
 }
 
-export const FriendCard: FC<FriendCardProps> = ({ name, avatar, numberOfClimbs }) => {
+export const FriendCard: FC<FriendCardProps> = (props) => {
+  const {
+    friend: { profImg, name },
+  } = props
   return (
     <View style={$friendContainer}>
-      <Image source={{ uri: avatar }} style={$avatar} />
+      <Image src={profImg} style={$avatar} />
       <Text text={name} style={$friendName} />
-      <Text text={`${numberOfClimbs} Climbs`} style={$numberOfClimbs} />
       <View style={$iconsContainer}>
-        <Icon icon={faComment} size={24} color="#3c3c3c9e" onPress={() => console.log(`Message ${name}`)} />
-        <Icon icon={faInfoCircle} size={24} color="#3c3c3c9e" onPress={() => console.log(`Info about ${name}`)} />
+        <Icon
+          icon={faComment}
+          size={24}
+          color="#3c3c3c9e"
+          onPress={() => console.log(`Message ${name}`)}
+        />
+        <Icon
+          icon={faInfoCircle}
+          size={24}
+          color="#3c3c3c9e"
+          onPress={() => console.log(`Info about ${name}`)}
+        />
       </View>
     </View>
-  );
-};
+  )
+}
 
 const $friendContainer: ViewStyle = {
   flexDirection: "row",
   alignItems: "center",
   marginBottom: spacing.md,
-  width: "100%",
+  minWidth: 120,
   paddingHorizontal: spacing.md,
   borderWidth: 1,
   borderColor: "#ccc",
   borderRadius: 10,
   paddingVertical: spacing.sm,
   backgroundColor: "#f9f9f9",
-};
+}
 
 const $friendName: TextStyle = {
   marginLeft: spacing.md,
   fontSize: 18,
   flex: 1, // To take up remaining space
-};
-
-const $numberOfClimbs: TextStyle = {
-  marginLeft: spacing.md,
-  fontSize: 16,
-  color: "#666",
-};
+}
 
 const $avatar: ImageStyle = {
   width: 50,
@@ -56,12 +61,11 @@ const $avatar: ImageStyle = {
   borderRadius: 25,
   borderWidth: 1,
   borderColor: "#ccc",
-};
+}
 
 const $iconsContainer: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
   width: 60,
   marginLeft: spacing.md,
-};
- 
+}

@@ -29,17 +29,31 @@ export const ChatModel = types.model("Chat", {
   chatName: types.maybeNull(types.string)
 
 }).views((chat) => ({
-  getChatName(viewingUserId: string) {
+  /**
+   * 
+   * @param viewingUserId input the user viewing the screen to remove them from the list of names
+   * @param numOfDisplayNames How many names to print before stopping and adding "and {num} others"
+   * @returns string
+   */
+  getChatName(viewingUserId: string, numOfDisplayNames?: number) {
     if(chat.chatName) {
       return chat.chatName
     }
     const names = chat.users.filter((user) => user.guid !== viewingUserId)
-      .map((user) => user.name) 
+      .map((user) => user.name)
+      
+    if(numOfDisplayNames && numOfDisplayNames < names.length) {
+      const displayNames = names.slice(0,numOfDisplayNames);
+      return `${displayNames.join(", ")}, and ${names.length - numOfDisplayNames === 1 ? `${names.length - numOfDisplayNames} other` : `${names.length - numOfDisplayNames} others`}`
+    }
     
     return names.join(names.length === 2 ? " & " : ", ")
   },
   get chatUserIds() {
     return chat.users.map((user) => user.guid)
+  },
+  get userCount() {
+    return chat.users.length
   }
 }))
 .actions((chat) => ({
