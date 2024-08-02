@@ -27,8 +27,10 @@ export function formatTimeSince(timeDifferenceMs: number) {
 }
 /**
  * 
+ * @param time 
+ * @returns 
  */
-export function formatLastMessageSentOn(time: Date) {
+export function formatSentOn(time: Date) {
     if(Date.now() - time.getTime() < ONE_DAY) {
         return time.toLocaleTimeString("en-US", {hour: "numeric", minute: "2-digit", hour12: true})
     }

@@ -7,7 +7,7 @@ import { useNavigation } from "@react-navigation/native"
 import { RootStackNavigation } from "app/navigators/types"
 import { useStores } from "app/models"
 import { Text } from "./Text"
-import { formatLastMessageSentOn } from "app/utils/formatTime"
+import { formatSentOn } from "app/utils/formatTime"
 import { IMessage } from "app/models/Message"
 import { Icon } from "./Icon"
 import { spacing } from "app/theme"
@@ -28,10 +28,10 @@ export const ChatCard = observer((props: ChatCardProps) => {
   const messageBody = lastMessage.body
   let lastSent
   if (lastMessage.sentOn) {
-    lastSent = formatLastMessageSentOn(lastMessage.sentOn)
+    lastSent = formatSentOn(lastMessage.sentOn)
   }
   const formatMessageBody = (body: string) => {
-    if (body.length > 70) {
+    if (body && body.length > 70) {
       return body.substring(0, 70).trimEnd() + "..."
     } else {
       return body

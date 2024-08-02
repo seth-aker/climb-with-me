@@ -49,7 +49,6 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
     try {
       logout()
       await clearSession()
-      navigation.navigate("Login")
     } catch (e) {
       console.log("Log out cancelled")
     }
