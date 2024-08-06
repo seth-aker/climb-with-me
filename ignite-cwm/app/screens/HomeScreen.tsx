@@ -17,7 +17,7 @@ import { Logo } from "app/components/Logo"
 interface HomeScreenProps extends HomeTabScreenProps<"Home"> {}
 
 export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_props) {
-  const { navigation } = _props
+  // const { navigation } = _props
   const { clearSession } = useAuth0()
   const {
     authenticationStore: { logout, tokenLoading },

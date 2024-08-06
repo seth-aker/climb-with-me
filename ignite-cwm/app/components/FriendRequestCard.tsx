@@ -9,6 +9,7 @@ import { colors, spacing } from "app/theme"
 import { useNavigation } from "@react-navigation/native"
 import { RootStackNavigation } from "app/navigators/types"
 import { formatSentOn } from "app/utils/formatTime"
+import { useStores } from "app/models"
 
 export interface FriendRequestCardProps {
   friendRequest: IFriendRequest
@@ -16,11 +17,14 @@ export interface FriendRequestCardProps {
 
 export const FriendRequestCard = observer((props: FriendRequestCardProps) => {
   const { friendRequest } = props
+  const { friendStore } = useStores()
   const navigation = useNavigation<RootStackNavigation>()
   const handleOnPress = () => {
     // navigation.push("UserProfile");
   }
-
+  const handleAcceptFriend = () => {
+    friendStore.acceptRequest(friendRequest.requestId)
+  }
   return (
     <Pressable onPress={handleOnPress} style={$container}>
       <AutoImage src={friendRequest.friendProfImg} style={$imgStyle} />
@@ -28,8 +32,18 @@ export const FriendRequestCard = observer((props: FriendRequestCardProps) => {
         <Text text={friendRequest.friendName} preset="bold" size="xl" />
         <Text text={`Sent: ${formatSentOn(friendRequest.requestedOn)}`} />
         <View style={$buttonContainer}>
-          <Button style={$buttonStyle} text="Accept" />
-          <Button style={$buttonStyle} preset="reversed" text="Deny" />
+          <Button
+            disabled={friendRequest.accepted}
+            onPress={handleAcceptFriend}
+            style={$buttonStyle}
+            text={friendRequest.accepted ? "Accepted" : "Accept"}
+          />
+          <Button
+            disabled={friendRequest.accepted}
+            style={$buttonStyle}
+            preset="reversed"
+            text="Deny"
+          />
         </View>
       </View>
     </Pressable>

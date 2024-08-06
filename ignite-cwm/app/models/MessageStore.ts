@@ -14,7 +14,7 @@ export const MessageStoreModel = types
   },
   setSelectedChatId(value: string | null) {
     store.selectedChatId = value;
-  }
+  },
 })).views((store) => ({
   get selectedChat() {
     return store.chats.find((chat) => {

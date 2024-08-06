@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { AppStackScreenProps } from "app/navigators/types"
 import { observer } from "mobx-react-lite"
 import { Button, Header, Icon, ListView, ListViewRef, Screen } from "app/components"
@@ -39,6 +39,10 @@ export const ChatScreen = observer((props: ChatScreenProps) => {
     messageStore.setSelectedChatId(null)
     navigation.goBack()
   }
+
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [])
 
   // const [textInputHeight, setTextInputHeight] = useState(35)
   // const $textInputHeight: ViewStyle = { height: textInputHeight }

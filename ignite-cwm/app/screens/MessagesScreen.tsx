@@ -31,35 +31,48 @@ export const MessagesScreen: FC<MessagesScreenProps> = observer(function Message
   const [toUsers, setToUsers] = useState<IFriend[]>([] as IFriend[])
   const [friendSearchResults, setFriendSearchResults] = useState<IFriend[]>([] as IFriend[])
   const textInputRef = useRef<TextInput>(null)
+  const chatList = messageStore.chats.slice().sort((a, b) => {
+    return (
+      (b.getLastMessage()?.sentOn.getTime() ?? b.createdOn.getTime()) -
+      (a.getLastMessage()?.sentOn.getTime() ?? a.createdOn.getTime())
+    )
+  })
 
   const handleCreateNewChat = () => {
-    const currentUser = ChatUserModel.create({
-      guid: userStore.authId,
-      name: userStore.name,
-      userImg: userStore.profileImg,
-      joinedOn: new Date(),
-    })
-    const chatUsers: IChatUser[] = [currentUser]
-    toUsers.forEach((user) => {
-      chatUsers.push(
-        ChatUserModel.create({
-          guid: user.guid,
-          name: user.name,
-          userImg: user.profImg,
-          joinedOn: new Date(),
-        }),
-      )
-    })
+    const chatUserIds = [userStore.authId, ...toUsers.map((user) => user.guid)]
+    const chatId = messageStore.chatWithUsersExists(chatUserIds)
+    if (chatId !== null) {
+      messageStore.setSelectedChatId(chatId)
+    } else {
+      const currentUser = ChatUserModel.create({
+        guid: userStore.authId,
+        name: userStore.name,
+        userImg: userStore.profileImg,
+        joinedOn: new Date(),
+      })
+      const chatUsers: IChatUser[] = [currentUser]
+      toUsers.forEach((user) => {
+        chatUsers.push(
+          ChatUserModel.create({
+            guid: user.guid,
+            name: user.name,
+            userImg: user.profImg,
+            joinedOn: new Date(),
+          }),
+        )
+      })
 
-    const newChat = ChatModel.create({
-      chatId: uuid.v4().toString(),
-      users: chatUsers,
-      messages: [],
-    })
+      const newChat = ChatModel.create({
+        chatId: uuid.v4().toString(),
+        users: chatUsers,
+        messages: [],
+      })
 
-    messageStore.addChat(newChat)
-    messageStore.setSelectedChatId(newChat.chatId)
+      messageStore.addChat(newChat)
+      messageStore.setSelectedChatId(newChat.chatId)
+    }
     navigation.push("ChatScreen")
+    setModalVis(false)
   }
 
   const handleTextChange = (text: string) => {
@@ -72,6 +85,8 @@ export const MessagesScreen: FC<MessagesScreenProps> = observer(function Message
     textInputRef.current?.clear()
   }
   const handleOpenModal = () => {
+    setToUsers([])
+    setToUserText("")
     setModalVis(true)
   }
 
@@ -91,7 +106,7 @@ export const MessagesScreen: FC<MessagesScreenProps> = observer(function Message
         backgroundColor={colors.palette.primary500}
       />
       <ListView<IChat>
-        data={messageStore.chats}
+        data={chatList}
         estimatedItemSize={80}
         renderItem={({ item }) => <ChatCard chat={item} />}
       />

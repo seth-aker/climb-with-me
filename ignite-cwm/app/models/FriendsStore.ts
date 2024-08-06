@@ -51,9 +51,13 @@ export const FriendsStoreModel = types.model("FriendsStore", {
   }),
   acceptRequest: flow(function* acceptRequest(requestId: string){
     const friendRequest = store.friendRequests.find((request) => request.requestId === requestId)
-    friendRequest?.setProp("accepted", true);
+    if(!friendRequest) {
+      return false;
+    }
+    friendRequest.setProp("accepted", true);
     // const friend = yield friendService.acceptFriendRequest(friendRequest.friendId)
-    
+    store.addFriend(FriendModel.create({guid: friendRequest.friendId, name: friendRequest.friendName, profImg: friendRequest.friendProfImg, friendSince: Date.now()}));
+    return true;
   }),
   denyRequest: flow(function* denyRequest(requestId: string) {
     const request = store.friendRequests.find((request) => request.requestId === requestId)

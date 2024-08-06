@@ -26,7 +26,7 @@ export const NewPostBar = observer((props: NewPostBarProps) => {
       </Pressable>
       <Pressable style={$newPostButton} onPress={() => setNewPostModalVis(true)}>
         <Text text="Where are you climbing?" style={$postButtonText} />
-        <Icon icon={"magnifying-glass"} color={colors.palette.neutral500} />
+        <Icon icon={"plus"} color={colors.palette.neutral500} />
       </Pressable>
       <NewPostModal visible={newPostModalVis} setVisible={setNewPostModalVis} />
     </View>

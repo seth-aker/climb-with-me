@@ -26,7 +26,8 @@ export const ChatModel = types.model("Chat", {
   chatId: types.identifier,
   messages: types.array(MessageModel),
   users: types.array(ChatUserModel),
-  chatName: types.maybeNull(types.string)
+  chatName: types.maybeNull(types.string),
+  createdOn: types.optional(types.Date, Date.now())
 
 }).views((chat) => ({
   /**
@@ -54,6 +55,12 @@ export const ChatModel = types.model("Chat", {
   },
   get userCount() {
     return chat.users.length
+  },
+  getUsersExcluding(excludeId: string) {
+    return chat.users.filter((user) => user.guid !== excludeId)
+  },
+  getLastMessage() {
+    return chat.messages.at(chat.messages.length - 1)
   }
 }))
 .actions((chat) => ({
