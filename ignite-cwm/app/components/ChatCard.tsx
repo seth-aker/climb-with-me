@@ -1,6 +1,6 @@
 import React from "react"
 import { observer } from "mobx-react-lite"
-import { ImageStyle, Pressable, TextStyle, View, ViewStyle } from "react-native"
+import { Dimensions, ImageStyle, Pressable, TextStyle, View, ViewStyle } from "react-native"
 import { AutoImage } from "./AutoImage"
 import { IChat } from "app/models/Chat"
 import { useNavigation } from "@react-navigation/native"
@@ -17,6 +17,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated"
+import { delay } from "app/utils/delay"
 
 export interface ChatCardProps {
   chat: IChat
@@ -26,12 +27,16 @@ export const ChatCard = observer((props: ChatCardProps) => {
   const { chat } = props
   const { messageStore, userStore } = useStores()
   const navigation = useNavigation<RootStackNavigation>()
-
+  const windowWidth = Dimensions.get("window").width
   const offset = useSharedValue(0)
   const offsetInitial = useSharedValue(0)
+  const cardHeight = useSharedValue(80)
 
   const pan = Gesture.Pan()
     .onChange((event) => {
+      if (event.translationX > 0) {
+        return
+      }
       offset.value = event.translationX + offsetInitial.value
     })
     .onFinalize(() => {
@@ -49,67 +54,80 @@ export const ChatCard = observer((props: ChatCardProps) => {
     transform: [{ translateX: offset.value }],
     flexBasis: "100%",
   }))
-
   const animatedDelete = useAnimatedStyle(() => ({
-    width: -1 * offset.value,
+    width: Math.min(windowWidth, -1 * offset.value),
     position: "absolute",
     right: 0,
     height: "100%",
     // overflow: "hidden",
+  }))
+  const animatedHeight = useAnimatedStyle(() => ({
+    height: cardHeight.value,
   }))
 
   const onPress = () => {
     messageStore.setSelectedChatId(chat.chatId)
     navigation.push("ChatScreen")
   }
+
+  const handleDelete = async () => {
+    offset.value = withTiming(-1 * windowWidth, { duration: 500 })
+    cardHeight.value = withTiming(0, { duration: 500 })
+    await delay(500)
+    messageStore.deleteChat(chat)
+  }
+
   const lastMessage = chat.getLastMessage()
   const lastSent = lastMessage?.sentOn
     ? formatSentOn(lastMessage.sentOn)
     : formatSentOn(chat.createdOn)
 
   const messageBody = lastMessage?.body ?? ""
-  const formatMessageBody = (body: string) => {
-    if (body && body.length > 70) {
-      return body.substring(0, 70).trimEnd() + "..."
-    } else {
-      return body
-    }
-  }
+
   const chatNameDisplay = chat.getChatName(userStore.authId, 3)
+
   return (
     <GestureDetector gesture={pan}>
-      <View style={$container}>
-        <Animated.View style={animatedCard}>
-          <Pressable style={$cardContainer} onPress={onPress}>
+      <Animated.View style={[$container, animatedHeight]}>
+        <Animated.View style={[$cardContainer, animatedCard]}>
+          <Pressable style={$pressableContainer} onPress={onPress}>
             <AutoImage
               src={chat.getUsersExcluding(userStore.authId).at(0)?.userImg}
               style={$chatImg}
             />
             <View style={$textContainer}>
               <View style={$topTextContainer}>
-                <Text size="xs" style={$chatTitle} text={chatNameDisplay} preset="bold" />
+                <Text
+                  ellipsizeMode="tail"
+                  numberOfLines={1}
+                  size="xs"
+                  style={$chatTitle}
+                  text={chatNameDisplay}
+                  preset="bold"
+                />
                 <Text weight="light" size="xxs" style={$lastSentStyle}>
                   {lastSent || ""}
                 </Text>
                 <Icon icon={"angle-right"} size={12} />
               </View>
-              <Text size="xxs" text={formatMessageBody(messageBody)} />
+              <Text ellipsizeMode={"tail"} numberOfLines={2} size="xxs" text={messageBody} />
             </View>
           </Pressable>
         </Animated.View>
         <Animated.View style={animatedDelete}>
-          <Pressable style={$deleteButton} onPress={() => messageStore.deleteChat(chat)}>
+          <Pressable style={$deleteButton} onPress={handleDelete}>
             <Icon icon={"trash"} color={colors.palette.neutral100} />
           </Pressable>
         </Animated.View>
-      </View>
+      </Animated.View>
     </GestureDetector>
   )
 })
 const $container: ViewStyle = {
   flexDirection: "row",
 }
-const $cardContainer: ViewStyle = {
+const $cardContainer: ViewStyle = {}
+const $pressableContainer: ViewStyle = {
   flexDirection: "row",
   height: 80,
   alignItems: "center",

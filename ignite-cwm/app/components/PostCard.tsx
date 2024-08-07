@@ -151,8 +151,8 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
       }
       ContentComponent={
         <View style={$contentContainer}>
-          <Text size="lg" weight="bold" text={post.title} />
-          <Text size="sm" text={post.body} />
+          <Text selectable size="lg" weight="bold" text={post.title} />
+          <Text selectable size="sm" text={post.body} />
           <View>
             <Pressable style={$numOfCommentsButton} onPress={handlePressViewComments}>
               <Text

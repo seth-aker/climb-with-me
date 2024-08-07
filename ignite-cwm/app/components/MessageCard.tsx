@@ -23,6 +23,7 @@ export const MessageCard = observer((props: MessageCardProps) => {
       <Text
         text={message.body}
         textColor={viewerIsOwner ? colors.palette.neutral100 : colors.text}
+        selectable
       />
       <View style={viewerIsOwner ? $rightArrow : $leftArrow} />
       <View style={viewerIsOwner ? $rightArrowOverlap : $leftArrowOverlap} />

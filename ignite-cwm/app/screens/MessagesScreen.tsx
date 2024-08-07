@@ -99,6 +99,7 @@ export const MessagesScreen: FC<MessagesScreenProps> = observer(function Message
             icon={"pen-to-square"}
             color={colors.palette.neutral100}
             onPress={handleOpenModal}
+            containerStyle={$iconContainerStyle}
           />
         }
         leftIconColor={colors.palette.neutral100}
@@ -108,6 +109,10 @@ export const MessagesScreen: FC<MessagesScreenProps> = observer(function Message
       <ListView<IChat>
         data={chatList}
         estimatedItemSize={80}
+        // Required for height animation change to not affect more than one card. This is due to flashlist's default component reuse
+        keyExtractor={(item) => {
+          return item.chatId
+        }}
         renderItem={({ item }) => <ChatCard chat={item} />}
       />
       <Modal
@@ -173,6 +178,14 @@ const $headerStyle: ViewStyle = {
   marginBottom: 0,
   paddingHorizontal: spacing.sm,
 }
+const $iconContainerStyle: ViewStyle = {
+  height: "100%",
+  justifyContent: "center",
+  alignItems: "center",
+  minWidth: 50,
+  position: "absolute",
+  right: -1 * spacing.sm,
+}
 const $modalStyle: ViewStyle = {}
 const $textInputContainer: ViewStyle = {
   width: "100%",
@@ -213,6 +226,7 @@ const $createButton: ViewStyle = {
   borderRadius: 15,
   alignSelf: "flex-end",
 }
+
 interface FriendInfoCardProps {
   friend: IFriend
   onPress: () => void

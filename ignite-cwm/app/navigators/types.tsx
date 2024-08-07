@@ -19,6 +19,7 @@ export type AppStackParamList = {
   PostScreen: { newComment?: boolean }
   Login: undefined
   ChatScreen: undefined
+  PublicProfile: undefined
   // 🔥 Your screens go here
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
