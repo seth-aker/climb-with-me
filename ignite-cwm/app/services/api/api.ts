@@ -1,50 +1,42 @@
-/**
- * This Api class lets you define an API endpoint and methods to request
- * data and process it.
- *
- * See the [Backend API Integration](https://docs.infinite.red/ignite-cli/boilerplate/app/services/#backend-api-integration)
- * documentation for more details.
- */
-import {
-  ApisauceInstance,
-  create,
-} from "apisauce"
-import Config from "../../config"
-import type {
-  ApiConfig,
-} from "./api.types"
+import axios, { AxiosResponse } from "axios"
+import Config from "app/config"
+import { IUserStoreSnapshotOut } from "app/models/UserStore"
 
-/**
- * Configuring the apisauce instance.
- */
-export const DEFAULT_API_CONFIG: ApiConfig = {
-  url: Config.API_URL,
+const api = axios.create({
+  // http://localhost:3000/api/v1
+  baseURL: Config.API_URL,
   timeout: 10000,
-}
+  headers: { "Content-Type": "application/json" },
+})
 
-/**
- * Manages all requests to the API. You can use this class to build out
- * various requests that you need to call from your backend API.
- */
-export class Api {
-  apisauce: ApisauceInstance
-  config: ApiConfig
-
-  /**
-   * Set up our API instance. Keep this lightweight!
-   */
-  constructor(config: ApiConfig = DEFAULT_API_CONFIG) {
-    this.config = config
-    this.apisauce = create({
-      baseURL: this.config.url,
-      timeout: this.config.timeout,
-      headers: {
-        Accept: "application/json",
-      },
+export const postUser = async (user: IUserStoreSnapshotOut, token: string) => {
+  try {
+    const response: AxiosResponse<IUserStoreSnapshotOut> = await api.post("/users", user, {
+      headers: { Authorization: `Bearer ${token}` },
     })
+    if (response.status !== 204 && response.status !== 200) {
+      throw Error("Error status: " + response.status + ": " + response.statusText)
+    }
+    return response.data
+  } catch (error) {
+    console.log(error)
+    return undefined
   }
-
 }
-
-// Singleton instance of the API for convenience
-export const api = new Api()
+export const getUser = async (
+  userId: string,
+  token: string,
+): Promise<IUserStoreSnapshotOut | undefined> => {
+  try {
+    const response: AxiosResponse<IUserStoreSnapshotOut> = await api.get(`/users/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (response.status !== 200) {
+      throw Error("Error status: " + response.status + ": " + response.statusText)
+    }
+    return response.data
+  } catch (error) {
+    console.log(error)
+    return undefined
+  }
+}

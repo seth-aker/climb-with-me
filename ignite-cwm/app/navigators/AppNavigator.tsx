@@ -19,6 +19,8 @@ import { AppStackParamList } from "./types"
 import { ChatScreen } from "app/screens/ChatScreen"
 import { LoginScreen, PostScreen } from "app/screens"
 import { FriendModel } from "app/models/Friend"
+import { getUser, postUser } from "app/services/api"
+import { applySnapshot, getSnapshot } from "mobx-state-tree"
 
 /**
  * This is a list of all the route names that will exit the app if the back button
@@ -31,7 +33,7 @@ const Stack = createNativeStackNavigator<AppStackParamList>()
 
 const AppStack = observer(function AppStack(_props) {
   const {
-    authenticationStore: { isAuthenticated, updateAndValidateToken },
+    authenticationStore: { isAuthenticated, updateAndValidateToken, authToken },
     userStore,
     friendStore,
   } = useStores()
@@ -153,8 +155,14 @@ const AppStack = observer(function AppStack(_props) {
   useEffect(() => {
     ;(async () => {
       await updateAndValidateToken(getCredentials)
+
       userStore.setProp("name", user?.name)
-      userStore.setProp("authId", user?.sub)
+      /**
+       * Splits the sub id along the | and stores only the unique id string
+       * Ex: sub = auth0|661ee47d61bc7139526a380c
+       * authId = 661ee47d61bc7139526a380c
+       */
+      userStore.setProp("authId", user?.sub?.split("|")[1])
       userStore.setProp("givenName", user?.givenName)
       userStore.setProp("familyName", user?.familyName)
       userStore.setProp("email", user?.email)
@@ -169,6 +177,16 @@ const AppStack = observer(function AppStack(_props) {
       // If the user
       if (user?.sub) {
         userStore.setProp("state", "success")
+      }
+
+      const userData = await getUser(user?.sub?.split("|")[1] ?? "", authToken ?? "")
+      if (!userData) {
+        console.log(getSnapshot(userStore))
+        const response = await postUser(getSnapshot(userStore), authToken ?? "")
+        console.log(response)
+        if (response) {
+          applySnapshot(userStore, response)
+        }
       }
     })()
   }, [user])
