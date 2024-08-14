@@ -25,7 +25,7 @@ export const ChatScreen = observer((props: ChatScreenProps) => {
     messageStore.selectedChat?.addMessage(
       MessageModel.create({
         guid: uuid.v4().toString(),
-        ownerId: userStore.authId,
+        ownerId: userStore._id,
         ownerName: userStore.name,
         body: messageText,
         sentOn: new Date(),
@@ -58,7 +58,7 @@ export const ChatScreen = observer((props: ChatScreenProps) => {
             // Else it is the chat name
             !messageStore.selectedChat.chatName && messageStore.selectedChat.userCount > 2
               ? `${messageStore.selectedChat.userCount - 1} people`
-              : messageStore.selectedChat.getChatName(userStore.authId)
+              : messageStore.selectedChat.getChatName(userStore._id)
           }
           titleStyle={{ color: colors.palette.neutral100 }}
           LeftActionComponent={
@@ -73,7 +73,7 @@ export const ChatScreen = observer((props: ChatScreenProps) => {
           data={messageStore.selectedChat?.messages.slice()}
           estimatedItemSize={40}
           renderItem={({ item }) => {
-            return <MessageCard message={item} viewerId={userStore.authId} />
+            return <MessageCard message={item} viewerId={userStore._id} />
           }}
           ListEmptyComponent={<EmptyListComponent />}
           onLoad={() => messageListRef.current?.scrollToEnd()}

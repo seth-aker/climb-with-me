@@ -13,7 +13,7 @@ export const UserStoreModel = types
      * Users auth id
      * AKA: sub
      */
-    authId: "",
+    _id: "",
     /**
      * First Name
      */
@@ -47,8 +47,6 @@ export const UserStoreModel = types
      */
     aboutMeText: types.maybe(types.string),
     climbingStyles: types.optional(types.array(ClimbingStyleModel), []),
-
-    state: types.optional(types.enumeration("State", ["pending", "success", "error"]), "pending"),
   })
   .actions(withSetPropAction)
   .actions((store) => ({

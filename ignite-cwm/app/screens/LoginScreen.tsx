@@ -9,6 +9,7 @@ import { useStores } from "app/models"
 import { LoadingSpinner } from "app/components/LoadingSpinner"
 
 import { Logo } from "app/components/Logo"
+import Config from "app/config"
 type LoginScreenProps = AppStackScreenProps<"Login">
 
 export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_props) {
@@ -20,7 +21,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   const handleLogin = async () => {
     setIsLoading(true)
     try {
-      const credentials = await authorize()
+      const credentials = await authorize({ audience: Config.AUDIENCE })
       setAuthToken(credentials?.accessToken)
     } catch (e) {
       console.log(e)
@@ -30,7 +31,10 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
 
   const handleRegister = async () => {
     try {
-      const credentials = await authorize({ additionalParameters: { screen_hint: "signup" } })
+      const credentials = await authorize({
+        audience: Config.AUDIENCE,
+        additionalParameters: { screen_hint: "signup" },
+      })
       setAuthToken(credentials?.accessToken)
     } catch (e) {
       console.log(e)

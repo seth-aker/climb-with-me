@@ -32,12 +32,8 @@ const exitRoutes = Config.exitRoutes
 const Stack = createNativeStackNavigator<AppStackParamList>()
 
 const AppStack = observer(function AppStack(_props) {
-  const {
-    authenticationStore: { isAuthenticated, updateAndValidateToken, authToken },
-    userStore,
-    friendStore,
-  } = useStores()
-  const { getCredentials, user } = useAuth0()
+  const { authenticationStore: authStore, userStore, friendStore } = useStores()
+  const { getCredentials, user, isLoading } = useAuth0()
 
   useEffect(() => {
     if (__DEV__) {
@@ -151,52 +147,37 @@ const AppStack = observer(function AppStack(_props) {
       })
     }
   }, [])
-  // Used to sync the authentication store with Auth0's SDK and determine what screen to load first.
+
   useEffect(() => {
-    ;(async () => {
-      await updateAndValidateToken(getCredentials)
+    authStore.updateAndValidateToken(getCredentials)
+    console.log("Effect Ran")
+    if (!isLoading && user && authStore.authToken) {
+      applySnapshot(userStore, user)
+      userStore.setProp("_id", user.sub?.split("|")[1])
+      userStore.setProp("profileImg", user.picture)
 
-      userStore.setProp("name", user?.name)
-      /**
-       * Splits the sub id along the | and stores only the unique id string
-       * Ex: sub = auth0|661ee47d61bc7139526a380c
-       * authId = 661ee47d61bc7139526a380c
-       */
-      userStore.setProp("authId", user?.sub?.split("|")[1])
-      userStore.setProp("givenName", user?.givenName)
-      userStore.setProp("familyName", user?.familyName)
-      userStore.setProp("email", user?.email)
-      userStore.setProp("emailVerified", user?.emailVerified)
-      if (user?.birthdate) {
-        userStore.setProp("dob", Date.parse(user.birthdate))
-      }
-      userStore.setProp("phoneNumber", user?.phoneNumber)
-      userStore.setProp("phoneVerified", user?.phoneNumberVerified)
-      userStore.setProp("gender", user?.gender)
-      userStore.setProp("profileImg", user?.picture)
-      // If the user
-      if (user?.sub) {
-        userStore.setProp("state", "success")
-      }
-
-      const userData = await getUser(user?.sub?.split("|")[1] ?? "", authToken ?? "")
-      if (!userData) {
-        console.log(getSnapshot(userStore))
-        const response = await postUser(getSnapshot(userStore), authToken ?? "")
-        console.log(response)
-        if (response) {
-          applySnapshot(userStore, response)
-        }
-      }
-    })()
+      getUser(userStore._id, authStore.authToken).then(
+        // Callback when request is successful
+        (response) => {
+          applySnapshot(userStore, response.data)
+        },
+        // Callback when request is unsuccessful
+        // Posts the user to mongodb
+        () => {
+          postUser(getSnapshot(userStore), authStore.authToken ?? "").then((postedUser) => {
+            applySnapshot(userStore, postedUser.data)
+          })
+        },
+      )
+    }
   }, [user])
 
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false, navigationBarColor: colors.background }}
-      initialRouteName={isAuthenticated ? "HomeTabs" : "Login"}
+      initialRouteName={authStore.isAuthenticated ? "HomeTabs" : "Login"}
     >
-      {isAuthenticated ? (
+      {authStore.isAuthenticated ? (
         <>
           <Stack.Screen name="HomeTabs" component={HomeTabNavigator} />
           <Stack.Screen

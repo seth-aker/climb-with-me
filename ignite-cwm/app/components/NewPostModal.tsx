@@ -42,7 +42,7 @@ export const NewPostModal = (props: NewPostModalProps) => {
       tripDate,
       createdAt: Date.now(),
       postUser: userStore.name,
-      postUserId: userStore.authId,
+      postUserId: userStore._id,
       postUserImg: userStore.profileImg,
       comments: [],
     })

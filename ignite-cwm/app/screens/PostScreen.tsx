@@ -28,7 +28,7 @@ export const PostScreen: FC<PostScreenProps> = observer(function PostScreen(_pro
   const sortedComments = post.comments.slice().sort((a, b) => {
     return a.createdAt.getTime() - b.createdAt.getTime()
   })
-  const postOwned = post.postUserId === userStore.authId
+  const postOwned = post.postUserId === userStore._id
   const [commentText, setCommentText] = useState<string>("")
   const [cardSettingOpen, setCardSettingOpen] = useState(false)
 
@@ -54,7 +54,7 @@ export const PostScreen: FC<PostScreenProps> = observer(function PostScreen(_pro
         createdAt: Date.now(),
         text: commentText,
         user: userStore.name || "",
-        userId: userStore.authId || "",
+        userId: userStore._id || "",
         userProfImg: userStore.profileImg || "",
       })
       post.addComment(comment)
@@ -68,16 +68,16 @@ export const PostScreen: FC<PostScreenProps> = observer(function PostScreen(_pro
     navigation.goBack()
   }
   const handlePressMessage = () => {
-    if (post.postUserId === userStore.authId) {
+    if (post.postUserId === userStore._id) {
       return
     }
-    const chatIdWithUsers = messageStore.chatWithUsersExists([userStore.authId, post.postUserId])
+    const chatIdWithUsers = messageStore.chatWithUsersExists([userStore._id, post.postUserId])
     if (chatIdWithUsers) {
       messageStore.setSelectedChatId(chatIdWithUsers)
       navigation.push("ChatScreen")
     } else {
       const currentUser = ChatUserModel.create({
-        guid: userStore.authId,
+        guid: userStore._id,
         name: userStore.name,
         userImg: userStore.profileImg,
         joinedOn: new Date(),

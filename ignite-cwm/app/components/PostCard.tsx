@@ -30,7 +30,7 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
   const navigation = useNavigation<RootStackNavigation>()
   const { post } = props
   const {
-    userStore: { authId, ...userStore },
+    userStore: { _id: authId, ...userStore },
     postStore,
     messageStore,
   } = useStores()
@@ -202,12 +202,12 @@ export const CardFooter = observer((props: CardFooterProps) => {
   } = props
 
   const { userStore } = useStores()
-  const userGuid = userStore.authId || ""
+  const userGuid = userStore._id || ""
   const liked = post.isLikedByUser(userGuid)
   const animValue = useSharedValue(liked ? 1 : 0)
 
   const handlePressLike = () => {
-    post.toggleLiked(userStore.authId || "")
+    post.toggleLiked(userStore._id || "")
     animValue.value = withSpring(liked ? 0 : 1)
   }
 

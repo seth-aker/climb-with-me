@@ -10,33 +10,21 @@ const api = axios.create({
 })
 
 export const postUser = async (user: IUserStoreSnapshotOut, token: string) => {
-  try {
-    const response: AxiosResponse<IUserStoreSnapshotOut> = await api.post("/users", user, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    if (response.status !== 204 && response.status !== 200) {
-      throw Error("Error status: " + response.status + ": " + response.statusText)
-    }
-    return response.data
-  } catch (error) {
-    console.log(error)
-    return undefined
+  const response: AxiosResponse<IUserStoreSnapshotOut> = await api.post("/users", user, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (response.status !== 204 && response.status !== 200) {
+    throw Error("Error status: " + response.status + ": " + response.statusText)
   }
+  return response
 }
+
 export const getUser = async (
   userId: string,
   token: string,
-): Promise<IUserStoreSnapshotOut | undefined> => {
-  try {
-    const response: AxiosResponse<IUserStoreSnapshotOut> = await api.get(`/users/${userId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    if (response.status !== 200) {
-      throw Error("Error status: " + response.status + ": " + response.statusText)
-    }
-    return response.data
-  } catch (error) {
-    console.log(error)
-    return undefined
-  }
+): Promise<AxiosResponse<IUserStoreSnapshotOut>> => {
+  const response: AxiosResponse<IUserStoreSnapshotOut> = await api.get(`/users/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  return response
 }

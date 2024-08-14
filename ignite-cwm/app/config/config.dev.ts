@@ -6,6 +6,8 @@ import { Platform } from "react-native"
  *
  * https://reactnative.dev/docs/security#storing-sensitive-info
  */
-export default {
+const ConfigDev = {
   API_URL: `http://${Platform.OS === "android" ? "10.0.2.2" : "localhost"}:8080/api/v1`,
+  AUDIENCE: `http://localhost:8080`,
 }
+export default ConfigDev

@@ -3,6 +3,7 @@ import {
   getUserPrivate,
   getUserPublic,
   createUser,
+  updateUser,
 } from "../handlers/userHandler";
 import jwtCheck from "../auth/jwtCheck";
 import { jwtDecode } from "jwt-decode";
@@ -36,6 +37,21 @@ router.post(
   json(),
   async (request: Request<{}, {}, IUser>, response: Response) => {
     createUser(request, response);
+  }
+);
+
+router.patch(
+  "/:id",
+  jwtCheck,
+  async (request: Request<{ id: string }>, response) => {
+    const authHeader = request.header("authorization");
+    const token = authHeader && authHeader.split(" ")[1];
+    const decoded = jwtDecode(token ?? "");
+    if (request.params.id !== decoded.sub?.split("|")[1]) {
+      response.sendStatus(401);
+    } else {
+      updateUser(request, response);
+    }
   }
 );
 export default router;

@@ -33,7 +33,7 @@ export const CommentSection = observer((props: CommentSectionProps) => {
         renderItem={(item) => (
           <CommentCard
             comment={item.item}
-            viewingUser={userStore.authId || ""}
+            viewingUser={userStore._id || ""}
             handlePressComment={handlePressComment}
           />
         )}

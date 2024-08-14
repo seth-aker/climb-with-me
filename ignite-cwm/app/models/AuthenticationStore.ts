@@ -1,7 +1,6 @@
+import Config from "app/config"
 import { Instance, SnapshotOut, flow, types } from "mobx-state-tree"
-import { Credentials } from "react-native-auth0";
-
-
+import { Credentials } from "react-native-auth0"
 
 export const AuthenticationStoreModel = types
   .model("AuthenticationStore")
@@ -20,15 +19,21 @@ export const AuthenticationStoreModel = types
     }
 
     function setTokenLoading(bool: boolean) {
-      store.tokenLoading = bool;
+      store.tokenLoading = bool
     }
-    const updateAndValidateToken = flow(function* (getCredentials: () => Promise<Credentials | undefined>) {
+    const updateAndValidateToken = flow(function* (
+      getCredentials: (
+        scope?: string,
+        minTtl?: number,
+        parameters?: Record<string, unknown>,
+        forceRefresh?: boolean,
+      ) => Promise<Credentials | undefined>,
+    ) {
       try {
-        setTokenLoading(true);
-        const credentials: Credentials | undefined = yield getCredentials();
-        if(__DEV__) {
-          console.tron.log(`Credentials: ${credentials?.accessToken}`)
-        }
+        setTokenLoading(true)
+        const credentials: Credentials | undefined = yield getCredentials(undefined, undefined, {
+          audience: Config.AUDIENCE,
+        })
         setAuthToken(credentials ? credentials.accessToken : undefined)
         setTokenLoading(false)
       } catch (err) {
@@ -40,14 +45,12 @@ export const AuthenticationStoreModel = types
       // store.authEmail = ""
     }
 
-  
     return {
       setAuthToken,
       updateAndValidateToken,
       logout,
-      
     }
-  });
+  })
 
 export interface AuthenticationStore extends Instance<typeof AuthenticationStoreModel> {}
 export interface AuthenticationStoreSnapshot extends SnapshotOut<typeof AuthenticationStoreModel> {}

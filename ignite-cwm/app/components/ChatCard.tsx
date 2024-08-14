@@ -84,7 +84,7 @@ export const ChatCard = observer((props: ChatCardProps) => {
 
   const messageBody = lastMessage?.body ?? ""
 
-  const chatNameDisplay = chat.getChatName(userStore.authId, 3)
+  const chatNameDisplay = chat.getChatName(userStore._id, 3)
 
   return (
     <GestureDetector gesture={pan}>
@@ -92,7 +92,7 @@ export const ChatCard = observer((props: ChatCardProps) => {
         <Animated.View style={[$cardContainer, animatedCard]}>
           <Pressable style={$pressableContainer} onPress={onPress}>
             <AutoImage
-              src={chat.getUsersExcluding(userStore.authId).at(0)?.userImg}
+              src={chat.getUsersExcluding(userStore._id).at(0)?.userImg}
               style={$chatImg}
             />
             <View style={$textContainer}>
