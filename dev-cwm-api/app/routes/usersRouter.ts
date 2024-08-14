@@ -21,7 +21,6 @@ router.get(
     const authHeader = request.header("authorization");
     const token = authHeader && authHeader.split(" ")[1];
     const decoded = jwtDecode(token ?? "");
-    console.log("Sub: " + decoded.sub);
     if (request.params.id !== decoded.sub?.split("|")[1]) {
       getUserPublic(request, response);
     } else {
@@ -43,7 +42,8 @@ router.post(
 router.patch(
   "/:id",
   jwtCheck,
-  async (request: Request<{ id: string }>, response) => {
+  json(),
+  async (request: Request<{ id: string }, {}, IUser>, response: Response) => {
     const authHeader = request.header("authorization");
     const token = authHeader && authHeader.split(" ")[1];
     const decoded = jwtDecode(token ?? "");

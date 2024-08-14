@@ -52,7 +52,10 @@ export const updateUser = async (
   const db = await useDatabase();
   const collection = db.collection<IUser>("users");
   const query: Document = { _id: request.params.id };
-  const updates = request.body;
+  const updates = {
+    $set: request.body,
+  };
+
   const result = await collection.updateOne(query, updates);
   response.send(result).status(200);
 };

@@ -170,7 +170,7 @@ const AppStack = observer(function AppStack(_props) {
         },
       )
     }
-  }, [user])
+  }, [user, isLoading, authStore.authToken])
 
   return (
     <Stack.Navigator

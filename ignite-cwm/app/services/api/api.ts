@@ -3,12 +3,13 @@ import Config from "app/config"
 import { IUserStoreSnapshotOut } from "app/models/UserStore"
 
 const api = axios.create({
-  // http://localhost:3000/api/v1
+  // http://localhost:8080/api/v1
   baseURL: Config.API_URL,
   timeout: 10000,
   headers: { "Content-Type": "application/json" },
 })
 
+// post to /api/v1/users
 export const postUser = async (user: IUserStoreSnapshotOut, token: string) => {
   const response: AxiosResponse<IUserStoreSnapshotOut> = await api.post("/users", user, {
     headers: { Authorization: `Bearer ${token}` },
@@ -19,6 +20,7 @@ export const postUser = async (user: IUserStoreSnapshotOut, token: string) => {
   return response
 }
 
+// get from api/v1/users/:id
 export const getUser = async (
   userId: string,
   token: string,
@@ -26,5 +28,16 @@ export const getUser = async (
   const response: AxiosResponse<IUserStoreSnapshotOut> = await api.get(`/users/${userId}`, {
     headers: { Authorization: `Bearer ${token}` },
   })
+  return response
+}
+
+// patch to api/v1/users/:id
+export const updateUser = async (user: IUserStoreSnapshotOut, token: string) => {
+  console.log(user)
+  const response: AxiosResponse<IUserStoreSnapshotOut> = await api.patch(
+    `/users/${user._id}`,
+    user,
+    { headers: { Authorization: `Bearer ${token}` } },
+  )
   return response
 }

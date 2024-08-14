@@ -6,6 +6,8 @@ import { useState } from "react"
 import { PhotoUploadModal } from "app/components/PhotoUploadModal"
 import { ImagePickerResult } from "expo-image-picker"
 import { useStores } from "app/models"
+import { updateUser } from "app/services/api"
+import { getSnapshot } from "mobx-state-tree"
 
 export interface ProfileHeaderProps {
   editable: boolean
@@ -14,7 +16,8 @@ export interface ProfileHeaderProps {
 
 export function ProfileHeader(props: ProfileHeaderProps) {
   const {
-    userStore: { name, profileImg, backgroundImg, ...userStore },
+    userStore,
+    authenticationStore: { authToken },
   } = useStores()
   const { editable, setEditable } = props
   const [profilePicModalVisible, setProfilePicModalVisible] = useState(false)
@@ -37,11 +40,30 @@ export function ProfileHeader(props: ProfileHeaderProps) {
     return true
   }
 
+  const toggleEditable = () => {
+    if (editable) {
+      saveChanges()
+      setEditable(false)
+    } else {
+      setEditable(true)
+    }
+  }
+  const saveChanges = async () => {
+    console.log("Saving changes")
+    try {
+      await updateUser(getSnapshot(userStore), authToken ?? "")
+
+      alert("Changes saved!")
+    } catch (e) {
+      console.log(e)
+      alert("An error occurred when saving changes, please try again.")
+    }
+  }
   return (
     <View>
       <View style={$profileImgContainer}>
-        {profileImg ? (
-          <Image src={profileImg} resizeMode="cover" style={$profileImage} />
+        {userStore.profileImg ? (
+          <Image src={userStore.profileImg} resizeMode="cover" style={$profileImage} />
         ) : (
           <LoadingSpinner />
         )}
@@ -61,7 +83,9 @@ export function ProfileHeader(props: ProfileHeaderProps) {
         />
       </View>
       <View style={$backgroundImgContainer}>
-        {backgroundImg && <Image src={backgroundImg} style={$backgroundImageStyle} />}
+        {userStore.backgroundImg && (
+          <Image src={userStore.backgroundImg} style={$backgroundImageStyle} />
+        )}
         <Pressable
           style={$editBackgroundImageButton}
           onPress={() => {
@@ -79,13 +103,11 @@ export function ProfileHeader(props: ProfileHeaderProps) {
         />
       </View>
       <View style={$textAndButtonContainer}>
-        <Text text={name} preset="heading" />
+        <Text text={userStore.name} preset="heading" />
         <View style={$buttonContainer}>
           <Button
             text={editable ? "Save Changes" : "Edit Profile"}
-            onPress={() => {
-              setEditable(!editable)
-            }}
+            onPress={toggleEditable}
             style={$editProfileButtonStyle}
             LeftAccessory={() => (
               <Icon

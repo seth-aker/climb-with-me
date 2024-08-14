@@ -44,6 +44,9 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
     user.setProp("aboutMeText", input)
   }
 
+  const handleGenderChange = (input: string) => {
+    user.setProp("gender", input)
+  }
   const handleAddClimbingStyleOnPress = () => {
     setClimbingStyleModalVisible(true)
     setClimbingStyle(undefined)
@@ -64,8 +67,6 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
       setClimbingStyleModalVisible(false)
     }
   }
-
-  const [gender, setGender] = useState<string>()
 
   const [climbingStyle, setClimbingStyle] = useState<string>()
 
@@ -122,8 +123,8 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
             onChangeText={handlePhoneNumberChange}
           />
           <ModalPicker
-            value={gender}
-            onChange={setGender}
+            value={user.gender}
+            onChange={handleGenderChange}
             disabled={!editable}
             data={genderOptions}
             placeholder="Please select your gender"
