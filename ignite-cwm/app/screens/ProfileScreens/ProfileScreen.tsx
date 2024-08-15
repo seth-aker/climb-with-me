@@ -2,7 +2,7 @@ import { Icon, Screen, TextField, Button, Card, ListView, Text, Header } from "a
 import { colors, spacing } from "app/theme"
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useState } from "react"
-import { ImageStyle, ScrollView, TextStyle, View, ViewStyle } from "react-native"
+import { ImageStyle, Modal, Pressable, ScrollView, TextStyle, View, ViewStyle } from "react-native"
 import { genderOptions } from "../../../data/ModalPickerOptions"
 import { formatPhoneNumber } from "app/utils/formatPhoneNumber"
 import { ProfileHeader } from "./ProfileHeader"
@@ -13,6 +13,8 @@ import { IClimbingStyle } from "app/models/ClimbingStyleModel"
 import { HomeTabScreenProps } from "app/navigators/types"
 import { Logo } from "app/components/Logo"
 import { useAuth0 } from "react-native-auth0"
+import { updateUser } from "app/services/api"
+import { getSnapshot } from "mobx-state-tree"
 
 interface ProfileScreenProps extends HomeTabScreenProps<"Profile"> {}
 
@@ -21,11 +23,11 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
   const { clearSession } = useAuth0()
   const {
     userStore: user,
-    authenticationStore: { logout },
+    authenticationStore: { logout, authToken },
   } = useStores()
   const [editable, setEditable] = useState(false)
   const [climbingStyleModalVisible, setClimbingStyleModalVisible] = useState(false)
-
+  const [deleteClimbingStyleModalVis, setDeleteClimbingStyleModalVis] = useState(false)
   const handleLogout = async () => {
     try {
       logout()
@@ -55,6 +57,15 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
     setYearsExp(undefined)
   }
 
+  const handleDeleteClimbingStyle = async (item: IClimbingStyle) => {
+    user.removeClimbingStyle(item)
+    try {
+      await updateUser(getSnapshot(user), authToken ?? "")
+      alert("Climbing Style Removed")
+    } catch (e) {
+      console.log(e)
+    }
+  }
   const submitNewClimbingStyle = () => {
     if (climbingStyle && yearsExp) {
       const newUserStyle: IClimbingStyle = {
@@ -138,57 +149,101 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
 
           <View style={$flashListContainerStyle}>
             <Text preset="formLabel" text="Climbing Styles" />
-            {userStylesEmpty && (
-              <Card
-                style={
-                  editable ? $cardContainerStyle : [$cardContainerStyle, $disabledContainerStyles]
-                }
-                ContentComponent={
-                  <Button
-                    text="Add a Climbing Style"
-                    disabled={!editable}
-                    onPress={() => handleAddClimbingStyleOnPress()}
-                    style={editable ? $addClimbingStyleButton : $disabledClimbingStyleButton}
-                    textStyle={$addClimbingStyleButtonText}
-                    LeftAccessory={() => (
-                      <Icon
-                        icon="plus"
-                        color={colors.palette.neutral500}
-                        style={$iconStyle}
-                        containerStyle={$iconContainer}
-                      />
-                    )}
-                  />
-                }
-              />
-            )}
-            {!userStylesEmpty && (
-              <ListView
-                data={user.climbingStyles.map((item) => item)}
-                estimatedItemSize={50}
-                renderItem={({ item }) => {
-                  const contentIndoor = item.maxGradeIndoor
-                    ? `Max Indoor Grade: ${item.maxGradeIndoor}`
-                    : ""
-                  const contentOutdoor = item.maxGradeOutdoor
-                    ? `Max Outdoor Grade: ${item.maxGradeOutdoor}`
-                    : ""
-                  const spacer = item.maxGradeIndoor && item.maxGradeOutdoor ? "\n" : ""
-                  return (
-                    <Card
-                      preset="default"
-                      heading={item.style}
-                      content={contentIndoor + spacer + contentOutdoor}
-                      footer={`Experience: ${item.yearsExp}`}
-                      style={$cardContainerStyle}
+            <ListView
+              data={user.climbingStyles.map((item) => item)}
+              estimatedItemSize={50}
+              ListEmptyComponent={
+                <Card
+                  style={
+                    editable ? $cardContainerStyle : [$cardContainerStyle, $disabledContainerStyles]
+                  }
+                  ContentComponent={
+                    <Button
+                      text="Add a Climbing Style"
+                      disabled={!editable}
+                      onPress={() => handleAddClimbingStyleOnPress()}
+                      style={editable ? $addClimbingStyleButton : $disabledClimbingStyleButton}
+                      textStyle={$addClimbingStyleButtonText}
+                      LeftAccessory={() => (
+                        <Icon
+                          icon="plus"
+                          color={colors.palette.neutral500}
+                          style={$iconStyle}
+                          containerStyle={$iconContainer}
+                        />
+                      )}
                     />
-                  )
-                }}
-              />
-            )}
+                  }
+                />
+              }
+              renderItem={({ item }) => {
+                const contentIndoor = item.maxGradeIndoor
+                  ? `Max Indoor Grade: ${item.maxGradeIndoor}`
+                  : ""
+                const contentOutdoor = item.maxGradeOutdoor
+                  ? `Max Outdoor Grade: ${item.maxGradeOutdoor}`
+                  : ""
+                const spacer = item.maxGradeIndoor && item.maxGradeOutdoor ? "\n" : ""
+                return (
+                  <Card
+                    preset="default"
+                    HeadingComponent={
+                      <View style={$climbingStyleCardHeader}>
+                        <Text text={item.style} />
+                        <Pressable onPress={() => setDeleteClimbingStyleModalVis(true)}>
+                          <Icon icon={"ellipsis-vertical"} />
+                        </Pressable>
+                        <Modal
+                          transparent
+                          visible={deleteClimbingStyleModalVis}
+                          animationType="slide"
+                          onRequestClose={() => setDeleteClimbingStyleModalVis(false)}
+                        >
+                          <View style={$modalEmptySpace} />
+                          <View style={$modalStyle}>
+                            <Header
+                              title="Close"
+                              containerStyle={$deleteClimbingModalHeader}
+                              rightIcon={"x"}
+                              rightIconColor={colors.text}
+                              onRightPress={() => setDeleteClimbingStyleModalVis(false)}
+                              backgroundColor={colors.palette.neutral100}
+                            />
+
+                            <Button
+                              style={$postModalButtonStyle}
+                              textStyle={$postButtonTextStyle}
+                              pressedStyle={$defaultButtonPressed}
+                              text="Delete"
+                              LeftAccessory={() => (
+                                <Icon icon={"xmark"} color={colors.palette.neutral700} />
+                              )}
+                              onPress={() => handleDeleteClimbingStyle(item)}
+                            />
+                            <Button
+                              style={$postModalButtonStyle}
+                              textStyle={$postButtonTextStyle}
+                              pressedStyle={$defaultButtonPressed}
+                              LeftAccessory={() => (
+                                <Icon icon={"pencil"} color={colors.palette.neutral700} />
+                              )}
+                              text="Edit"
+                            />
+                          </View>
+                        </Modal>
+                      </View>
+                    }
+                    heading={item.style}
+                    content={contentIndoor + spacer + contentOutdoor}
+                    footer={`Experience: ${item.yearsExp}`}
+                    style={$cardContainerStyle}
+                  />
+                )
+              }}
+            />
           </View>
 
-          {!userStylesEmpty && (
+          {!userStylesEmpty && editable && (
             <Button
               text="Add Climbing Style"
               disabled={!editable}
@@ -301,4 +356,37 @@ const $disabledClimbingStyleButton: ViewStyle = {
 }
 const $addClimbingStyleButtonText: TextStyle = {
   color: colors.palette.neutral500,
+}
+
+const $climbingStyleCardHeader: ViewStyle = {
+  flexDirection: "row",
+  justifyContent: "space-between",
+}
+const $deleteClimbingModalHeader: ViewStyle = {
+  paddingTop: 0,
+  marginTop: 0,
+}
+const $modalStyle: ViewStyle = {
+  borderTopWidth: 1,
+  borderTopColor: colors.palette.neutral200,
+  height: "85%",
+  backgroundColor: colors.palette.neutral200,
+}
+
+const $postButtonTextStyle: TextStyle = {
+  color: colors.palette.neutral700,
+}
+const $postModalButtonStyle: ViewStyle = {
+  marginTop: 8,
+  backgroundColor: colors.palette.neutral100,
+  borderRadius: 5,
+  justifyContent: "flex-start",
+}
+
+const $modalEmptySpace: ViewStyle = {
+  height: "15%",
+  backgroundColor: colors.transparent,
+}
+const $defaultButtonPressed: ViewStyle = {
+  backgroundColor: colors.palette.neutral200,
 }

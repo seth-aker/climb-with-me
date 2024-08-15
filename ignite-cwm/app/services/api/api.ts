@@ -31,13 +31,11 @@ export const getUser = async (
   return response
 }
 
-// patch to api/v1/users/:id
+// put to api/v1/users/:id
 export const updateUser = async (user: IUserStoreSnapshotOut, token: string) => {
   console.log(user)
-  const response: AxiosResponse<IUserStoreSnapshotOut> = await api.patch(
-    `/users/${user._id}`,
-    user,
-    { headers: { Authorization: `Bearer ${token}` } },
-  )
+  const response: AxiosResponse<IUserStoreSnapshotOut> = await api.put(`/users/${user._id}`, user, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
   return response
 }

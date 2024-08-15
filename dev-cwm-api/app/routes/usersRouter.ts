@@ -39,7 +39,7 @@ router.post(
   }
 );
 
-router.patch(
+router.put(
   "/:id",
   jwtCheck,
   json(),
