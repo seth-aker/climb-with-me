@@ -42,11 +42,11 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
   const [cardSettingOpen, setCardSettingOpen] = useState(false)
 
   const handlePressComment = () => {
-    postStore.setSelectedPostId(post.guid)
+    postStore.setSelectedPostId(post._id)
     navigation.navigate("PostScreen", { newComment: true })
   }
   const handlePressViewComments = () => {
-    postStore.setSelectedPostId(post.guid)
+    postStore.setSelectedPostId(post._id)
     navigation.navigate("PostScreen", { newComment: false })
   }
   const handledSettingBtnPressed = () => {

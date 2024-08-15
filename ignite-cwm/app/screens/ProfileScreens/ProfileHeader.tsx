@@ -6,8 +6,9 @@ import { useState } from "react"
 import { PhotoUploadModal } from "app/components/PhotoUploadModal"
 import { ImagePickerResult } from "expo-image-picker"
 import { useStores } from "app/models"
-import { updateUser } from "app/services/api"
+
 import { getSnapshot } from "mobx-state-tree"
+import { updateUser } from "app/services/api/userService/userService"
 
 export interface ProfileHeaderProps {
   editable: boolean

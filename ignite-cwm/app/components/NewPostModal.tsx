@@ -36,7 +36,7 @@ export const NewPostModal = (props: NewPostModalProps) => {
     setLoading(true)
     // Change this to an api call
     const post = PostModel.create({
-      guid,
+      _id: guid,
       title: postTitle,
       body,
       tripDate,

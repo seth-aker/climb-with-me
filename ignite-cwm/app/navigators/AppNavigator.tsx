@@ -19,8 +19,9 @@ import { AppStackParamList } from "./types"
 import { ChatScreen } from "app/screens/ChatScreen"
 import { LoginScreen, PostScreen } from "app/screens"
 import { FriendModel } from "app/models/Friend"
-import { getUser, postUser } from "app/services/api"
+
 import { applySnapshot, getSnapshot } from "mobx-state-tree"
+import { getUser, postUser } from "app/services/api/userService/userService"
 
 /**
  * This is a list of all the route names that will exit the app if the back button

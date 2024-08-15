@@ -13,8 +13,9 @@ import { IClimbingStyle } from "app/models/ClimbingStyleModel"
 import { HomeTabScreenProps } from "app/navigators/types"
 import { Logo } from "app/components/Logo"
 import { useAuth0 } from "react-native-auth0"
-import { updateUser } from "app/services/api"
+
 import { getSnapshot } from "mobx-state-tree"
+import { updateUser } from "app/services/api/userService/userService"
 
 interface ProfileScreenProps extends HomeTabScreenProps<"Profile"> {}
 
