@@ -22,6 +22,7 @@ import { useNavigation } from "@react-navigation/native"
 import { RootStackNavigation } from "app/navigators/types"
 import { ChatModel, ChatUserModel } from "app/models/Chat"
 import uuid from "react-native-uuid"
+import { addLike, removeLike } from "app/services/api/postService/postService"
 
 export interface PostCardProps {
   post: Post
@@ -33,11 +34,12 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
     userStore: { _id: authId, ...userStore },
     postStore,
     messageStore,
+    authenticationStore: { authToken },
   } = useStores()
 
   const userGuid = authId || ""
 
-  const postOwned = userGuid === post.postUserId
+  const postOwned = userGuid === post.authorId
 
   const [cardSettingOpen, setCardSettingOpen] = useState(false)
 
@@ -53,15 +55,18 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
     setCardSettingOpen(true)
   }
 
-  const handleDeletePost = () => {
-    postStore.deletePost(post)
-    setCardSettingOpen(false)
+  const handleDeletePost = async () => {
+    const success = await postStore.deletePost(post._id, authToken ?? "")
+    if (success) {
+      postStore.removePost(post)
+      setCardSettingOpen(false)
+    }
   }
   const handlePressMessage = () => {
-    if (post.postUserId === userGuid) {
+    if (post.authorId === userGuid) {
       return
     }
-    const chatIdWithUsers = messageStore.chatWithUsersExists([userGuid, post.postUserId])
+    const chatIdWithUsers = messageStore.chatWithUsersExists([userGuid, post.authorId])
     if (chatIdWithUsers) {
       messageStore.setSelectedChatId(chatIdWithUsers)
       navigation.push("ChatScreen")
@@ -73,9 +78,9 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
         joinedOn: new Date(),
       })
       const userToMessage = ChatUserModel.create({
-        guid: post.postUserId,
-        name: post.postUser,
-        userImg: post.postUserImg,
+        guid: post.authorId,
+        name: post.authorName,
+        userImg: post.authorProfImg,
         joinedOn: new Date(),
       })
       const newChat = ChatModel.create({
@@ -95,9 +100,9 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
       HeadingComponent={
         <View style={$itemHeader}>
           <View style={flexRow}>
-            <AutoImage style={$itemThumbnail} src={post.postUserImg} />
+            <AutoImage style={$itemThumbnail} src={post.authorProfImg} />
             <View style={$headerTextContainer}>
-              <Text size="xs" text={post.postUser} />
+              <Text size="xs" text={post.authorName} />
               <Text size="xxs" weight="light" text={`${formatTimeSince(post.timeSincePost())}`} />
             </View>
           </View>
@@ -201,12 +206,18 @@ export const CardFooter = observer((props: CardFooterProps) => {
     onPressMessage,
   } = props
 
-  const { userStore } = useStores()
+  const {
+    userStore,
+    authenticationStore: { authToken },
+  } = useStores()
   const userGuid = userStore._id || ""
   const liked = post.isLikedByUser(userGuid)
   const animValue = useSharedValue(liked ? 1 : 0)
 
   const handlePressLike = () => {
+    post.isLikedByUser(userGuid)
+      ? removeLike(post._id, authToken ?? "")
+      : addLike(post._id, authToken ?? "")
     post.toggleLiked(userStore._id || "")
     animValue.value = withSpring(liked ? 0 : 1)
   }

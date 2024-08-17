@@ -1,5 +1,7 @@
-import { Instance, SnapshotOut, types } from "mobx-state-tree"
+import { cast, flow, getSnapshot, Instance, SnapshotOut, types } from "mobx-state-tree"
 import { Post, PostModel } from "./Post"
+import postService from "app/services/api/postService/postService"
+import { AxiosResponse } from "axios"
 
 export const PostStoreModel = types
   .model("PostStore", {
@@ -22,30 +24,51 @@ export const PostStoreModel = types
     addPost(post: Post) {
       store.posts.push(post)
     },
-    deletePost(post: Post) {
+    removePost(post: Post) {
       return store.posts.remove(post)
     },
     setSelectedPostId(postId: string | null) {
       store.selectedPostId = postId
     },
-  }))
-  .actions((store) => ({
-    async fetchPosts() {
-      // implement api call here
-      return true
-    },
-    async createPost(post: Post) {
-      // implement api call here
-      // store.posts = response.data or something
-      // for now:
-      store.posts.push(post)
-      return true
-    },
-    async deletePostAsync(post: Post) {
-      // implement api call here
-      store.deletePost(post)
+    setPosts(posts: Post[]) {
+      store.posts = cast(posts)
     },
   }))
+  .actions((store) => {
+    const createPost = flow(function* (post: Post, token: string) {
+      // optimistic update to the ui
+      store.addPost(post)
+      try {
+        console.log("Sending post")
+        yield postService.createPost(getSnapshot(post), token)
+        return true
+      } catch (e) {
+        store.removePost(post)
+        alert("An error occurred adding this post. Please try again")
+        console.log(e)
+        return false
+      }
+    })
+    const fetchPosts = flow(function* (token: string) {
+      try {
+        const results: AxiosResponse<Post[]> = yield postService.getRecentPosts(token)
+        return results.data
+      } catch (e) {
+        alert("An error occurred fetching posts, please try again.")
+        return false
+      }
+    })
+    const deletePost = flow(function* (postId: string, token: string) {
+      try {
+        yield postService.deletePost(postId, token)
+        return true
+      } catch (e) {
+        alert("An error occurred deleting the post. Please try again.")
+        return false
+      }
+    })
+    return { createPost, fetchPosts, deletePost }
+  })
 
 export interface IPostStore extends Instance<typeof PostStoreModel> {}
 export interface IPostStoreSnapshot extends SnapshotOut<typeof PostStoreModel> {}

@@ -20,7 +20,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
   // const { navigation } = _props
   const { clearSession } = useAuth0()
   const {
-    authenticationStore: { logout, tokenLoading },
+    authenticationStore: { logout, tokenLoading, authToken },
     postStore,
   } = useStores()
   // const [location, setLocation] = useState<Location.LocationObject | undefined>(undefined)
@@ -56,7 +56,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
 
   const manualRefresh = async () => {
     setRefreshing(true)
-    await postStore.fetchPosts()
+    await postStore.fetchPosts(authToken ?? "")
     setRefreshing(false)
   }
 

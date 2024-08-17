@@ -5,9 +5,11 @@ import { useStores } from "app/models"
 import { ChatModel, ChatUserModel } from "app/models/Chat"
 import { CommentModel } from "app/models/CommentModel"
 import { AppStackScreenProps } from "app/navigators/types"
+import { addComment } from "app/services/api/postService/postService"
 import { colors, spacing } from "app/theme"
 import { formatTimeSince } from "app/utils/formatTime"
 import { observer } from "mobx-react-lite"
+import { getSnapshot } from "mobx-state-tree"
 import React, { FC, useEffect, useRef, useState } from "react"
 import { ImageStyle, Modal, ScrollView, TextInput, TextStyle, View, ViewStyle } from "react-native"
 
@@ -15,7 +17,12 @@ import uuid from "react-native-uuid"
 
 export type PostScreenProps = AppStackScreenProps<"PostScreen">
 export const PostScreen: FC<PostScreenProps> = observer(function PostScreen(_props) {
-  const { postStore, userStore, messageStore } = useStores()
+  const {
+    postStore,
+    userStore,
+    messageStore,
+    authenticationStore: { authToken },
+  } = useStores()
   const { navigation, route } = _props
   const post = postStore.getPostById(postStore.selectedPostId || "")
   if (!post) {
@@ -28,7 +35,7 @@ export const PostScreen: FC<PostScreenProps> = observer(function PostScreen(_pro
   const sortedComments = post.comments.slice().sort((a, b) => {
     return a.createdAt.getTime() - b.createdAt.getTime()
   })
-  const postOwned = post.postUserId === userStore._id
+  const postOwned = post.authorId === userStore._id
   const [commentText, setCommentText] = useState<string>("")
   const [cardSettingOpen, setCardSettingOpen] = useState(false)
 
@@ -37,7 +44,7 @@ export const PostScreen: FC<PostScreenProps> = observer(function PostScreen(_pro
   }
 
   const handleDeletePost = () => {
-    postStore.deletePost(post)
+    postStore.removePost(post)
     postStore.setSelectedPostId(null)
     navigation.goBack()
   }
@@ -47,19 +54,25 @@ export const PostScreen: FC<PostScreenProps> = observer(function PostScreen(_pro
     insertCommentRef.current?.focus()
   }
 
-  const onSubmitComment = () => {
+  const onSubmitComment = async () => {
     if (commentText) {
       const comment = CommentModel.create({
-        guid: uuid.v4().toString(),
+        _id: uuid.v4().toString(),
         createdAt: Date.now(),
-        text: commentText,
-        user: userStore.name || "",
-        userId: userStore._id || "",
-        userProfImg: userStore.profileImg || "",
+        body: commentText,
+        authorName: userStore.name || "",
+        authorId: userStore._id || "",
+        authorProfImg: userStore.profileImg || "",
       })
-      post.addComment(comment)
-      setCommentText("")
-      insertCommentRef.current?.blur()
+      // This should be inside the post store but I am lazy... sorry future Seth
+      const result = await addComment(post._id, getSnapshot(comment), authToken ?? "")
+      if (result.status === 200) {
+        post.addComment(comment)
+        setCommentText("")
+        insertCommentRef.current?.blur()
+      } else {
+        alert("An error occurred posting comment. Please try again.")
+      }
     }
   }
 
@@ -68,10 +81,10 @@ export const PostScreen: FC<PostScreenProps> = observer(function PostScreen(_pro
     navigation.goBack()
   }
   const handlePressMessage = () => {
-    if (post.postUserId === userStore._id) {
+    if (post.authorId === userStore._id) {
       return
     }
-    const chatIdWithUsers = messageStore.chatWithUsersExists([userStore._id, post.postUserId])
+    const chatIdWithUsers = messageStore.chatWithUsersExists([userStore._id, post.authorId])
     if (chatIdWithUsers) {
       messageStore.setSelectedChatId(chatIdWithUsers)
       navigation.push("ChatScreen")
@@ -83,9 +96,9 @@ export const PostScreen: FC<PostScreenProps> = observer(function PostScreen(_pro
         joinedOn: new Date(),
       })
       const userToMessage = ChatUserModel.create({
-        guid: post.postUserId,
-        name: post.postUser,
-        userImg: post.postUserImg,
+        guid: post.authorId,
+        name: post.authorName,
+        userImg: post.authorProfImg,
         joinedOn: new Date(),
       })
       const newChat = ChatModel.create({
@@ -118,9 +131,9 @@ export const PostScreen: FC<PostScreenProps> = observer(function PostScreen(_pro
         <View style={$postHeader}>
           {/* eslint-disable-next-line react-native/no-inline-styles */}
           <View style={{ flexDirection: "row" }}>
-            <AutoImage style={$postThumbnail} src={post.postUserImg} />
+            <AutoImage style={$postThumbnail} src={post.authorProfImg} />
             <View style={$postHeaderTextContainer}>
-              <Text size="xs" text={post.postUser} />
+              <Text size="xs" text={post.authorName} />
               <Text size="xxs" weight="light" text={`${formatTimeSince(post.timeSincePost())}`} />
             </View>
           </View>

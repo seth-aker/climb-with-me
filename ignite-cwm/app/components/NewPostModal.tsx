@@ -8,7 +8,6 @@ import DateTimePicker from "@react-native-community/datetimepicker"
 import { formatDate } from "app/utils/formatDate"
 import { Button } from "./Button"
 import { LoadingSpinner } from "app/screens"
-import { delay } from "app/utils/delay"
 import { useStores } from "app/models"
 import uuid from "react-native-uuid"
 import { PostModel } from "app/models/Post"
@@ -20,7 +19,11 @@ interface NewPostModalProps extends ModalProps {
 
 export const NewPostModal = (props: NewPostModalProps) => {
   const { visible, setVisible, onRequestClose } = props
-  const { userStore, postStore } = useStores()
+  const {
+    userStore,
+    postStore,
+    authenticationStore: { authToken },
+  } = useStores()
   const [postTitle, setPostTitle] = useState("")
   const [body, setPostDetails] = useState("")
   const [tripDate, setTripDate] = useState(new Date())
@@ -34,22 +37,23 @@ export const NewPostModal = (props: NewPostModalProps) => {
       return
     }
     setLoading(true)
-    // Change this to an api call
     const post = PostModel.create({
       _id: guid,
       title: postTitle,
       body,
       tripDate,
       createdAt: Date.now(),
-      postUser: userStore.name,
-      postUserId: userStore._id,
-      postUserImg: userStore.profileImg,
+      authorName: userStore.name,
+      authorId: userStore._id,
+      authorProfImg: userStore.profileImg,
       comments: [],
     })
-    await postStore.createPost(post)
-    await delay(750)
+    console.log("Creating post")
+    const success = await postStore.createPost(post, authToken ?? "")
     setLoading(false)
-    handleCloseModal()
+    if (success) {
+      handleCloseModal()
+    }
   }
 
   const handleCloseModal = () => {

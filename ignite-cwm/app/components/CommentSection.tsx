@@ -79,13 +79,13 @@ export const CommentCard = observer((props: CommentCardProps) => {
   const likeTextStyle = liked ? $likedButtonText : $likeButtonText
   return (
     <View style={$container}>
-      <AutoImage style={$itemThumbnail} src={comment.userProfImg} />
+      <AutoImage style={$itemThumbnail} src={comment.authorProfImg} />
       <View style={$cardContainer}>
         <View style={$commentHeading}>
-          <Text text={comment.user} size="xs" />
+          <Text text={comment.authorName} size="xs" />
           <Text size="xxs" weight="light" text={`${formatTimeSince(timeSinceComment)}`} />
         </View>
-        <Text style={$commentTextStyle} text={comment.text} />
+        <Text style={$commentTextStyle} text={comment.body} />
         <View style={$footerContainer}>
           <Button style={$likeButton} pressedStyle={$pressedLikeButton} onPress={handlePressLike}>
             <Animated.Text style={[likeTextStyle, animatedLikedText]}>{"Like"}</Animated.Text>

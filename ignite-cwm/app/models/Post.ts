@@ -20,15 +20,15 @@ export const PostModel = types
     /**
      * Name of the user who posted the message
      */
-    postUser: "",
+    authorName: "",
     /**
      * Guid of the user who posted the message
      */
-    postUserId: "",
+    authorId: "",
     /**
      * Profile img uri of the user who posted the message
      */
-    postUserImg: "",
+    authorProfImg: "",
     /**
      * List of comments related to the post.
      */
