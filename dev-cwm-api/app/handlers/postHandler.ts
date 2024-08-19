@@ -22,6 +22,7 @@ export const getPosts = async (request: Request, response: Response) => {
   const result = await collection.find({}).limit(50).toArray();
   response.send(result).status(200);
 };
+
 export const addLike = async (
   request: Request<{ id: string }>,
   response: Response
@@ -41,6 +42,7 @@ export const addLike = async (
   const result = await collection.updateOne(query, updates);
   response.send(result).status(200);
 };
+
 export const removeLike = async (
   request: Request<{ id: string }>,
   response: Response
@@ -74,6 +76,62 @@ export const addComment = async (
   };
   const result = collection.updateOne(query, updates);
   response.send(result).status(200);
+};
+
+export const addCommentLike = async (
+  request: Request<{ postId: string; commentId: string }>,
+  response: Response
+) => {
+  const db = await useDatabase();
+  const collection = db.collection<IPost>("posts");
+  const authHeader = request.header("authorization");
+  const token = authHeader && authHeader.split(" ")[1];
+  const decoded = jwtDecode(token ?? "");
+  const userId = decoded.sub?.split("|")[1];
+  if (!userId) {
+    throw Error("User id could not be parsed");
+  }
+  const query: Document = {
+    _id: request.params.postId,
+  };
+  const updates = {
+    $addToSet: { "comments.$[comment].likes": userId },
+  };
+  const arrayFilters = {
+    arrayFilters: [{ "comment._id": request.params.commentId }],
+  };
+  try {
+    const result = await collection.updateOne(query, updates, arrayFilters);
+    response.send(result);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+export const removeCommentLike = async (
+  request: Request<{ postId: string; commentId: string }>,
+  response: Response
+) => {
+  const db = await useDatabase();
+  const collection = db.collection<IPost>("posts");
+  const authHeader = request.header("authorization");
+  const token = authHeader && authHeader.split(" ")[1];
+  const decoded = jwtDecode(token ?? "");
+  const userId = decoded.sub?.split("|")[1];
+  if (!userId) {
+    throw Error("User id could not be parsed");
+  }
+  const query: Document = {
+    _id: request.params.postId,
+  };
+  const updates = {
+    $pull: { "comments.$[comment].likes": userId },
+  };
+  const arrayFilters = {
+    arrayFilters: [{ "comment._id": request.params.commentId }],
+  };
+  const result = collection.updateOne(query, updates, arrayFilters);
+  response.send(result);
 };
 
 export const deletePost = async (

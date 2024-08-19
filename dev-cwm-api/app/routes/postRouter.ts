@@ -8,6 +8,8 @@ import {
   deletePost,
   getPosts,
   removeLike,
+  addCommentLike,
+  removeCommentLike,
 } from "../handlers/postHandler";
 import { IComment } from "../database/documentTypes/comment.type";
 const router = Router();
@@ -41,6 +43,27 @@ router.patch(
     response: Response
   ) => {
     addComment(request, response);
+  }
+);
+// /api/v1/posts/:postId/comments/:commentId/like
+router.patch(
+  "/:postId/comments/:commentId/like",
+  jwtCheck,
+  async (
+    request: Request<{ postId: string; commentId: string }>,
+    response: Response
+  ) => {
+    addCommentLike(request, response);
+  }
+);
+router.patch(
+  "/:postId/comments/:commentId/unlike",
+  jwtCheck,
+  async (
+    request: Request<{ postId: string; commentId: string }>,
+    response: Response
+  ) => {
+    removeCommentLike(request, response);
   }
 );
 

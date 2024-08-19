@@ -26,12 +26,14 @@ export const addComment = async (postId: string, comment: ICommentSnapshotOut, t
     headers: { Authorization: `Bearer ${token}` },
   })
 }
-export const updateComment = async (
-  postId: string,
-  comment: ICommentSnapshotOut,
-  token: string,
-) => {
-  return await api.patch(`/post/${postId}/comment-${comment._id}`, comment, {
+export const addCommentLike = async (postId: string, commentId: string, token: string) => {
+  console.log("Sending like update")
+  return await api.patch(`/posts/${postId}/comments/${commentId}/like`, undefined, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+}
+export const removeCommentLike = async (postId: string, commentId: string, token: string) => {
+  return await api.patch(`/posts/${postId}/comments/${commentId}/unlike`, undefined, {
     headers: { Authorization: `Bearer ${token}` },
   })
 }

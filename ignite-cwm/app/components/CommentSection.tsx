@@ -15,6 +15,7 @@ import { formatTimeSince } from "app/utils/formatTime"
 import { colors, spacing } from "app/theme"
 import { Button } from "./Button"
 import { observer } from "mobx-react-lite"
+import { addCommentLike, removeCommentLike } from "app/services/api/postService/postService"
 
 export interface CommentSectionProps {
   comments: IComment[]
@@ -56,13 +57,26 @@ export interface CommentCardProps {
 }
 export const CommentCard = observer((props: CommentCardProps) => {
   const { comment, viewingUser } = props
+  const {
+    postStore,
+    authenticationStore: { authToken },
+  } = useStores()
   const liked = comment.likedByUser(viewingUser)
   const likedFontSize = useSharedValue(12)
   const timeSinceComment = Date.now() - comment.createdAt.getTime()
   const handlePressLike = () => {
     if (liked) {
+      removeCommentLike(postStore.selectedPostId ?? "", comment._id, authToken ?? "").catch((e) => {
+        // if an error occurs then reset like
+        comment.addLike(viewingUser)
+        console.log(e)
+      })
       comment.removeLike(viewingUser)
     } else {
+      addCommentLike(postStore.selectedPostId ?? "", comment._id, authToken ?? "").catch((e) => {
+        comment.removeLike(viewingUser)
+        console.log(e)
+      })
       comment.addLike(viewingUser)
       likedFontSize.value = withSequence(
         withSpring(15, { duration: 600 }),
