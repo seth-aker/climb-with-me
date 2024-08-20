@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import { IClimbingStyle } from "./climbingStyle.type";
+import { IFriendRequest } from "./friendRequests.type";
 
 export interface IUser {
   _id: ObjectId;
@@ -18,4 +19,5 @@ export interface IUser {
   climbingStyles: IClimbingStyle[];
   createdOn?: Date;
   lastUpdated?: Date;
+  friendRequests?: IFriendRequest[];
 }

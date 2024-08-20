@@ -39,7 +39,7 @@ export const MessagesScreen: FC<MessagesScreenProps> = observer(function Message
   })
 
   const handleCreateNewChat = () => {
-    const chatUserIds = [userStore._id, ...toUsers.map((user) => user.guid)]
+    const chatUserIds = [userStore._id, ...toUsers.map((user) => user._id)]
     const chatId = messageStore.chatWithUsersExists(chatUserIds)
     if (chatId !== null) {
       messageStore.setSelectedChatId(chatId)
@@ -54,7 +54,7 @@ export const MessagesScreen: FC<MessagesScreenProps> = observer(function Message
       toUsers.forEach((user) => {
         chatUsers.push(
           ChatUserModel.create({
-            guid: user.guid,
+            guid: user._id,
             name: user.name,
             userImg: user.profImg,
             joinedOn: new Date(),

@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { ImageStyle, Pressable, View, ViewStyle } from "react-native"
 import { AutoImage } from "./AutoImage"
 import { Text } from "./Text"
@@ -10,6 +10,8 @@ import { useNavigation } from "@react-navigation/native"
 import { RootStackNavigation } from "app/navigators/types"
 import { formatSentOn } from "app/utils/formatTime"
 import { useStores } from "app/models"
+import { respondToFriendRequest } from "app/services/api/friendService/friendService"
+import { LoadingSpinner } from "./LoadingSpinner"
 
 export interface FriendRequestCardProps {
   friendRequest: IFriendRequest
@@ -17,13 +19,25 @@ export interface FriendRequestCardProps {
 
 export const FriendRequestCard = observer((props: FriendRequestCardProps) => {
   const { friendRequest } = props
-  const { friendStore } = useStores()
+  const {
+    friendStore,
+    authenticationStore: { authToken },
+  } = useStores()
   const navigation = useNavigation<RootStackNavigation>()
+  const [responseLoading, setResponseLoading] = useState(false)
   const handleOnPress = () => {
     // navigation.push("UserProfile");
   }
-  const handleAcceptFriend = () => {
-    friendStore.acceptRequest(friendRequest.requestId)
+  const handleAcceptFriend = async () => {
+    setResponseLoading(true)
+    await respondToFriendRequest(friendRequest._id, true, authToken ?? "")
+
+    setResponseLoading(false)
+  }
+  const handleDenyRequest = async () => {
+    setResponseLoading(true)
+    await respondToFriendRequest(friendRequest._id, false, authToken ?? "")
+    setResponseLoading(false)
   }
   return (
     <Pressable onPress={handleOnPress} style={$container}>
@@ -33,16 +47,22 @@ export const FriendRequestCard = observer((props: FriendRequestCardProps) => {
         <Text text={`Sent: ${formatSentOn(friendRequest.requestedOn)}`} />
         <View style={$buttonContainer}>
           <Button
-            disabled={friendRequest.accepted}
+            disabled={friendRequest.accepted || responseLoading}
             onPress={handleAcceptFriend}
             style={$buttonStyle}
-            text={friendRequest.accepted ? "Accepted" : "Accept"}
-          />
+          >
+            {responseLoading ? (
+              <LoadingSpinner />
+            ) : (
+              <Text text={friendRequest.accepted ? "Accepted" : "Accept"} />
+            )}
+          </Button>
           <Button
-            disabled={friendRequest.accepted}
+            disabled={friendRequest.accepted || responseLoading}
             style={$buttonStyle}
             preset="reversed"
             text="Deny"
+            onPress={handleDenyRequest}
           />
         </View>
       </View>

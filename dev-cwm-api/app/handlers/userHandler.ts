@@ -8,9 +8,11 @@ export const getUserPrivate = async (
   response: Response
 ) => {
   const db = await useDatabase();
-  const collection = db.collection("users");
+  const collection = db.collection<IUser>("users");
   const query: Document = { _id: request.params.id };
-  const result = await collection.findOne(query);
+  const result = await collection.findOne(query, {
+    projection: { friends: false, friendRequests: false },
+  });
 
   if (result === null) {
     console.log("sending 404");

@@ -4,6 +4,8 @@ import { IComment } from "../database/documentTypes/comment.type";
 import { IPost } from "../database/documentTypes/post.type";
 import { Document, MongoError, MongoServerError } from "mongodb";
 import { jwtDecode } from "jwt-decode";
+import { parseUserId } from "../util/parseUserId";
+import { auth } from "express-oauth2-jwt-bearer";
 
 export const createPost = async (
   request: Request<{}, {}, IPost>,
@@ -28,9 +30,7 @@ export const addLike = async (
   response: Response
 ) => {
   const authHeader = request.header("authorization");
-  const token = authHeader && authHeader.split(" ")[1];
-  const decoded = jwtDecode(token ?? "");
-  const userId = decoded.sub?.split("|")[1];
+  const userId = parseUserId(authHeader);
 
   const db = await useDatabase();
   const collection = db.collection<IPost>("posts");
@@ -48,9 +48,7 @@ export const removeLike = async (
   response: Response
 ) => {
   const authHeader = request.header("authorization");
-  const token = authHeader && authHeader.split(" ")[1];
-  const decoded = jwtDecode(token ?? "");
-  const userId = decoded.sub?.split("|")[1];
+  const userId = parseUserId(authHeader);
 
   const db = await useDatabase();
   const collection = db.collection<IPost>("posts");
@@ -85,12 +83,7 @@ export const addCommentLike = async (
   const db = await useDatabase();
   const collection = db.collection<IPost>("posts");
   const authHeader = request.header("authorization");
-  const token = authHeader && authHeader.split(" ")[1];
-  const decoded = jwtDecode(token ?? "");
-  const userId = decoded.sub?.split("|")[1];
-  if (!userId) {
-    throw Error("User id could not be parsed");
-  }
+  const userId = parseUserId(authHeader);
   const query: Document = {
     _id: request.params.postId,
   };
@@ -115,12 +108,7 @@ export const removeCommentLike = async (
   const db = await useDatabase();
   const collection = db.collection<IPost>("posts");
   const authHeader = request.header("authorization");
-  const token = authHeader && authHeader.split(" ")[1];
-  const decoded = jwtDecode(token ?? "");
-  const userId = decoded.sub?.split("|")[1];
-  if (!userId) {
-    throw Error("User id could not be parsed");
-  }
+  const userId = parseUserId(authHeader);
   const query: Document = {
     _id: request.params.postId,
   };
@@ -143,8 +131,7 @@ export const deletePost = async (
   const query: Document = { _id: request.params.id };
   const postToDelete = await collection.findOne(query);
   const authHeader = request.header("authorization");
-  const userAuthToken = authHeader?.split(" ")[1];
-  const authorId = jwtDecode(userAuthToken ?? "").sub?.split("|")[1];
+  const authorId = parseUserId(authHeader);
   if (postToDelete?.authorId !== authorId) {
     response.sendStatus(401);
   }

@@ -2,7 +2,7 @@ import { Instance, SnapshotOut, types } from "mobx-state-tree"
 import { withSetPropAction } from "./helpers/withSetPropAction"
 export const FriendRequestModel = types
   .model("FriendRequest", {
-    requestId: types.identifier,
+    _id: types.identifier,
     friendId: types.string,
     friendName: types.string,
     friendProfImg: types.string,

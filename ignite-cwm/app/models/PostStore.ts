@@ -52,7 +52,8 @@ export const PostStoreModel = types
     const fetchPosts = flow(function* (token: string) {
       try {
         const results: AxiosResponse<Post[]> = yield postService.getRecentPosts(token)
-        return results.data
+        store.setPosts(results.data)
+        return true
       } catch (e) {
         alert("An error occurred fetching posts, please try again.")
         return false

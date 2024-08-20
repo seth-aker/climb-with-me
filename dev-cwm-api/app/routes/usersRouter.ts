@@ -8,6 +8,7 @@ import {
 import jwtCheck from "../auth/jwtCheck";
 import { jwtDecode } from "jwt-decode";
 import { IUser } from "../database/documentTypes/user.type";
+import { parseUserId } from "../util/parseUserId";
 
 const router = Router();
 // /api/v1/users
@@ -19,9 +20,8 @@ router.get(
   jwtCheck,
   async (request: Request<{ id: string }>, response) => {
     const authHeader = request.header("authorization");
-    const token = authHeader && authHeader.split(" ")[1];
-    const decoded = jwtDecode(token ?? "");
-    if (request.params.id !== decoded.sub?.split("|")[1]) {
+    const userId = parseUserId(authHeader);
+    if (request.params.id !== userId) {
       getUserPublic(request, response);
     } else {
       getUserPrivate(request, response);
@@ -45,9 +45,8 @@ router.put(
   json(),
   async (request: Request<{ id: string }, {}, IUser>, response: Response) => {
     const authHeader = request.header("authorization");
-    const token = authHeader && authHeader.split(" ")[1];
-    const decoded = jwtDecode(token ?? "");
-    if (request.params.id !== decoded.sub?.split("|")[1]) {
+    const userId = parseUserId(authHeader);
+    if (request.params.id !== userId) {
       response.sendStatus(401);
     } else {
       updateUser(request, response);

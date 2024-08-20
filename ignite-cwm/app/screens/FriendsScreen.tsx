@@ -2,7 +2,7 @@ import { Header, ListView, Screen } from "app/components"
 import { HomeTabScreenProps } from "app/navigators/types"
 import { colors, spacing } from "app/theme"
 import { observer } from "mobx-react-lite"
-import React, { FC } from "react"
+import React, { FC, useEffect, useState } from "react"
 import { View, ViewStyle } from "react-native"
 
 import { useStores } from "app/models"
@@ -10,10 +10,27 @@ import { IFriendRequest } from "app/models/FriendRequest"
 import { FriendRequestCard } from "app/components/FriendRequestCard"
 import { EmptyListComponent } from "app/components/EmptyListComponent"
 
+import { getFriendRequests as apiGetFriendRequests } from "app/services/api/friendService/friendService"
+
 interface FriendsScreenProps extends HomeTabScreenProps<"Friends"> {}
 
 export const FriendsScreen: FC<FriendsScreenProps> = observer(function FriendsScreen(_props) {
-  const { friendStore } = useStores()
+  const {
+    friendStore,
+    authenticationStore: { authToken },
+  } = useStores()
+  const [friendRequestsLoading, setFriendRequestsLoading] = useState(false)
+
+  const getFriendRequests = async () => {
+    setFriendRequestsLoading(true)
+    const result = await apiGetFriendRequests(authToken ?? "")
+    console.log(result.data)
+    friendStore.setProp("friendRequests", result.data.friendRequests)
+    setFriendRequestsLoading(false)
+  }
+  useEffect(() => {
+    getFriendRequests()
+  }, [])
   return (
     <Screen preset="fixed" contentContainerStyle={$screenContainer} safeAreaEdges={["bottom"]}>
       <Header
@@ -24,6 +41,8 @@ export const FriendsScreen: FC<FriendsScreenProps> = observer(function FriendsSc
       />
       <View style={$listContainer}>
         <ListView<IFriendRequest>
+          refreshing={friendRequestsLoading}
+          onRefresh={getFriendRequests}
           data={friendStore.friendRequests.slice()}
           contentContainerStyle={$listContentContainer}
           estimatedItemSize={200}
