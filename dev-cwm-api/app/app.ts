@@ -1,20 +1,32 @@
 import express from "express";
-import usersRouter from "./routes/usersRouter";
 import dotenv from "dotenv";
+import { createServer } from "http";
+import { Server, Socket } from "socket.io";
+import usersRouter from "./routes/usersRouter";
 import postRouter from "./routes/postRouter";
 import friendsRouter from "./routes/friendsRouter";
-import expressWs from "express-ws";
+import { registerMessageHandler } from "./handlers/messageHandler";
 
 dotenv.config();
 const PORT = process.env.PORT;
+const app = express();
+const server = createServer(app);
+const io = new Server(server, { cors: { origin: "http://localhost:5173" } });
 
-const { app } = expressWs(express());
-// Setup routes
+app.get("/ping", (req, res) => {
+  res.send("Pong");
+});
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/posts", postRouter);
 app.use("/api/v1/friends", friendsRouter);
-app.ws("/api/v1/messages", async (ws, req) => {});
+
+const onConnection = (socket: Socket) => {
+  console.log("Connected");
+  registerMessageHandler(io, socket);
+};
+io.on("connection", onConnection);
+
 //Start
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Running on Port: ${PORT}`);
 });

@@ -56,7 +56,7 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow Climb With Me to use your location."
+          "locationAlwaysAndWhenInUsePermission": "Allow Climb With Me to use your location?"
         }
       ],
       [
