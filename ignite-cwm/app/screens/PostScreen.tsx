@@ -90,25 +90,25 @@ export const PostScreen: FC<PostScreenProps> = observer(function PostScreen(_pro
       navigation.push("ChatScreen")
     } else {
       const currentUser = ChatUserModel.create({
-        guid: userStore._id,
+        _id: userStore._id,
         name: userStore.name,
         userImg: userStore.profileImg,
         joinedOn: new Date(),
       })
       const userToMessage = ChatUserModel.create({
-        guid: post.authorId,
+        _id: post.authorId,
         name: post.authorName,
         userImg: post.authorProfImg,
         joinedOn: new Date(),
       })
       const newChat = ChatModel.create({
-        chatId: uuid.v4().toString(),
+        _id: uuid.v4().toString(),
         users: [currentUser, userToMessage],
         messages: [],
       })
 
       messageStore.addChat(newChat)
-      messageStore.setSelectedChatId(newChat.chatId)
+      messageStore.setSelectedChatId(newChat._id)
       navigation.push("ChatScreen")
     }
   }

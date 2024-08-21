@@ -11,9 +11,14 @@ dotenv.config();
 const PORT = process.env.PORT;
 const app = express();
 const server = createServer(app);
-const io = new Server(server, { cors: { origin: "http://localhost:5173" } });
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
+});
 
-app.get("/ping", (req, res) => {
+app.get("/api/v1/ping", (req, res) => {
+  console.log(req);
   res.send("Pong");
 });
 app.use("/api/v1/users", usersRouter);
@@ -25,7 +30,6 @@ const onConnection = (socket: Socket) => {
   registerMessageHandler(io, socket);
 };
 io.on("connection", onConnection);
-
 //Start
 server.listen(PORT, () => {
   console.log(`Running on Port: ${PORT}`);

@@ -8,4 +8,5 @@
 export default {
   API_URL: "CHANGEME",
   AUDIENCE: "CHANGEME",
+  SOCKET_ORIGIN: "CHANGEME",
 }

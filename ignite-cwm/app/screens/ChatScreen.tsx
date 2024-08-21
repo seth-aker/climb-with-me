@@ -1,14 +1,16 @@
 import React, { useEffect, useRef, useState } from "react"
 import { AppStackScreenProps } from "app/navigators/types"
 import { observer } from "mobx-react-lite"
-import { Button, Header, Icon, ListView, ListViewRef, Screen } from "app/components"
+import { Button, Header, Icon, ListView, ListViewRef, Screen, Text } from "app/components"
 import { TextInput, TextStyle, View, ViewStyle } from "react-native"
 import { colors, spacing } from "app/theme"
 import { useStores } from "app/models"
-import { IMessage, MessageModel } from "app/models/Message"
+import { IMessage, IMessageSnapshotOut, MessageModel } from "app/models/Message"
 import uuid from "react-native-uuid"
 import { MessageCard } from "app/components/MessageCard"
 import { EmptyListComponent } from "app/components/EmptyListComponent"
+import socket from "app/services/webSocket/socket"
+import { getSnapshot } from "mobx-state-tree"
 
 interface ChatScreenProps extends AppStackScreenProps<"ChatScreen"> {}
 export const ChatScreen = observer((props: ChatScreenProps) => {
@@ -20,17 +22,56 @@ export const ChatScreen = observer((props: ChatScreenProps) => {
   const messageListRef = useRef<ListViewRef<IMessage>>(null)
 
   const [messageText, setMessageText] = useState("")
+  const [wsConnected, setWsConnected] = useState(false)
+
+  const onConnect = () => {
+    setWsConnected(true)
+    if (messageStore.selectedChatId) {
+      socket.emit("join", messageStore.selectedChatId)
+    } else throw Error("Something went horribly wrong, please restart the app")
+  }
+
+  const onMessageReceived = (message: IMessageSnapshotOut) => {
+    messageStore.selectedChat?.addMessage(MessageModel.create(message))
+  }
+  const onDisconnect = () => {
+    setWsConnected(false)
+  }
+  useEffect(() => {
+    if (socket.connected) {
+      onConnect()
+    }
+    socket.on("connect", onConnect)
+    socket.on("message", onMessageReceived)
+    socket.on("disconnect", onDisconnect)
+    socket.on("connect_error", (err) => {
+      console.log(`connect_error due to ${err.message}`)
+    })
+
+    return () => {
+      socket.off("connect", onConnect)
+      socket.off("message", onMessageReceived)
+      socket.off("disconnect", onDisconnect)
+      socket.off("connect_error", (err) => {
+        console.log(`connect_error due to ${err.message}`)
+      })
+    }
+  }, [])
 
   const sendMessage = () => {
-    messageStore.selectedChat?.addMessage(
-      MessageModel.create({
-        guid: uuid.v4().toString(),
-        ownerId: userStore._id,
-        ownerName: userStore.name,
-        body: messageText,
-        sentOn: new Date(),
-      }),
-    )
+    const newMsg = MessageModel.create({
+      _id: uuid.v4().toString(),
+      ownerId: userStore._id,
+      ownerName: userStore.name,
+      body: messageText,
+      sentOn: new Date(),
+    })
+    messageStore.selectedChat?.addMessage(newMsg)
+    if (messageStore.selectedChat) {
+      socket.emit("message", getSnapshot(messageStore.selectedChat), getSnapshot(newMsg))
+    } else {
+      throw new Error("There was an error syncing chat data, please try again")
+    }
     setMessageText("")
     inputRef.current?.blur()
   }
@@ -78,6 +119,7 @@ export const ChatScreen = observer((props: ChatScreenProps) => {
           ListEmptyComponent={<EmptyListComponent />}
           onLoad={() => messageListRef.current?.scrollToEnd()}
         />
+        <Text text={`Connected: ${wsConnected}`} />
       </View>
       <View style={$bottomContainer}>
         <View style={$textInputContainer}>

@@ -66,7 +66,7 @@ export const ChatCard = observer((props: ChatCardProps) => {
   }))
 
   const onPress = () => {
-    messageStore.setSelectedChatId(chat.chatId)
+    messageStore.setSelectedChatId(chat._id)
     navigation.push("ChatScreen")
   }
 

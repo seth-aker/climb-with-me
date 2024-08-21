@@ -1,5 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
-import React from "react"
+import React, { useEffect } from "react"
 import { TextStyle, ViewStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { colors, spacing, typography } from "app/theme"
@@ -10,12 +10,28 @@ import { Icon } from "app/components"
 import { MessagesScreen } from "app/screens/MessagesScreen"
 import { FriendsScreen } from "app/screens/FriendsScreen"
 import { HomeTabParamList } from "./types"
+import { useStores } from "app/models"
+import { getFriendsList } from "app/services/api/friendService/friendService"
 
 const Tab = createBottomTabNavigator<HomeTabParamList>()
 
 export function HomeTabNavigator() {
   const { bottom } = useSafeAreaInsets()
-
+  const {
+    authenticationStore: { tokenLoading, authToken },
+    friendStore,
+  } = useStores()
+  useEffect(() => {
+    if (authToken && !tokenLoading) {
+      getFriendsList(authToken)
+        .then((response) => {
+          if (response.data.friends) friendStore.setProp("friends", response.data.friends)
+        })
+        .catch((e) => {
+          console.log("In HomeTabNavigator", e)
+        })
+    }
+  }, [tokenLoading, authToken])
   return (
     <Tab.Navigator
       screenOptions={{

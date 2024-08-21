@@ -9,6 +9,7 @@ import { useStores } from "app/models"
 
 import { getSnapshot } from "mobx-state-tree"
 import { updateUser } from "app/services/api/userService/userService"
+import api from "app/services/api/api"
 
 export interface ProfileHeaderProps {
   editable: boolean
@@ -39,6 +40,10 @@ export function ProfileHeader(props: ProfileHeaderProps) {
     }
     userStore.setProp("backgroundImg", image.assets[0].uri)
     return true
+  }
+  const pingServer = async () => {
+    const res = await api.get("/ping")
+    console.log(res.status + " " + res.data)
   }
 
   const toggleEditable = () => {
@@ -123,6 +128,7 @@ export function ProfileHeader(props: ProfileHeaderProps) {
           <Button
             text="Settings"
             style={$editSettingsButtonStyle}
+            onPress={pingServer}
             LeftAccessory={() => (
               <Icon
                 icon="ellipsis-vertical"

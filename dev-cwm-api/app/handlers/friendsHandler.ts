@@ -75,7 +75,7 @@ export const getFriendsList = async (request: Request, response: Response) => {
   const authHeader = request.header("authorization");
   const userId = parseUserId(authHeader);
   const filter: Document = { _id: userId };
-  const result = collection.findOne(filter, {
+  const result = await collection.findOne(filter, {
     projection: { friends: true, _id: false },
   });
   response.send(result);

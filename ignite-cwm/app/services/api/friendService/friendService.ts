@@ -3,7 +3,11 @@ import api from "../api"
 import { AxiosResponse } from "axios"
 
 export const getFriendsList = async (token: string) => {
-  return await api.get("/friends", { headers: { Authorization: `Bearer ${token}` } })
+  const friendsList: AxiosResponse<{ friends: IFriendRequestSnapshotOut[] }> = await api.get(
+    "/friends",
+    { headers: { Authorization: `Bearer ${token}` } },
+  )
+  return friendsList
 }
 export const getFriendRequests = async (token: string) => {
   const result: AxiosResponse<{ friendRequests: IFriendRequestSnapshotOut[] }> = await api.get(

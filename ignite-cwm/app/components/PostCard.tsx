@@ -72,25 +72,25 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
       navigation.push("ChatScreen")
     } else {
       const currentUser = ChatUserModel.create({
-        guid: userGuid,
+        _id: userGuid,
         name: userStore.name,
         userImg: userStore.profileImg,
         joinedOn: new Date(),
       })
       const userToMessage = ChatUserModel.create({
-        guid: post.authorId,
+        _id: post.authorId,
         name: post.authorName,
         userImg: post.authorProfImg,
         joinedOn: new Date(),
       })
       const newChat = ChatModel.create({
-        chatId: uuid.v4().toString(),
+        _id: uuid.v4().toString(),
         users: [currentUser, userToMessage],
         messages: [],
       })
 
       messageStore.addChat(newChat)
-      messageStore.setSelectedChatId(newChat.chatId)
+      messageStore.setSelectedChatId(newChat._id)
       navigation.push("ChatScreen")
     }
   }

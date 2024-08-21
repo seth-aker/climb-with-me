@@ -45,7 +45,7 @@ export const MessagesScreen: FC<MessagesScreenProps> = observer(function Message
       messageStore.setSelectedChatId(chatId)
     } else {
       const currentUser = ChatUserModel.create({
-        guid: userStore._id,
+        _id: userStore._id,
         name: userStore.name,
         userImg: userStore.profileImg,
         joinedOn: new Date(),
@@ -54,7 +54,7 @@ export const MessagesScreen: FC<MessagesScreenProps> = observer(function Message
       toUsers.forEach((user) => {
         chatUsers.push(
           ChatUserModel.create({
-            guid: user._id,
+            _id: user._id,
             name: user.name,
             userImg: user.profImg,
             joinedOn: new Date(),
@@ -63,13 +63,13 @@ export const MessagesScreen: FC<MessagesScreenProps> = observer(function Message
       })
 
       const newChat = ChatModel.create({
-        chatId: uuid.v4().toString(),
+        _id: uuid.v4().toString(),
         users: chatUsers,
         messages: [],
       })
 
       messageStore.addChat(newChat)
-      messageStore.setSelectedChatId(newChat.chatId)
+      messageStore.setSelectedChatId(newChat._id)
     }
     navigation.push("ChatScreen")
     setModalVis(false)
@@ -111,7 +111,7 @@ export const MessagesScreen: FC<MessagesScreenProps> = observer(function Message
         estimatedItemSize={80}
         // Required for height animation change to not affect more than one card. This is due to flashlist's default component reuse
         keyExtractor={(item) => {
-          return item.chatId
+          return item._id
         }}
         renderItem={({ item }) => <ChatCard chat={item} />}
       />
