@@ -3,6 +3,8 @@ import { IMessage } from "../database/documentTypes/message.type";
 import { useDatabase } from "../database/connection";
 import { Document } from "mongodb";
 import { IChat } from "../database/documentTypes/chat.type";
+import { Request, Response } from "express";
+import { parseUserId } from "../util/parseUserId";
 
 export const registerMessageHandler = async (io: Server, socket: Socket) => {
   const db = await useDatabase();
@@ -28,4 +30,14 @@ export const registerMessageHandler = async (io: Server, socket: Socket) => {
 
   socket.on("join", joinRoom);
   socket.on("message", sendMessage);
+};
+
+export const getUserChats = async (req: Request, res: Response) => {
+  const db = await useDatabase();
+  const chats = db.collection("chats");
+  const authHeader = req.header("authorization");
+  const userId = parseUserId(authHeader);
+  const filter: Document = { "users._id": { $in: [userId] } };
+  const result = await chats.find(filter).toArray();
+  res.send(result);
 };

@@ -94,18 +94,21 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
       navigation.push("ChatScreen")
     }
   }
+  const navigateToProfile = () => {
+    navigation.push("PublicProfile", { userId: post.authorId })
+  }
   return (
     <Card
       style={$item}
       HeadingComponent={
         <View style={$itemHeader}>
-          <View style={flexRow}>
+          <Pressable style={flexRow} onPress={navigateToProfile}>
             <AutoImage style={$itemThumbnail} src={post.authorProfImg} />
             <View style={$headerTextContainer}>
               <Text size="xs" text={post.authorName} />
               <Text size="xxs" weight="light" text={`${formatTimeSince(post.timeSincePost())}`} />
             </View>
-          </View>
+          </Pressable>
           <Button
             onPress={handledSettingBtnPressed}
             style={$headerButtonStyle}

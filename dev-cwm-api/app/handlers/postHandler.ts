@@ -21,7 +21,11 @@ export const createPost = async (
 export const getPosts = async (request: Request, response: Response) => {
   const db = await useDatabase();
   const collection = db.collection<IPost>("posts");
-  const result = await collection.find({}).limit(50).toArray();
+  const result = await collection
+    .find({})
+    .limit(50)
+    .sort({ createdAt: -1 })
+    .toArray();
   response.send(result).status(200);
 };
 

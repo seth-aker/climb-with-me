@@ -10,7 +10,10 @@ import { useNavigation } from "@react-navigation/native"
 import { RootStackNavigation } from "app/navigators/types"
 import { formatSentOn } from "app/utils/formatTime"
 import { useStores } from "app/models"
-import { respondToFriendRequest } from "app/services/api/friendService/friendService"
+import {
+  getFriendRequests,
+  respondToFriendRequest,
+} from "app/services/api/friendService/friendService"
 import { LoadingSpinner } from "./LoadingSpinner"
 
 export interface FriendRequestCardProps {
@@ -28,15 +31,30 @@ export const FriendRequestCard = observer((props: FriendRequestCardProps) => {
   const handleOnPress = () => {
     // navigation.push("UserProfile");
   }
+  const refreshFriendRequests = async () => {
+    const result = await getFriendRequests(authToken ?? "")
+    console.log(result.data)
+    friendStore.setProp("friendRequests", result.data.friendRequests)
+  }
   const handleAcceptFriend = async () => {
     setResponseLoading(true)
-    await respondToFriendRequest(friendRequest._id, true, authToken ?? "")
+    try {
+      await respondToFriendRequest(friendRequest._id, true, authToken ?? "")
+      await refreshFriendRequests()
+    } catch (err) {
+      console.log(err)
+    }
 
     setResponseLoading(false)
   }
   const handleDenyRequest = async () => {
     setResponseLoading(true)
-    await respondToFriendRequest(friendRequest._id, false, authToken ?? "")
+    try {
+      await respondToFriendRequest(friendRequest._id, false, authToken ?? "")
+      await refreshFriendRequests()
+    } catch (err) {
+      console.log(err)
+    }
     setResponseLoading(false)
   }
   return (
@@ -54,7 +72,10 @@ export const FriendRequestCard = observer((props: FriendRequestCardProps) => {
             {responseLoading ? (
               <LoadingSpinner />
             ) : (
-              <Text text={friendRequest.accepted ? "Accepted" : "Accept"} />
+              <Text
+                text={friendRequest.accepted ? "Accepted" : "Accept"}
+                textColor={colors.background}
+              />
             )}
           </Button>
           <Button
@@ -89,6 +110,7 @@ const $rightContainer: ViewStyle = {
 }
 const $buttonContainer: ViewStyle = {
   flexDirection: "row",
+  maxHeight: 75,
 }
 const $buttonStyle: ViewStyle = {
   borderRadius: 5,

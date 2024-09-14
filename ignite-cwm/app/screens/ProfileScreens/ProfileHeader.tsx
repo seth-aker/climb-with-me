@@ -8,8 +8,13 @@ import { ImagePickerResult } from "expo-image-picker"
 import { useStores } from "app/models"
 
 import { getSnapshot } from "mobx-state-tree"
-import { updateUser } from "app/services/api/userService/userService"
+import {
+  postBackgroundImg,
+  postProfileImg,
+  updateUser,
+} from "app/services/api/userService/userService"
 import api from "app/services/api/api"
+import Config from "app/config"
 
 export interface ProfileHeaderProps {
   editable: boolean
@@ -30,7 +35,22 @@ export function ProfileHeader(props: ProfileHeaderProps) {
     if (image.canceled) {
       return false
     }
-    userStore.setProp("profileImg", image.assets[0].uri)
+    const pickedImg = image.assets[0]
+    // if image size is larger than 10Mb or 10,000,000 bytes
+    if (pickedImg.fileSize && pickedImg.fileSize > 10000000) {
+      console.log("File size too big, please select an image smaller than 10Mb")
+      return false
+    }
+    try {
+      await postProfileImg(userStore._id, pickedImg.uri, authToken ?? "", pickedImg.mimeType)
+    } catch (e) {
+      console.log(e)
+    }
+    const imgUrl = `https://${Config.AWS_BUCKET_NAME}.s3.amazonaws.com/profile/${
+      userStore._id
+    }.${pickedImg.mimeType?.split("/").pop()}`
+
+    userStore.setProp("profileImg", imgUrl)
     return true
   }
 
@@ -38,7 +58,21 @@ export function ProfileHeader(props: ProfileHeaderProps) {
     if (image.canceled) {
       return false
     }
-    userStore.setProp("backgroundImg", image.assets[0].uri)
+    const pickedImg = image.assets[0]
+    if (pickedImg.fileSize && pickedImg.fileSize > 10000000) {
+      console.log("File size too big, please select an image smaller than 10Mb")
+      return false
+    }
+    try {
+      postBackgroundImg(userStore._id, pickedImg.uri, authToken ?? "", pickedImg.mimeType)
+    } catch (e) {
+      console.log(e)
+    }
+    const imgUrl = `https://${Config.AWS_BUCKET_NAME}.s3.amazonaws.com/background/${
+      userStore._id
+    }.${pickedImg.mimeType?.split("/").pop()}`
+
+    userStore.setProp("backgroundImg", imgUrl)
     return true
   }
   const pingServer = async () => {

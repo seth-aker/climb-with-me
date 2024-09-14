@@ -9,14 +9,15 @@ import { IMessage, IMessageSnapshotOut, MessageModel } from "app/models/Message"
 import uuid from "react-native-uuid"
 import { MessageCard } from "app/components/MessageCard"
 import { EmptyListComponent } from "app/components/EmptyListComponent"
-import socket from "app/services/webSocket/socket"
 import { getSnapshot } from "mobx-state-tree"
+import { useWebSocket } from "app/services/webSocket/socket"
 
 interface ChatScreenProps extends AppStackScreenProps<"ChatScreen"> {}
 export const ChatScreen = observer((props: ChatScreenProps) => {
   // const bottomSafeArea = useSafeAreaInsetsStyle(["bottom"])
   const { navigation } = props
   const { messageStore, userStore } = useStores()
+  const { socket } = useWebSocket()
 
   const inputRef = useRef<TextInput>(null)
   const messageListRef = useRef<ListViewRef<IMessage>>(null)
@@ -35,11 +36,14 @@ export const ChatScreen = observer((props: ChatScreenProps) => {
     messageStore.selectedChat?.addMessage(MessageModel.create(message))
   }
   const onDisconnect = () => {
+    console.log("Disconnected")
     setWsConnected(false)
+    socket.disconnect()
   }
   useEffect(() => {
     if (socket.connected) {
       onConnect()
+    } else {
     }
     socket.on("connect", onConnect)
     socket.on("message", onMessageReceived)
@@ -53,7 +57,7 @@ export const ChatScreen = observer((props: ChatScreenProps) => {
       socket.off("message", onMessageReceived)
       socket.off("disconnect", onDisconnect)
       socket.off("connect_error", (err) => {
-        console.log(`connect_error due to ${err.message}`)
+        console.log(`connect_error due to ${err.message}, ${err.cause}`)
       })
     }
   }, [])
@@ -78,11 +82,17 @@ export const ChatScreen = observer((props: ChatScreenProps) => {
 
   const handleGoBack = () => {
     messageStore.setSelectedChatId(null)
+    if (socket.connected) {
+      socket.disconnect()
+    }
     navigation.goBack()
   }
 
   useEffect(() => {
     inputRef.current?.focus()
+    navigation.addListener("beforeRemove", () => {
+      socket.disconnect()
+    })
   }, [])
 
   // const [textInputHeight, setTextInputHeight] = useState(35)

@@ -4,8 +4,7 @@
  * be kicking off our app.
  *
  * Most of this file is boilerplate and you shouldn't need to modify
- * it very often. But take some time to look through and understand
- * what is going on here.
+ * it very often.
  *
  * The app navigation resides in ./app/navigators, so head over there
  * if you're interested in adding screens and navigators.
@@ -45,18 +44,26 @@ const prefix = Linking.createURL("/")
 const config = {
   screens: {
     Login: {
+      path: "/login",
+    },
+
+    Home: {
       path: "",
     },
-    Welcome: "welcome",
-    Demo: {
-      screens: {
-        DemoShowroom: {
-          path: "showroom/:queryIndex?/:itemIndex?",
-        },
-        DemoDebug: "debug",
-        DemoPodcastList: "podcast",
-        DemoCommunity: "community",
-      },
+    Messages: {
+      path: "/messages",
+    },
+    Friends: {
+      path: "/friends",
+    },
+    Profile: {
+      path: "/:userId",
+    },
+    Post: {
+      path: "/posts/:postId",
+    },
+    Chat: {
+      path: "/chats/:id",
     },
   },
 }

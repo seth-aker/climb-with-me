@@ -14,7 +14,9 @@ const router = Router();
 router.get("", jwtCheck, async (request: Request, response: Response) => {
   getFriendsList(request, response);
 });
+
 router.get("/requests", jwtCheck, getFriendRequests);
+
 // Create Friend Request
 // /api/v1/friends/requests
 router.post(
@@ -26,6 +28,7 @@ router.post(
   }
 );
 
+// Respond to friend Request
 // /api/v1/friends/requests/:requestId?accepted={accepted}
 router.patch(
   "/requests/:requestId",

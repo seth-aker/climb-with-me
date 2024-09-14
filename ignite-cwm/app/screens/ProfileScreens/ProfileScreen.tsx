@@ -2,7 +2,16 @@ import { Icon, Screen, TextField, Button, Card, ListView, Text, Header } from "a
 import { colors, spacing } from "app/theme"
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useState } from "react"
-import { ImageStyle, Modal, Pressable, ScrollView, TextStyle, View, ViewStyle } from "react-native"
+import {
+  Alert,
+  ImageStyle,
+  Modal,
+  Pressable,
+  ScrollView,
+  TextStyle,
+  View,
+  ViewStyle,
+} from "react-native"
 import { genderOptions } from "../../../data/ModalPickerOptions"
 import { formatPhoneNumber } from "app/utils/formatPhoneNumber"
 import { ProfileHeader } from "./ProfileHeader"
@@ -11,7 +20,6 @@ import { ClimbingStyleModal } from "./ClimbingStyleModal"
 import { useStores } from "app/models"
 import { IClimbingStyle } from "app/models/ClimbingStyleModel"
 import { HomeTabScreenProps } from "app/navigators/types"
-import { Logo } from "app/components/Logo"
 import { useAuth0 } from "react-native-auth0"
 
 import { getSnapshot } from "mobx-state-tree"
@@ -80,6 +88,9 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
     }
   }
 
+  const handleGoBack = () => {
+    navigation.goBack()
+  }
   const [climbingStyle, setClimbingStyle] = useState<string>()
 
   const [maxGradeIndoor, setMaxGradeIndoor] = useState<string>()
@@ -96,10 +107,37 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
     }
   }, [user.climbingStyles])
 
+  useEffect(() => {
+    navigation.addListener("beforeRemove", (e) => {
+      if (!editable) {
+        // Do nothing if changes are saved. (When editable is false)
+        return
+      }
+      e.preventDefault()
+      // Prompt the user before leaving the screen
+      Alert.alert(
+        "Discard changes?",
+        "You have unsaved changes. Are you sure to discard them and leave the screen?",
+        [
+          { text: "Don't leave", style: "cancel" },
+          {
+            text: "Discard",
+            style: "destructive",
+            // If the user confirmed, then we dispatch the action we blocked earlier
+            // This will continue the action that had triggered the removal of the screen
+            onPress: () => navigation.dispatch(e.data.action),
+          },
+        ],
+      )
+    })
+  }, [navigation, editable])
+
   return (
     <Screen preset="fixed" contentContainerStyle={$screenContainer}>
       <Header
-        LeftActionComponent={<Logo width={30} height={30} fill={colors.palette.neutral100} />}
+        LeftActionComponent={
+          <Icon icon={"angle-left"} onPress={handleGoBack} color={colors.palette.neutral100} />
+        }
         RightActionComponent={
           <Text
             text="Logout"

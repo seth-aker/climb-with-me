@@ -15,12 +15,14 @@ import { colors } from "app/theme"
 import { useStores } from "app/models"
 import { useAuth0 } from "react-native-auth0"
 import { HomeTabNavigator } from "./HomeTabsNavigator"
-import { AppStackParamList } from "./types"
+import { AppStackParamList, NavigationProps } from "./types"
 import { ChatScreen } from "app/screens/ChatScreen"
 import { LoginScreen, PostScreen } from "app/screens"
 
 import { applySnapshot, getSnapshot } from "mobx-state-tree"
 import { getUser, postUser } from "app/services/api/userService/userService"
+import { PublicProfileScreen } from "app/screens/PublicProfileScreen"
+import { SocketProvider } from "app/services/webSocket/socket"
 
 /**
  * This is a list of all the route names that will exit the app if the back button
@@ -60,35 +62,35 @@ const AppStack = observer(function AppStack(_props) {
   }, [user, isLoading, authStore.authToken])
 
   return (
-    <Stack.Navigator
-      screenOptions={{ headerShown: false, navigationBarColor: colors.background }}
-      initialRouteName={authStore.isAuthenticated ? "HomeTabs" : "Login"}
-    >
-      {authStore.isAuthenticated ? (
-        <>
-          <Stack.Screen name="HomeTabs" component={HomeTabNavigator} />
-          <Stack.Screen
-            name="PostScreen"
-            component={PostScreen}
-            options={{ animation: "slide_from_right" }}
-          />
-          <Stack.Screen
-            name="ChatScreen"
-            component={ChatScreen}
-            options={{ animation: "slide_from_right" }}
-          />
-        </>
-      ) : (
-        <>
-          <Stack.Screen name="Login" component={LoginScreen} />
-        </>
-      )}
-    </Stack.Navigator>
+    <SocketProvider token={authStore.authToken}>
+      <Stack.Navigator
+        screenOptions={{ headerShown: false, navigationBarColor: colors.background }}
+        initialRouteName={authStore.isAuthenticated ? "HomeTabs" : "Login"}
+      >
+        {authStore.isAuthenticated ? (
+          <>
+            <Stack.Screen name="HomeTabs" component={HomeTabNavigator} />
+            <Stack.Screen
+              name="PostScreen"
+              component={PostScreen}
+              options={{ animation: "slide_from_right" }}
+            />
+            <Stack.Screen
+              name="ChatScreen"
+              component={ChatScreen}
+              options={{ animation: "slide_from_right" }}
+            />
+            <Stack.Screen name="PublicProfile" component={PublicProfileScreen} />
+          </>
+        ) : (
+          <>
+            <Stack.Screen name="Login" component={LoginScreen} />
+          </>
+        )}
+      </Stack.Navigator>
+    </SocketProvider>
   )
 })
-
-export interface NavigationProps
-  extends Partial<React.ComponentProps<typeof NavigationContainer>> {}
 
 export const AppNavigator = observer(function AppNavigator(props: NavigationProps) {
   const colorScheme = useColorScheme()

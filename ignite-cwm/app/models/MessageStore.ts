@@ -1,11 +1,13 @@
 import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree"
 import { ChatModel, IChat } from "./Chat"
+import { withSetPropAction } from "./helpers/withSetPropAction"
 
 export const MessageStoreModel = types
   .model("MessageStore", {
     chats: types.array(ChatModel),
     selectedChatId: types.maybeNull(types.string),
   })
+  .actions(withSetPropAction)
   .actions((store) => ({
     addChat(chat: IChat) {
       store.chats.push(chat)

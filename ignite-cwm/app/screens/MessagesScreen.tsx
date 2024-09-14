@@ -1,7 +1,7 @@
 import { HomeTabScreenProps } from "app/navigators/types"
 // import { useSafeAreaInsetsStyle } from "app/utils/useSafeAreaInsetsStyle";
 import { observer } from "mobx-react-lite"
-import React, { FC, useRef, useState } from "react"
+import React, { FC, useEffect, useRef, useState } from "react"
 import { AutoImage, Button, Header, Icon, ListView, Screen, Text } from "app/components"
 import {
   FlatList,
@@ -20,17 +20,26 @@ import { ChatCard } from "app/components/ChatCard"
 import { ChatUserModel, IChat, ChatModel, IChatUser } from "app/models/Chat"
 import uuid from "react-native-uuid"
 import { IFriend } from "app/models/Friend"
+import { getUserChats } from "app/services/api/chatService/chatService"
 
 interface MessagesScreenProps extends HomeTabScreenProps<"Messages"> {}
 
 export const MessagesScreen: FC<MessagesScreenProps> = observer(function MessageScreen(_props) {
   const { navigation } = _props
-  const { messageStore, userStore, friendStore } = useStores()
+  const {
+    messageStore,
+    userStore,
+    friendStore,
+    authenticationStore: { authToken },
+  } = useStores()
   const [modalVis, setModalVis] = useState(false)
   const [toUserSearchText, setToUserText] = useState("")
   const [toUsers, setToUsers] = useState<IFriend[]>([] as IFriend[])
   const [friendSearchResults, setFriendSearchResults] = useState<IFriend[]>([] as IFriend[])
+  const [refreshingChats, setRefreshingChats] = useState(false)
+
   const textInputRef = useRef<TextInput>(null)
+
   const chatList = messageStore.chats.slice().sort((a, b) => {
     return (
       (b.getLastMessage()?.sentOn.getTime() ?? b.createdOn.getTime()) -
@@ -38,6 +47,15 @@ export const MessagesScreen: FC<MessagesScreenProps> = observer(function Message
     )
   })
 
+  useEffect(() => {
+    refreshChat()
+  }, [])
+  const refreshChat = async () => {
+    setRefreshingChats(true)
+    const response = await getUserChats(authToken ?? "")
+    messageStore.setProp("chats", response.data)
+    setRefreshingChats(false)
+  }
   const handleCreateNewChat = () => {
     const chatUserIds = [userStore._id, ...toUsers.map((user) => user._id)]
     const chatId = messageStore.chatWithUsersExists(chatUserIds)
@@ -109,6 +127,8 @@ export const MessagesScreen: FC<MessagesScreenProps> = observer(function Message
       <ListView<IChat>
         data={chatList}
         estimatedItemSize={80}
+        refreshing={refreshingChats}
+        onRefresh={refreshChat}
         // Required for height animation change to not affect more than one card. This is due to flashlist's default component reuse
         keyExtractor={(item) => {
           return item._id

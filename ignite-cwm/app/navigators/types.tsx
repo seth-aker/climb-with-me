@@ -1,5 +1,9 @@
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs"
-import { CompositeScreenProps, NavigatorScreenParams } from "@react-navigation/native"
+import {
+  CompositeScreenProps,
+  NavigationContainer,
+  NavigatorScreenParams,
+} from "@react-navigation/native"
 import { NativeStackNavigationProp, NativeStackScreenProps } from "@react-navigation/native-stack"
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -19,7 +23,7 @@ export type AppStackParamList = {
   PostScreen: { newComment?: boolean }
   Login: undefined
   ChatScreen: undefined
-  PublicProfile: undefined
+  PublicProfile: { userId: string }
   // 🔥 Your screens go here
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
@@ -46,3 +50,5 @@ export type RootStackNavigation = NativeStackNavigationProp<
   keyof AppStackParamList,
   undefined
 >
+export interface NavigationProps
+  extends Partial<React.ComponentProps<typeof NavigationContainer>> {}

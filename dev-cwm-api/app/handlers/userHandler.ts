@@ -3,6 +3,9 @@ import { useDatabase } from "../database/connection";
 import { Document, ObjectId } from "mongodb";
 import { IUser } from "../database/documentTypes/user.type";
 
+import dotenv from "dotenv";
+
+dotenv.config();
 export const getUserPrivate = async (
   request: Request<{ id: string }>,
   response: Response
