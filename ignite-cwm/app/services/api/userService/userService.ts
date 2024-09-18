@@ -37,16 +37,21 @@ export const updateUser = async (user: IUserStoreSnapshotOut, token: string) => 
 export const postProfileImg = async (
   userId: string,
   localUri: string,
+  uri: string,
   token: string,
   mimeType?: string,
 ) => {
   try {
-    await FileSystem.uploadAsync(`${Config.API_URL}/users/${userId}/img?type=profile`, localUri, {
-      headers: { authorization: `Bearer ${token}` },
-      fieldName: "profile",
-      mimeType,
-      uploadType: FileSystem.FileSystemUploadType.MULTIPART,
-    })
+    await FileSystem.uploadAsync(
+      `${Config.API_URL}/users/${userId}/img?type=profile&resourceUri=${uri}`,
+      localUri,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        fieldName: "profile",
+        mimeType,
+        uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+      },
+    )
   } catch (e) {
     console.log("Error")
     console.log(e)
@@ -63,7 +68,7 @@ export const postBackgroundImg = async (
       `${Config.API_URL}/users/${userId}/img?type=background`,
       localUri,
       {
-        headers: { authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` },
         fieldName: "background",
         mimeType,
         uploadType: FileSystem.FileSystemUploadType.MULTIPART,

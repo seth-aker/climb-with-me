@@ -60,7 +60,6 @@ export const updateUser = async (
   const updates = {
     $set: request.body,
   };
-
   const result = await collection.updateOne(query, updates);
   response.send(result).status(200);
 };

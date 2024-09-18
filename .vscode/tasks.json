@@ -1,0 +1,44 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start Dev Server",
+      "type": "shell",
+      "command": "npm run dev",
+      "group": "build",
+      "options": { "cwd": "${workspaceFolder}/dev-cwm-api" },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "group": "groupA"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Start Android App",
+      "type": "shell",
+      "command": "npx expo run:android",
+      "group": "build",
+      "options": { "cwd": "${workspaceFolder}/ignite-cwm" },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "group": "groupA"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "start dev",
+      "type": "shell",
+      "dependsOn": ["Start Dev Server", "Start Android App"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}

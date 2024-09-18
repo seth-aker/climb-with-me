@@ -41,15 +41,20 @@ export function ProfileHeader(props: ProfileHeaderProps) {
       console.log("File size too big, please select an image smaller than 10Mb")
       return false
     }
+    const imgUrl = `https://${Config.AWS_BUCKET_NAME}.s3.amazonaws.com/profile/${
+      userStore._id
+    }.${pickedImg.mimeType?.split("/").pop()}?t=${Date.now()}`
     try {
-      await postProfileImg(userStore._id, pickedImg.uri, authToken ?? "", pickedImg.mimeType)
+      await postProfileImg(
+        userStore._id,
+        pickedImg.uri,
+        imgUrl,
+        authToken ?? "",
+        pickedImg.mimeType,
+      )
     } catch (e) {
       console.log(e)
     }
-    const imgUrl = `https://${Config.AWS_BUCKET_NAME}.s3.amazonaws.com/profile/${
-      userStore._id
-    }.${pickedImg.mimeType?.split("/").pop()}`
-
     userStore.setProp("profileImg", imgUrl)
     return true
   }
@@ -70,7 +75,7 @@ export function ProfileHeader(props: ProfileHeaderProps) {
     }
     const imgUrl = `https://${Config.AWS_BUCKET_NAME}.s3.amazonaws.com/background/${
       userStore._id
-    }.${pickedImg.mimeType?.split("/").pop()}`
+    }.${pickedImg.mimeType?.split("/").pop()}?t=${Date.now()}`
 
     userStore.setProp("backgroundImg", imgUrl)
     return true

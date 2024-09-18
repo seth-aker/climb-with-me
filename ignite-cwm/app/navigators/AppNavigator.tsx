@@ -43,7 +43,10 @@ const AppStack = observer(function AppStack(_props) {
     if (!isLoading && user && authStore.authToken) {
       applySnapshot(userStore, user)
       userStore.setProp("_id", user.sub?.split("|")[1])
-      userStore.setProp("profileImg", user.picture)
+      const imgUri = `https://${Config.AWS_BUCKET_NAME}.s3.amazonaws.com/profile/${
+        userStore._id
+      }.jpg?t=${Date.now()}`
+      userStore.setProp("profileImg", imgUri)
 
       getUser(userStore._id, authStore.authToken).then(
         // Callback when request is successful

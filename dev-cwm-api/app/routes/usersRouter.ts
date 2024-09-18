@@ -1,4 +1,4 @@
-import { Request, Response, Router, json } from "express";
+import { NextFunction, Request, Response, Router, json } from "express";
 import {
   getUserPrivate,
   getUserPublic,
@@ -12,6 +12,7 @@ import { parseUserId } from "../util/parseUserId";
 import { S3Client } from "@aws-sdk/client-s3";
 import multer from "multer";
 import multerS3 from "multer-s3";
+import { handleUserProfileImgChange } from "../database/functions/updateUserPosts";
 
 const s3 = new S3Client({ region: process.env.AWS_REGION });
 const upload = multer({
@@ -76,8 +77,19 @@ router.put(
 );
 router.post(
   "/:id/img",
+  // Check for a valid user
   jwtCheck,
-  async (request: Request<{ id: string }>, response: Response, next) => {
+  // Check if user is the owner of the resource
+  async (
+    request: Request<
+      { id: string },
+      {},
+      {},
+      { type: "profile" | "background"; resourceUri: string }
+    >,
+    response: Response,
+    next: NextFunction
+  ) => {
     const authHeader = request.header("authorization");
     const userId = parseUserId(authHeader);
     if (request.params.id !== userId) {
@@ -86,11 +98,27 @@ router.post(
     console.log("Post Received");
     next();
   },
+  // Use multer to upload the image to s3 based on the query parameters of either "profile", or "background"
   upload.fields([
     { name: "profile", maxCount: 1 },
     { name: "background", maxCount: 1 },
   ]),
-  (request: Request<{ id: string }>, response: Response) => {
+  // Propagate the change to all resources using the image
+  async (
+    request: Request<
+      { id: string },
+      {},
+      {},
+      { type: "profile" | "background"; resourceUri: string }
+    >,
+    response: Response
+  ) => {
+    if (request.query.type === "profile") {
+      await handleUserProfileImgChange(
+        request.params.id,
+        request.query.resourceUri
+      );
+    }
     response.sendStatus(204);
   }
 );

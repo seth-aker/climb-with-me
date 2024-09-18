@@ -44,8 +44,8 @@ export const ChatScreen = observer((props: ChatScreenProps) => {
     if (socket.connected) {
       onConnect()
     } else {
+      socket.connect()
     }
-    socket.on("connect", onConnect)
     socket.on("message", onMessageReceived)
     socket.on("disconnect", onDisconnect)
     socket.on("connect_error", (err) => {
@@ -53,14 +53,13 @@ export const ChatScreen = observer((props: ChatScreenProps) => {
     })
 
     return () => {
-      socket.off("connect", onConnect)
       socket.off("message", onMessageReceived)
       socket.off("disconnect", onDisconnect)
       socket.off("connect_error", (err) => {
         console.log(`connect_error due to ${err.message}, ${err.cause}`)
       })
     }
-  }, [])
+  }, [socket.connected])
 
   const sendMessage = () => {
     const newMsg = MessageModel.create({
