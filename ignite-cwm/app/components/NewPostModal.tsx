@@ -45,7 +45,7 @@ export const NewPostModal = (props: NewPostModalProps) => {
       createdAt: Date.now(),
       authorName: userStore.name,
       authorId: userStore._id,
-      authorProfImg: userStore.profileImg,
+      authorProfImg: userStore.avatar,
       comments: [],
     })
     console.log("Creating post")

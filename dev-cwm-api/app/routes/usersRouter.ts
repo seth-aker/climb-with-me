@@ -6,7 +6,6 @@ import {
   updateUser,
 } from "../handlers/userHandler";
 import jwtCheck from "../auth/jwtCheck";
-import { jwtDecode } from "jwt-decode";
 import { IUser } from "../database/documentTypes/user.type";
 import { parseUserId } from "../util/parseUserId";
 import { S3Client } from "@aws-sdk/client-s3";
@@ -33,30 +32,37 @@ const upload = multer({
 // /api/v1/users
 const router = Router();
 
-// Get User Profile
-// /api/v1/users/vbjalire
+// Get User Public Info
+// /api/v1/users/public/vbjalire
 router.get(
-  "/:id",
+  "/public/:id",
   jwtCheck,
-  async (request: Request<{ id: string }>, response) => {
-    const authHeader = request.header("authorization");
-    const userId = parseUserId(authHeader);
-    if (request.params.id !== userId) {
-      getUserPublic(request, response);
+  async (req: Request<{ id: string }>, res) => {
+    getUserPublic(req, res);
+  }
+);
+//
+router.get(
+  "/private/:id",
+  jwtCheck,
+  async (req: Request<{ id: string }>, res) => {
+    const authHeader = req.header("Authorization");
+    const sub = parseUserId(authHeader);
+    if (sub !== req.params.id) {
+      res.sendStatus(403);
     } else {
-      getUserPrivate(request, response);
+      getUserPrivate(req, res);
     }
   }
 );
-
 // createUser
 // /api/v1/users
 router.post(
   "",
   jwtCheck,
   json(),
-  async (request: Request<{}, {}, IUser>, response: Response) => {
-    createUser(request, response);
+  async (req: Request<{}, {}, IUser>, res: Response) => {
+    createUser(req, res);
   }
 );
 
@@ -65,35 +71,37 @@ router.put(
   "/:id",
   jwtCheck,
   json(),
-  async (request: Request<{ id: string }, {}, IUser>, response: Response) => {
-    const authHeader = request.header("authorization");
-    const userId = parseUserId(authHeader);
-    if (request.params.id !== userId) {
-      response.sendStatus(401);
+  async (req: Request<{ id: string }, {}, IUser>, res: Response) => {
+    // Validate Ownership of the resource
+    const authHeader = req.header("Authorization");
+    const sub = parseUserId(authHeader);
+    if (sub !== req.params.id) {
+      res.sendStatus(403);
     } else {
-      updateUser(request, response);
+      updateUser(req, res);
     }
   }
 );
+
 router.post(
   "/:id/img",
   // Check for a valid user
   jwtCheck,
-  // Check if user is the owner of the resource
+  // Verify if user is the owner of the resource
   async (
-    request: Request<
+    req: Request<
       { id: string },
       {},
       {},
       { type: "profile" | "background"; resourceUri: string }
     >,
-    response: Response,
+    res: Response,
     next: NextFunction
   ) => {
-    const authHeader = request.header("authorization");
+    const authHeader = req.header("authorization");
     const userId = parseUserId(authHeader);
-    if (request.params.id !== userId) {
-      response.sendStatus(401);
+    if (req.params.id !== userId) {
+      res.sendStatus(403);
     }
     console.log("Post Received");
     next();
@@ -105,21 +113,18 @@ router.post(
   ]),
   // Propagate the change to all resources using the image
   async (
-    request: Request<
+    req: Request<
       { id: string },
       {},
       {},
       { type: "profile" | "background"; resourceUri: string }
     >,
-    response: Response
+    res: Response
   ) => {
-    if (request.query.type === "profile") {
-      await handleUserProfileImgChange(
-        request.params.id,
-        request.query.resourceUri
-      );
+    if (req.query.type === "profile") {
+      await handleUserProfileImgChange(req.params.id, req.query.resourceUri);
     }
-    response.sendStatus(204);
+    res.sendStatus(204);
   }
 );
 export default router;

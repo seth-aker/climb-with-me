@@ -20,9 +20,9 @@ import { ChatScreen } from "app/screens/ChatScreen"
 import { LoginScreen, PostScreen } from "app/screens"
 
 import { applySnapshot, getSnapshot } from "mobx-state-tree"
-import { getUser, postUser } from "app/services/api/userService/userService"
 import { PublicProfileScreen } from "app/screens/PublicProfileScreen"
 import { SocketProvider } from "app/services/webSocket/socket"
+import { getUserPrivate, postUser } from "app/services/api/userService/userService"
 
 /**
  * This is a list of all the route names that will exit the app if the back button
@@ -46,9 +46,9 @@ const AppStack = observer(function AppStack(_props) {
       const imgUri = `https://${Config.AWS_BUCKET_NAME}.s3.amazonaws.com/profile/${
         userStore._id
       }.jpg?t=${Date.now()}`
-      userStore.setProp("profileImg", imgUri)
+      userStore.setProp("avatar", imgUri)
 
-      getUser(userStore._id, authStore.authToken).then(
+      getUserPrivate(userStore._id, authStore.authToken).then(
         // Callback when request is successful
         (response) => {
           applySnapshot(userStore, response.data)

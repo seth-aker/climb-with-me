@@ -14,17 +14,25 @@ export const postUser = async (user: IUserStoreSnapshotOut, token: string) => {
   return response
 }
 
-// get from api/v1/users/:id
-export const getUser = async (
+// get from api/v1/users/public/:id
+export const getUserPublic = async (
   userId: string,
   token: string,
 ): Promise<AxiosResponse<IUserStoreSnapshotOut>> => {
-  const response: AxiosResponse<IUserStoreSnapshotOut> = await api.get(`/users/${userId}`, {
+  const response: AxiosResponse<IUserStoreSnapshotOut> = await api.get(`/users/public/${userId}`, {
     headers: { Authorization: `Bearer ${token}` },
   })
   return response
 }
-
+export const getUserPrivate = async (
+  userId: string,
+  token: string,
+): Promise<AxiosResponse<IUserStoreSnapshotOut>> => {
+  const response: AxiosResponse<IUserStoreSnapshotOut> = await api.get(`/users/private/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  return response
+}
 // put to api/v1/users/:id
 export const updateUser = async (user: IUserStoreSnapshotOut, token: string) => {
   console.log(user)
@@ -34,7 +42,7 @@ export const updateUser = async (user: IUserStoreSnapshotOut, token: string) => 
   return response
 }
 
-export const postProfileImg = async (
+export const postAvatar = async (
   userId: string,
   localUri: string,
   uri: string,

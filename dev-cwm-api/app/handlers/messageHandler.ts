@@ -20,7 +20,7 @@ export const registerMessageHandler = async (io: Server, socket: Socket) => {
       chat.messages.push(message);
       await chats.findOneAndReplace(filter, chat);
     }
-    console.log(`${message.ownerName} sent this message: ${message.body}`);
+    console.log(`${message.ownerId} sent this message: ${message.body}`);
     socket.to(_chat._id.toString()).emit("message", message);
   };
   const joinRoom = (roomId: string) => {

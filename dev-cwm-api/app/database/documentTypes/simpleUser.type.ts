@@ -1,8 +1,7 @@
 import { ObjectId } from "mongodb";
 
-export interface IFriend {
+export interface ISimpleUser {
   _id: ObjectId;
   name: string;
-  profileImg: string;
-  friendSince: Date;
+  avatar: string;
 }

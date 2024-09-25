@@ -74,7 +74,7 @@ export const PostCard = observer(function PostCard(props: PostCardProps) {
       const currentUser = ChatUserModel.create({
         _id: userGuid,
         name: userStore.name,
-        userImg: userStore.profileImg,
+        userImg: userStore.avatar,
         joinedOn: new Date(),
       })
       const userToMessage = ChatUserModel.create({

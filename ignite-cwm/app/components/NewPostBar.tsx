@@ -22,7 +22,7 @@ export const NewPostBar = observer((props: NewPostBarProps) => {
   return (
     <View style={[$container, $viewStyleOverride]}>
       <Pressable onPress={() => navigation.navigate("HomeTabs", { screen: "Profile" })}>
-        <AutoImage src={userStore.profileImg} style={$imgThumbnail} />
+        <AutoImage src={userStore.avatar} style={$imgThumbnail} />
       </Pressable>
       <Pressable style={$newPostButton} onPress={() => setNewPostModalVis(true)}>
         <Text text="Where are you climbing?" style={$postButtonText} />

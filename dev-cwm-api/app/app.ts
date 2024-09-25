@@ -18,10 +18,6 @@ const io = new Server(server, {
   },
 });
 
-app.get("/api/v1/ping", (req, res) => {
-  console.log(req);
-  res.send("Pong");
-});
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/posts", postRouter);
 app.use("/api/v1/friends", friendsRouter);

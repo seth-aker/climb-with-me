@@ -65,7 +65,7 @@ export const MessagesScreen: FC<MessagesScreenProps> = observer(function Message
       const currentUser = ChatUserModel.create({
         _id: userStore._id,
         name: userStore.name,
-        userImg: userStore.profileImg,
+        userImg: userStore.avatar,
         joinedOn: new Date(),
       })
       const chatUsers: IChatUser[] = [currentUser]

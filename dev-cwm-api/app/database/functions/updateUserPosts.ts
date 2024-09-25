@@ -8,8 +8,5 @@ export const handleUserProfileImgChange = async (
   const db = await useDatabase();
   const posts = db.collection<IPost>("posts");
 
-  await posts.updateMany(
-    { authorId: userId },
-    { $set: { authorProfImg: profImg } }
-  );
+  await posts.updateMany({ authorId: userId }, { $set: { avatar: profImg } });
 };

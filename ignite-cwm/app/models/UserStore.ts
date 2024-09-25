@@ -37,7 +37,7 @@ export const UserStoreModel = types
     /**
      * URI lookup to the profile picture or default image if none provided
      */
-    profileImg: types.maybe(types.string),
+    avatar: types.maybe(types.string),
     /**
      * URI lookup to for the background image for the user
      */
@@ -46,6 +46,8 @@ export const UserStoreModel = types
      * User's about me section.
      */
     aboutMeText: types.maybe(types.string),
+    createdOn: types.optional(types.Date, Date.now()),
+    lastUpdated: types.optional(types.Date, Date.now()),
     climbingStyles: types.optional(types.array(ClimbingStyleModel), []),
   })
   .actions(withSetPropAction)

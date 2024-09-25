@@ -64,7 +64,7 @@ export const PublicProfileScreen = observer((props: PublicProfileScreenProps) =>
       <View style={$screenBody}>
         <AutoImage source={{ uri: user.backgroundImg, cache: "reload" }} style={$coverPhoto} />
         <AutoImage
-          source={{ uri: user.profileImg, cache: "reload" }}
+          source={{ uri: user.avatar, cache: "reload" }}
           height={75}
           width={75}
           style={$profileImg}

@@ -8,11 +8,7 @@ import { ImagePickerResult } from "expo-image-picker"
 import { useStores } from "app/models"
 
 import { getSnapshot } from "mobx-state-tree"
-import {
-  postBackgroundImg,
-  postProfileImg,
-  updateUser,
-} from "app/services/api/userService/userService"
+import { postBackgroundImg, postAvatar, updateUser } from "app/services/api/userService/userService"
 import api from "app/services/api/api"
 import Config from "app/config"
 
@@ -45,17 +41,11 @@ export function ProfileHeader(props: ProfileHeaderProps) {
       userStore._id
     }.${pickedImg.mimeType?.split("/").pop()}?t=${Date.now()}`
     try {
-      await postProfileImg(
-        userStore._id,
-        pickedImg.uri,
-        imgUrl,
-        authToken ?? "",
-        pickedImg.mimeType,
-      )
+      await postAvatar(userStore._id, pickedImg.uri, imgUrl, authToken ?? "", pickedImg.mimeType)
     } catch (e) {
       console.log(e)
     }
-    userStore.setProp("profileImg", imgUrl)
+    userStore.setProp("avatar", imgUrl)
     return true
   }
 
@@ -69,7 +59,7 @@ export function ProfileHeader(props: ProfileHeaderProps) {
       return false
     }
     try {
-      postBackgroundImg(userStore._id, pickedImg.uri, authToken ?? "", pickedImg.mimeType)
+      postBackgroundImg(userStore._id, pickedImg.uri, authToken || "", pickedImg.mimeType)
     } catch (e) {
       console.log(e)
     }
@@ -107,8 +97,8 @@ export function ProfileHeader(props: ProfileHeaderProps) {
   return (
     <View>
       <View style={$profileImgContainer}>
-        {userStore.profileImg ? (
-          <Image src={userStore.profileImg} resizeMode="cover" style={$profileImage} />
+        {userStore.avatar ? (
+          <Image src={userStore.avatar} resizeMode="cover" style={$profileImage} />
         ) : (
           <LoadingSpinner />
         )}

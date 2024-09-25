@@ -62,7 +62,7 @@ export const PostScreen: FC<PostScreenProps> = observer(function PostScreen(_pro
         body: commentText,
         authorName: userStore.name || "",
         authorId: userStore._id || "",
-        authorProfImg: userStore.profileImg || "",
+        authorProfImg: userStore.avatar || "",
       })
       // This should be inside the post store but I am lazy... sorry future Seth
       const result = await addComment(post._id, getSnapshot(comment), authToken ?? "")
@@ -92,7 +92,7 @@ export const PostScreen: FC<PostScreenProps> = observer(function PostScreen(_pro
       const currentUser = ChatUserModel.create({
         _id: userStore._id,
         name: userStore.name,
-        userImg: userStore.profileImg,
+        userImg: userStore.avatar,
         joinedOn: new Date(),
       })
       const userToMessage = ChatUserModel.create({
@@ -199,7 +199,7 @@ export const PostScreen: FC<PostScreenProps> = observer(function PostScreen(_pro
       <View style={$bottomContainer}>
         <View style={$footerContainer}>
           <View style={$textInputContainer}>
-            <AutoImage style={$commentThumbnail} src={userStore.profileImg} />
+            <AutoImage style={$commentThumbnail} src={userStore.avatar} />
             <TextInput
               ref={insertCommentRef}
               style={$textInputStyle}
