@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite"
 import React, { FC, useState } from "react"
-import { View, ViewStyle } from "react-native"
-import { Header, ListView, Screen, Text } from "app/components"
+import { ImageStyle, Pressable, View, ViewStyle } from "react-native"
+import { AutoImage, Header, Icon, ListView, Screen, Text } from "app/components"
 import { colors, spacing } from "../theme"
 import { LoadingSpinner } from "../components/LoadingSpinner"
 import { useAuth0 } from "react-native-auth0"
@@ -12,16 +12,17 @@ import { PostCard } from "app/components/PostCard"
 import { ContentStyle } from "@shopify/flash-list"
 import { HomeTabScreenProps } from "app/navigators/types"
 import { NewPostBar } from "app/components/NewPostBar"
-import { Logo } from "app/components/Logo"
+import MapView from "react-native-maps"
 
 interface HomeScreenProps extends HomeTabScreenProps<"Home"> {}
 
 export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_props) {
-  // const { navigation } = _props
+  const { navigation } = _props
   const { clearSession } = useAuth0()
   const {
     authenticationStore: { logout, tokenLoading, authToken },
     postStore,
+    userStore,
   } = useStores()
   // const [location, setLocation] = useState<Location.LocationObject | undefined>(undefined)
   // const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
@@ -67,31 +68,28 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
   ) : (
     <Screen preset="fixed" contentContainerStyle={$container}>
       <Header
-        LeftActionComponent={<Logo width={30} height={30} fill={colors.palette.neutral100} />}
         RightActionComponent={
-          <Text
-            text="Logout"
-            preset="bold"
-            textColor={colors.palette.neutral100}
-            onPress={handleLogout}
-          />
+          <Pressable onPress={() => navigation.navigate("HomeTabs", { screen: "Profile" })}>
+            <AutoImage src={userStore.avatar} style={$imgThumbnail} />
+          </Pressable>
         }
-        leftIconColor={colors.palette.neutral100}
-        onRightPress={handleLogout}
+        LeftActionComponent={
+          <Icon icon={"gear"} color={colors.tint} size={28} containerStyle={$settingsButtonStyle} />
+        }
         containerStyle={$headerStyle}
-        backgroundColor={colors.palette.primary500}
+        backgroundColor={colors.background}
       />
 
       <View style={$topContainer}>
-        <NewPostBar />
-        <ListView<Post>
+        <MapView style={{ width: "100%", height: "100%" }}></MapView>
+        {/* <ListView<Post>
           contentContainerStyle={$listContentContainer}
           data={postStore.posts.slice()} // Using slice to create a copy of the array that is then used for the cards. Breaks if you don't do this
           estimatedItemSize={162}
           onRefresh={manualRefresh}
           refreshing={refreshing}
           renderItem={({ item }) => <PostCard post={item} />}
-        />
+        /> */}
       </View>
 
       {/* <View style={[$bottomContainer, $bottomContainerInsets]}>
@@ -130,7 +128,22 @@ const $topContainer: ViewStyle = {
 const $listContentContainer: ContentStyle = {
   paddingTop: spacing.xxs,
 }
+const $imgThumbnail: ImageStyle = {
+  height: 40,
+  width: 40,
+  borderRadius: 20,
+  alignSelf: "flex-start",
+  marginRight: spacing.sm,
+}
 
+const $settingsButtonStyle: ViewStyle = {
+  height: 40,
+  width: 40,
+  borderRadius: 25,
+  backgroundColor: colors.backgroundDim,
+  alignItems: "center",
+  justifyContent: "center",
+}
 // const $bottomContainer: ViewStyle = {
 
 //   backgroundColor: colors.palette.neutral100,

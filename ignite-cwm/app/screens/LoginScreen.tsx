@@ -68,7 +68,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
               style={$loadingSpinnerStyle}
               circumference={60}
               strokeWidth={3}
-              stroke={colors.palette.neutral200}
+              stroke={colors.text}
             />
           )}
         </Button>

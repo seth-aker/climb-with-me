@@ -2,20 +2,20 @@
 
 const palette = {
   neutral100: "#FFFFFF",
-  neutral200: "#f2f4f1",
+  neutral200: "#222222",
   neutral300: "#cfd8ca",
-  neutral400: "#abb6a5",
+  neutral400: "#2c2c2c",
   neutral500: "#8f988b",
   neutral600: "#4d5549",
   neutral700: "#373b35",
-  neutral800: "#090c08",
+  neutral800: "#EDEDED",
   neutral900: "#000000",
 
   primary100: "#BCDFAA",
   primary200: "#A3C691",
   primary300: "#89AC77",
   primary400: "#70935E",
-  primary500: "#567944",
+  primary500: "#315523",
   primary600: "#3D602B",
 
   secondary100: "#DCDDE9",
@@ -60,6 +60,10 @@ export const colors = {
    * The default color of the screen background.
    */
   background: palette.neutral200,
+  /**
+   * The background color for pressable elements to differentiate from the main background
+   */
+  backgroundDim: palette.neutral400,
   /**
    * The default border color.
    */

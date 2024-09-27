@@ -62,9 +62,9 @@ export const respondToFriendRequest = async (
     const newFriendUpdate = {
       $push: {
         friends: {
-          _id: friendRequest[0].friendId,
-          name: friendRequest[0].friendName,
-          profileImg: friendRequest[0].friendProfImg,
+          _id: friendRequest[0].fromUser._id,
+          name: friendRequest[0].fromUser.name,
+          profileImg: friendRequest[0].fromUser.avatar,
           friendSince: Date.now(),
         },
       },

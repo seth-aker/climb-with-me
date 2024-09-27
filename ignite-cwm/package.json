@@ -74,7 +74,8 @@
     "react-native-svg": "15.2.0",
     "react-native-uuid": "^2.0.2",
     "react-native-web": "~0.19.6",
-    "socket.io-client": "^4.7.5"
+    "socket.io-client": "^4.7.5",
+    "react-native-maps": "1.14.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -2,16 +2,16 @@ import * as React from "react"
 import { ComponentType } from "react"
 import {
   ImageStyle,
+  Pressable,
+  PressableProps,
   StyleProp,
-  TouchableOpacity,
   TouchableOpacityProps,
   View,
   ViewProps,
   ViewStyle,
 } from "react-native"
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome"
-import { IconProp as FaIconProps} from "@fortawesome/fontawesome-svg-core"
-
+import { IconProp as FaIconProps } from "@fortawesome/fontawesome-svg-core"
 
 interface IconProps extends TouchableOpacityProps {
   /**
@@ -63,8 +63,8 @@ export function Icon(props: IconProps) {
   } = props
 
   const isPressable = !!WrapperProps.onPress
-  const Wrapper = (WrapperProps?.onPress ? TouchableOpacity : View) as ComponentType<
-    TouchableOpacityProps | ViewProps
+  const Wrapper = (WrapperProps?.onPress ? Pressable : View) as ComponentType<
+    PressableProps | ViewProps
   >
 
   const $imageStyle: StyleProp<ViewStyle> = [
@@ -80,16 +80,10 @@ export function Icon(props: IconProps) {
       {...WrapperProps}
       style={$containerStyleOverride}
     >
-      <FontAwesomeIcon 
-        icon={icon} 
-        style={$imageStyle} 
-        size={size}
-        color={color}
-        />
+      <FontAwesomeIcon icon={icon} style={$imageStyle} size={size} color={color} />
     </Wrapper>
   )
 }
-
 
 const $imageStyleBase: ImageStyle = {
   resizeMode: "contain",
