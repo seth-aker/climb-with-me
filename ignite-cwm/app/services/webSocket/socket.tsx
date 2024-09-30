@@ -20,9 +20,15 @@ export const SocketContext = createContext({} as TSocketContext)
  *
  */
 export function SocketProvider({ children, token }: SocketProviderProps) {
-  const [socket] = useState<Socket>(io(Config.SOCKET_ORIGIN, { auth: { token } }))
+  const [socket, setSocket] = useState<Socket>()
+  const socketSetup = () => {
+    if (!socket) {
+      setSocket(io(Config.SOCKET_ORIGIN, { auth: { token } }))
+    }
+  }
+  socketSetup()
   if (!socket) {
-    throw new Error("Connection error, socket not defined")
+    return null
   }
   return <SocketContext.Provider value={{ socket }}>{children}</SocketContext.Provider>
 }

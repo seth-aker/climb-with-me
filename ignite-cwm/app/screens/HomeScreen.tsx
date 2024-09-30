@@ -1,18 +1,18 @@
 import { observer } from "mobx-react-lite"
-import React, { FC, useState } from "react"
+import React, { FC, useEffect, useState } from "react"
 import { ImageStyle, Pressable, View, ViewStyle } from "react-native"
-import { AutoImage, Header, Icon, ListView, Screen, Text } from "app/components"
+import { AutoImage, Header, Icon, Screen, Text } from "app/components"
 import { colors, spacing } from "../theme"
 import { LoadingSpinner } from "../components/LoadingSpinner"
 import { useAuth0 } from "react-native-auth0"
 import { useStores } from "app/models"
-// import * as Location from "expo-location"
+import * as Location from "expo-location"
 import { Post } from "app/models/Post"
 import { PostCard } from "app/components/PostCard"
 import { ContentStyle } from "@shopify/flash-list"
 import { HomeTabScreenProps } from "app/navigators/types"
-import { NewPostBar } from "app/components/NewPostBar"
-import MapView from "react-native-maps"
+import MapView, { PROVIDER_GOOGLE } from "react-native-maps"
+import { ScreenContext } from "react-native-screens"
 
 interface HomeScreenProps extends HomeTabScreenProps<"Home"> {}
 
@@ -24,27 +24,27 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
     postStore,
     userStore,
   } = useStores()
-  // const [location, setLocation] = useState<Location.LocationObject | undefined>(undefined)
-  // const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
+  const [location, setLocation] = useState<Location.LocationObject | undefined>(undefined)
+  const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined)
   const [refreshing, setRefreshing] = useState(false)
 
-  // TODO: make this into a hook that can be used anywhere
-  // useEffect(() => {
-  //   (async () => {
-  //     let { status } = await Location.getForegroundPermissionsAsync();
-  //     // checks current permission status and if not granted yet, requests permission
-  //     if(status !== "granted") {
-  //       status = (await Location.requestForegroundPermissionsAsync()).status
-  //     }
-  //     // checks permission status again if the user granted permission from the Location.requestForegroundPermissionsAsync() function.
-  //     if(status !== "granted") {
-  //       setErrorMsg('Permission to access location was denied');
-  //       return;
-  //     }
-  //     const location = await Location.getCurrentPositionAsync();
-  //     setLocation(location);
-  //   })();
-  // }, [])
+  //  TODO: make this into a hook that can be used anywhere
+  useEffect(() => {
+    ;(async () => {
+      let { status } = await Location.getForegroundPermissionsAsync()
+      // checks current permission status and if not granted yet, requests permission
+      if (status !== "granted") {
+        status = (await Location.requestForegroundPermissionsAsync()).status
+      }
+      // checks permission status again if the user granted permission from the Location.requestForegroundPermissionsAsync() function.
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied")
+        return
+      }
+      const location = await Location.getCurrentPositionAsync()
+      setLocation(location)
+    })()
+  }, [])
 
   const handleLogout = async () => {
     try {
@@ -68,12 +68,12 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
   ) : (
     <Screen preset="fixed" contentContainerStyle={$container}>
       <Header
-        RightActionComponent={
+        LeftActionComponent={
           <Pressable onPress={() => navigation.navigate("HomeTabs", { screen: "Profile" })}>
             <AutoImage src={userStore.avatar} style={$imgThumbnail} />
           </Pressable>
         }
-        LeftActionComponent={
+        RightActionComponent={
           <Icon icon={"gear"} color={colors.tint} size={28} containerStyle={$settingsButtonStyle} />
         }
         containerStyle={$headerStyle}
@@ -81,7 +81,26 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
       />
 
       <View style={$topContainer}>
-        <MapView style={{ width: "100%", height: "100%" }}></MapView>
+        {location ? (
+          <View>
+            <MapView
+              provider={PROVIDER_GOOGLE}
+              style={$mapStyle}
+              initialRegion={{
+                longitude: location.coords.longitude,
+                latitude: location.coords.latitude,
+                longitudeDelta: 0.75,
+                latitudeDelta: 0.75,
+              }}
+            ></MapView>
+            
+          </View>
+        ) : (
+          <View style={$loadingSpinnerStyle}>
+            <Text preset="subheading" text="Fetching Location..." textColor={colors.tint} />
+            <LoadingSpinner circumference={200} />
+          </View>
+        )}
         {/* <ListView<Post>
           contentContainerStyle={$listContentContainer}
           data={postStore.posts.slice()} // Using slice to create a copy of the array that is then used for the cards. Breaks if you don't do this
@@ -124,10 +143,6 @@ const $topContainer: ViewStyle = {
   flexGrow: 1,
   justifyContent: "center",
 }
-
-const $listContentContainer: ContentStyle = {
-  paddingTop: spacing.xxs,
-}
 const $imgThumbnail: ImageStyle = {
   height: 40,
   width: 40,
@@ -143,6 +158,10 @@ const $settingsButtonStyle: ViewStyle = {
   backgroundColor: colors.backgroundDim,
   alignItems: "center",
   justifyContent: "center",
+}
+const $mapStyle: ViewStyle = {
+  height: "100%",
+  width: "100%",
 }
 // const $bottomContainer: ViewStyle = {
 

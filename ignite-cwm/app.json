@@ -30,6 +30,11 @@
         "image": "./assets/images/splash-logo-android-universal.png",
         "resizeMode": "contain",
         "backgroundColor": "#222222"
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": ""
+        }
       }
     },
     "ios": {
@@ -78,10 +83,21 @@
           }
         }
       ],
+      [
+       "expo-dev-launcher",
+       {
+         "launchMode": "most-recent"
+       }
+     ],
       "expo-font"
     ],
     "experiments": {
       "tsconfigPaths": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "847bdd70-7536-445d-a679-3e58c7827f1d"
+      }
     }
   }
  

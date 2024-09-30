@@ -1,5 +1,6 @@
 import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree"
 import { CommentModel, IComment } from "./CommentModel"
+import { LocationModel } from "./Location"
 
 export const PostModel = types
   .model("Post", {
@@ -16,6 +17,11 @@ export const PostModel = types
      * When the poster plans to go climbing
      */
     tripDate: types.Date,
+    /**
+     * Lat and long coordinates of the climbing area
+     */
+    tripLocation: LocationModel,
+    climbingType: types.enumeration(["Sport", "Trad", "Bouldering", "Top Rope"]),
     createdAt: types.Date,
     /**
      * Name of the user who posted the message
@@ -37,7 +43,6 @@ export const PostModel = types
      * Array of GUIDs of the other users who have liked the post
      */
     likes: types.array(types.string),
-    // tripLocation: "",
   })
   .actions((post) => ({
     addLiked(guid: string) {
