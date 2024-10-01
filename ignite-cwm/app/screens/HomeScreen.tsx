@@ -11,7 +11,7 @@ import { Post } from "app/models/Post"
 import { PostCard } from "app/components/PostCard"
 import { ContentStyle } from "@shopify/flash-list"
 import { HomeTabScreenProps } from "app/navigators/types"
-import MapView, { PROVIDER_GOOGLE } from "react-native-maps"
+import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps"
 import { ScreenContext } from "react-native-screens"
 
 interface HomeScreenProps extends HomeTabScreenProps<"Home"> {}
@@ -20,13 +20,14 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
   const { navigation } = _props
   const { clearSession } = useAuth0()
   const {
-    authenticationStore: { logout, tokenLoading, authToken },
+    authenticationStore: { logout, tokenLoading },
     postStore,
     userStore,
   } = useStores()
-  const [location, setLocation] = useState<Location.LocationObject | undefined>(undefined)
+  const [location, setLocation] = useState<Region | undefined>(undefined)
   const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined)
   const [refreshing, setRefreshing] = useState(false)
+  const [markers, setMarkers] = useState(postStore.postMarkers())
 
   //  TODO: make this into a hook that can be used anywhere
   useEffect(() => {
@@ -42,7 +43,12 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
         return
       }
       const location = await Location.getCurrentPositionAsync()
-      setLocation(location)
+      setLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.75,
+        longitudeDelta: 0.75,
+      })
     })()
   }, [])
 
@@ -54,13 +60,6 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
       console.log("Log out cancelled")
     }
   }
-
-  const manualRefresh = async () => {
-    setRefreshing(true)
-    await postStore.fetchPosts(authToken ?? "")
-    setRefreshing(false)
-  }
-
   return tokenLoading ? (
     <>
       <LoadingSpinner circumference={100} style={$loadingSpinnerStyle} />
@@ -86,14 +85,16 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
             <MapView
               provider={PROVIDER_GOOGLE}
               style={$mapStyle}
+              region={location}
               initialRegion={{
-                longitude: location.coords.longitude,
-                latitude: location.coords.latitude,
+                longitude: location.longitude,
+                latitude: location.latitude,
                 longitudeDelta: 0.75,
                 latitudeDelta: 0.75,
               }}
-            ></MapView>
-            
+            >
+              <Marker coordinate={{ longitude: location.longitude, latitude: location.latitude }} />
+            </MapView>
           </View>
         ) : (
           <View style={$loadingSpinnerStyle}>

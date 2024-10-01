@@ -19,6 +19,16 @@ export const PostStoreModel = types
       })
       return totalLikes
     },
+    postMarkers() {
+      return store.posts.map((post) => {
+        return {
+          lat: post.tripLocation.latitude,
+          lng: post.tripLocation.longitude,
+          title: post.title,
+          description: post.body,
+        }
+      })
+    },
   }))
   .actions((store) => ({
     addPost(post: Post) {

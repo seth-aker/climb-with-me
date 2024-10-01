@@ -49,6 +49,7 @@ export const UserStoreModel = types
     createdOn: types.optional(types.Date, Date.now()),
     lastUpdated: types.optional(types.Date, Date.now()),
     climbingStyles: types.optional(types.array(ClimbingStyleModel), []),
+    postalCode: types.maybe(types.number),
   })
   .actions(withSetPropAction)
   .actions((store) => ({
