@@ -20,7 +20,7 @@ export const PostModel = types
     /**
      * Lat and long coordinates of the climbing area
      */
-    tripLocation: LocationModel,
+    coordinates: LocationModel,
     climbingType: types.enumeration(["Sport", "Trad", "Bouldering", "Top Rope"]),
     createdAt: types.Date,
     /**

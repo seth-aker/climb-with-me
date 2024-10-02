@@ -35,7 +35,10 @@
         "googleMaps": {
           "apiKey": ""
         }
-      }
+      },
+      "permissions": [
+        "ACCESS_FINE_LOCATION"
+      ]
     },
     "ios": {
       "icon": "./assets/images/app-icon-ios.png",

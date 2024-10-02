@@ -7,12 +7,9 @@ import { LoadingSpinner } from "../components/LoadingSpinner"
 import { useAuth0 } from "react-native-auth0"
 import { useStores } from "app/models"
 import * as Location from "expo-location"
-import { Post } from "app/models/Post"
-import { PostCard } from "app/components/PostCard"
-import { ContentStyle } from "@shopify/flash-list"
 import { HomeTabScreenProps } from "app/navigators/types"
-import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps"
-import { ScreenContext } from "react-native-screens"
+import MapView, { Callout, Marker, PROVIDER_GOOGLE, Region } from "react-native-maps"
+import { TripMarkerCallout } from "app/components/TripMarker"
 
 interface HomeScreenProps extends HomeTabScreenProps<"Home"> {}
 
@@ -20,36 +17,37 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
   const { navigation } = _props
   const { clearSession } = useAuth0()
   const {
-    authenticationStore: { logout, tokenLoading },
+    authenticationStore: { logout, tokenLoading, authToken },
     postStore,
     userStore,
   } = useStores()
   const [location, setLocation] = useState<Region | undefined>(undefined)
   const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined)
   const [refreshing, setRefreshing] = useState(false)
-  const [markers, setMarkers] = useState(postStore.postMarkers())
 
   //  TODO: make this into a hook that can be used anywhere
+  const queryLocation = async () => {
+    let { status } = await Location.getForegroundPermissionsAsync()
+    // checks current permission status and if not granted yet, requests permission
+    if (status !== "granted") {
+      status = (await Location.requestForegroundPermissionsAsync()).status
+    }
+    // checks permission status again if the user granted permission from the Location.requestForegroundPermissionsAsync() function.
+    if (status !== "granted") {
+      setErrorMsg("Permission to access location was denied")
+      return
+    }
+    const location = await Location.getCurrentPositionAsync()
+    setLocation({
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+      latitudeDelta: 0.75,
+      longitudeDelta: 0.75,
+    })
+    console.log(JSON.stringify(location))
+  }
   useEffect(() => {
-    ;(async () => {
-      let { status } = await Location.getForegroundPermissionsAsync()
-      // checks current permission status and if not granted yet, requests permission
-      if (status !== "granted") {
-        status = (await Location.requestForegroundPermissionsAsync()).status
-      }
-      // checks permission status again if the user granted permission from the Location.requestForegroundPermissionsAsync() function.
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied")
-        return
-      }
-      const location = await Location.getCurrentPositionAsync()
-      setLocation({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.75,
-        longitudeDelta: 0.75,
-      })
-    })()
+    queryLocation()
   }, [])
 
   const handleLogout = async () => {
@@ -73,7 +71,16 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
           </Pressable>
         }
         RightActionComponent={
-          <Icon icon={"gear"} color={colors.tint} size={28} containerStyle={$settingsButtonStyle} />
+          <Icon
+            icon={"gear"}
+            color={colors.tint}
+            size={28}
+            containerStyle={$settingsButtonStyle}
+            onPress={() => {
+              postStore.fetchPosts(authToken ?? "")
+              queryLocation()
+            }}
+          />
         }
         containerStyle={$headerStyle}
         backgroundColor={colors.background}
@@ -82,18 +89,20 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
       <View style={$topContainer}>
         {location ? (
           <View>
-            <MapView
-              provider={PROVIDER_GOOGLE}
-              style={$mapStyle}
-              region={location}
-              initialRegion={{
-                longitude: location.longitude,
-                latitude: location.latitude,
-                longitudeDelta: 0.75,
-                latitudeDelta: 0.75,
-              }}
-            >
-              <Marker coordinate={{ longitude: location.longitude, latitude: location.latitude }} />
+            <MapView provider={PROVIDER_GOOGLE} style={$mapStyle} region={location}>
+              {postStore.posts.map((post, index) => (
+                <Marker
+                  key={index}
+                  coordinate={{
+                    latitude: post.coordinates.latitude,
+                    longitude: post.coordinates.longitude,
+                  }}
+                >
+                  <Callout style={$calloutContainerStyle}>
+                    <TripMarkerCallout key={index} post={post} />
+                  </Callout>
+                </Marker>
+              ))}
             </MapView>
           </View>
         ) : (
@@ -163,6 +172,11 @@ const $settingsButtonStyle: ViewStyle = {
 const $mapStyle: ViewStyle = {
   height: "100%",
   width: "100%",
+}
+const $calloutContainerStyle: ViewStyle = {
+  flex: 1,
+  maxWidth: 300,
+  minWidth: 150,
 }
 // const $bottomContainer: ViewStyle = {
 
