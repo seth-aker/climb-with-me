@@ -10,9 +10,15 @@ export interface IPost {
   authorName: string;
   authorId: string;
   authorProfImg: string;
-  coordinates: { latitude: number; longitude: number };
+  location: ILocation;
   climbingType: "Sport" | "Trad" | "Bouldering" | "Top Rope";
   comments: IComment[];
   // Array of user ids who liked the post.
   likes: string[];
+}
+
+export interface ILocation {
+  coords: { latitude: number; longitude: number };
+  address: string;
+  name: string;
 }

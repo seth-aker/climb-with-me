@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useState } from "react"
-import { ImageStyle, Pressable, View, ViewStyle } from "react-native"
-import { AutoImage, Header, Icon, Screen, Text } from "app/components"
+import { View, ViewStyle } from "react-native"
+import { Screen, Text } from "app/components"
 import { colors, spacing } from "../theme"
 import { LoadingSpinner } from "../components/LoadingSpinner"
 import { useAuth0 } from "react-native-auth0"
@@ -10,16 +10,16 @@ import * as Location from "expo-location"
 import { HomeTabScreenProps } from "app/navigators/types"
 import MapView, { Callout, Marker, PROVIDER_GOOGLE, Region } from "react-native-maps"
 import { TripMarkerCallout } from "app/components/TripMarker"
+import { AppHeader } from "app/components/AppHeader"
+import { getRecentPosts } from "app/services/api/postService/postService"
 
 interface HomeScreenProps extends HomeTabScreenProps<"Home"> {}
 
 export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_props) {
-  const { navigation } = _props
   const { clearSession } = useAuth0()
   const {
     authenticationStore: { logout, tokenLoading, authToken },
     postStore,
-    userStore,
   } = useStores()
   const [location, setLocation] = useState<Region | undefined>(undefined)
   const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined)
@@ -39,15 +39,18 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
     }
     const location = await Location.getCurrentPositionAsync()
     setLocation({
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
+      latitude: __DEV__ ? 43.1915008 : location.coords.latitude,
+      longitude: __DEV__ ? -70.8476928 : location.coords.longitude,
       latitudeDelta: 0.75,
       longitudeDelta: 0.75,
     })
-    console.log(JSON.stringify(location))
   }
   useEffect(() => {
+    console.log(PROVIDER_GOOGLE)
     queryLocation()
+    getRecentPosts(authToken ?? "").then((res) => {
+      postStore.setPosts(res.data)
+    })
   }, [])
 
   const handleLogout = async () => {
@@ -58,47 +61,28 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
       console.log("Log out cancelled")
     }
   }
+
   return tokenLoading ? (
     <>
       <LoadingSpinner circumference={100} style={$loadingSpinnerStyle} />
     </>
   ) : (
     <Screen preset="fixed" contentContainerStyle={$container}>
-      <Header
-        LeftActionComponent={
-          <Pressable onPress={() => navigation.navigate("HomeTabs", { screen: "Profile" })}>
-            <AutoImage src={userStore.avatar} style={$imgThumbnail} />
-          </Pressable>
-        }
-        RightActionComponent={
-          <Icon
-            icon={"gear"}
-            color={colors.tint}
-            size={28}
-            containerStyle={$settingsButtonStyle}
-            onPress={() => {
-              postStore.fetchPosts(authToken ?? "")
-              queryLocation()
-            }}
-          />
-        }
-        containerStyle={$headerStyle}
-        backgroundColor={colors.background}
-      />
-
+      <AppHeader />
       <View style={$topContainer}>
         {location ? (
           <View>
             <MapView provider={PROVIDER_GOOGLE} style={$mapStyle} region={location}>
               {postStore.posts.map((post, index) => (
                 <Marker
+                  calloutAnchor={{ x: 0.5, y: 0 }}
                   key={index}
                   coordinate={{
-                    latitude: post.coordinates.latitude,
-                    longitude: post.coordinates.longitude,
+                    latitude: post.location.coords.latitude,
+                    longitude: post.location.coords.longitude,
                   }}
                 >
-                  <Callout style={$calloutContainerStyle}>
+                  <Callout tooltip style={$calloutContainerStyle}>
                     <TripMarkerCallout key={index} post={post} />
                   </Callout>
                 </Marker>
@@ -144,29 +128,10 @@ const $container: ViewStyle = {
   height: "100%",
   backgroundColor: colors.background,
 }
-const $headerStyle: ViewStyle = {
-  marginBottom: 0,
-  paddingHorizontal: spacing.sm,
-}
+
 const $topContainer: ViewStyle = {
   marginTop: 0,
   flexGrow: 1,
-  justifyContent: "center",
-}
-const $imgThumbnail: ImageStyle = {
-  height: 40,
-  width: 40,
-  borderRadius: 20,
-  alignSelf: "flex-start",
-  marginRight: spacing.sm,
-}
-
-const $settingsButtonStyle: ViewStyle = {
-  height: 40,
-  width: 40,
-  borderRadius: 25,
-  backgroundColor: colors.backgroundDim,
-  alignItems: "center",
   justifyContent: "center",
 }
 const $mapStyle: ViewStyle = {
@@ -174,9 +139,9 @@ const $mapStyle: ViewStyle = {
   width: "100%",
 }
 const $calloutContainerStyle: ViewStyle = {
-  flex: 1,
-  maxWidth: 300,
-  minWidth: 150,
+  minWidth: 250,
+  margin: spacing.md,
+  elevation: 10,
 }
 // const $bottomContainer: ViewStyle = {
 

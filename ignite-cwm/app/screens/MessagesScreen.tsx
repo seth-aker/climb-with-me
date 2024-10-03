@@ -2,7 +2,7 @@ import { HomeTabScreenProps } from "app/navigators/types"
 // import { useSafeAreaInsetsStyle } from "app/utils/useSafeAreaInsetsStyle";
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useRef, useState } from "react"
-import { AutoImage, Button, Header, Icon, ListView, Screen, Text } from "app/components"
+import { AutoImage, Button, Icon, ListView, Screen, Text } from "app/components"
 import {
   FlatList,
   ImageStyle,
@@ -14,13 +14,14 @@ import {
   ViewStyle,
 } from "react-native"
 import { colors, spacing } from "app/theme"
-import { Logo } from "app/components/Logo"
+
 import { useStores } from "app/models"
 import { ChatCard } from "app/components/ChatCard"
 import { ChatUserModel, IChat, ChatModel, IChatUser } from "app/models/Chat"
 import uuid from "react-native-uuid"
 import { IFriend } from "app/models/Friend"
 import { getUserChats } from "app/services/api/chatService/chatService"
+import { AppHeader } from "app/components/AppHeader"
 
 interface MessagesScreenProps extends HomeTabScreenProps<"Messages"> {}
 
@@ -110,8 +111,7 @@ export const MessagesScreen: FC<MessagesScreenProps> = observer(function Message
 
   return (
     <Screen preset="fixed" contentContainerStyle={$screenContainer}>
-      <Header
-        LeftActionComponent={<Logo width={30} height={30} fill={colors.palette.neutral100} />}
+      <AppHeader
         RightActionComponent={
           <Icon
             icon={"pen-to-square"}
@@ -120,9 +120,9 @@ export const MessagesScreen: FC<MessagesScreenProps> = observer(function Message
             containerStyle={$iconContainerStyle}
           />
         }
-        leftIconColor={colors.palette.neutral100}
-        containerStyle={$headerStyle}
-        backgroundColor={colors.palette.primary500}
+        // leftIconColor={colors.palette.neutral100}
+        // containerStyle={$headerStyle}
+        // backgroundColor={colors.palette.primary500}
       />
       <ListView<IChat>
         data={chatList}
@@ -141,7 +141,7 @@ export const MessagesScreen: FC<MessagesScreenProps> = observer(function Message
         style={$modalStyle}
         animationType="slide"
       >
-        <Header
+        <AppHeader
           containerStyle={$headerStyle}
           title="New Message"
           titleStyle={{ color: colors.palette.neutral100 }}
