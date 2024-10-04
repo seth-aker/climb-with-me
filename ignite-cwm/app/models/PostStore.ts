@@ -19,6 +19,24 @@ export const PostStoreModel = types
       })
       return totalLikes
     },
+
+    /**
+     * Returns a map of posts grouped by location. The key is a comma separated
+     * string of the latitude and longitude of the post and the value is an array
+     * of posts at that location.
+     * @returns {Map<string, Post[]>}
+     */
+    get postsGroupedByLocation() {
+      const postsGroupedByLocation = new Map<string, Post[]>()
+      store.posts.forEach((post) => {
+        const location = `${post.location.coords.latitude},${post.location.coords.longitude}`
+        if (!postsGroupedByLocation.has(location)) {
+          postsGroupedByLocation.set(location, [])
+        }
+        postsGroupedByLocation.get(location)?.push(post)
+      })
+      return postsGroupedByLocation
+    },
   }))
   .actions((store) => ({
     addPost(post: Post) {

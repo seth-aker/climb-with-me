@@ -23,6 +23,7 @@ import { applySnapshot, getSnapshot } from "mobx-state-tree"
 import { PublicProfileScreen } from "app/screens/PublicProfileScreen"
 import { SocketProvider } from "app/services/webSocket/socket"
 import { getUserPrivate, postUser } from "app/services/api/userService/userService"
+import { SettingsScreen } from "app/screens/SettingsScreen"
 
 /**
  * This is a list of all the route names that will exit the app if the back button
@@ -84,6 +85,11 @@ const AppStack = observer(function AppStack(_props) {
               options={{ animation: "slide_from_right" }}
             />
             <Stack.Screen name="PublicProfile" component={PublicProfileScreen} />
+            <Stack.Screen
+              name="Settings"
+              component={SettingsScreen}
+              options={{ animation: "slide_from_bottom" }}
+            />
           </>
         ) : (
           <>

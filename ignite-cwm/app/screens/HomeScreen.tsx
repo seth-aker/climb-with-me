@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useState } from "react"
-import { View, ViewStyle } from "react-native"
+import { Dimensions, View, ViewStyle } from "react-native"
 import { Screen, Text } from "app/components"
 import { colors, spacing } from "../theme"
 import { LoadingSpinner } from "../components/LoadingSpinner"
@@ -24,7 +24,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
   const [location, setLocation] = useState<Region | undefined>(undefined)
   const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined)
   const [refreshing, setRefreshing] = useState(false)
-
+  const screenWidth = Math.round(Dimensions.get("window").width)
   //  TODO: make this into a hook that can be used anywhere
   const queryLocation = async () => {
     let { status } = await Location.getForegroundPermissionsAsync()
@@ -46,7 +46,6 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
     })
   }
   useEffect(() => {
-    console.log(PROVIDER_GOOGLE)
     queryLocation()
     getRecentPosts(authToken ?? "").then((res) => {
       postStore.setPosts(res.data)
@@ -62,6 +61,59 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
     }
   }
 
+  const markers: JSX.Element[] = []
+  postStore.postsGroupedByLocation.forEach((posts, locationKey) => {
+    if (posts.length === 1) {
+      markers.push(
+        <Marker
+          calloutAnchor={{ x: 0.5, y: 0 }}
+          key={locationKey}
+          coordinate={{
+            latitude: Number(locationKey.split(",")[0]),
+            longitude: Number(locationKey.split(",")[1]),
+          }}
+        >
+          <Callout tooltip style={[$calloutContainerStyle, { maxWidth: screenWidth * 0.9 }]}>
+            <TripMarkerCallout post={posts[0]} />
+          </Callout>
+        </Marker>,
+      )
+    }
+    if (posts.length > 1) {
+      const climbingTypes: string[] = []
+      posts.forEach((post) => {
+        if (!climbingTypes.includes(post.climbingType)) {
+          climbingTypes.push(post.climbingType)
+        }
+      })
+      markers.push(
+        <Marker
+          calloutAnchor={{ x: 0.5, y: 0 }}
+          key={locationKey}
+          coordinate={{
+            latitude: Number(locationKey.split(",")[0]),
+            longitude: Number(locationKey.split(",")[1]),
+          }}
+        >
+          <Callout tooltip style={$calloutContainerStyle}>
+            <View style={$calloutCardStyle}>
+              <View style={$calloutHeader}>
+                <Text preset="bold" size="xs" text={posts[0].location.name} />
+                <Text size="xxs" text={`${posts.length} trips in this area`} />
+              </View>
+              <View style={$calloutBody}>
+                <View style={$rowStyle}>
+                  <Text size="xxs" text={"Climbing Types"} />
+                  <Text style={$textStyle} size="xxs" text={climbingTypes.join(", ")} />
+                </View>
+              </View>
+            </View>
+          </Callout>
+        </Marker>,
+      )
+    }
+  })
+
   return tokenLoading ? (
     <>
       <LoadingSpinner circumference={100} style={$loadingSpinnerStyle} />
@@ -73,20 +125,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
         {location ? (
           <View>
             <MapView provider={PROVIDER_GOOGLE} style={$mapStyle} region={location}>
-              {postStore.posts.map((post, index) => (
-                <Marker
-                  calloutAnchor={{ x: 0.5, y: 0 }}
-                  key={index}
-                  coordinate={{
-                    latitude: post.location.coords.latitude,
-                    longitude: post.location.coords.longitude,
-                  }}
-                >
-                  <Callout tooltip style={$calloutContainerStyle}>
-                    <TripMarkerCallout key={index} post={post} />
-                  </Callout>
-                </Marker>
-              ))}
+              {markers}
             </MapView>
           </View>
         ) : (
@@ -143,19 +182,29 @@ const $calloutContainerStyle: ViewStyle = {
   margin: spacing.md,
   elevation: 10,
 }
-// const $bottomContainer: ViewStyle = {
+const $calloutCardStyle: ViewStyle = {
+  elevation: 5,
+  shadowColor: "black",
+  borderRadius: 15,
+  backgroundColor: colors.palette.neutral300,
+}
+const $calloutHeader: ViewStyle = {
+  flexDirection: "row",
+  margin: spacing.xs,
+}
 
-//   backgroundColor: colors.palette.neutral100,
-//   borderTopLeftRadius: 16,
-//   borderTopRightRadius: 16,
-//   justifyContent: "space-around",
-// }
-// const $welcomeLogo: ImageStyle = {
-//   height: 88,
-//   width: "100%",
-//   marginBottom: spacing.xxl,
-// }
-
-// const $welcomeHeading: TextStyle = {
-//   marginBottom: spacing.md,
-// }
+const $calloutBody: ViewStyle = {
+  flex: 1,
+  backgroundColor: colors.palette.neutral800,
+  borderRadius: 15,
+  paddingBottom: spacing.xs,
+}
+const $rowStyle: ViewStyle = {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  marginHorizontal: spacing.sm,
+  marginTop: spacing.xxs,
+}
+const $textStyle: ViewStyle = {
+  width: "100%",
+}

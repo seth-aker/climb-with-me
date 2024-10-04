@@ -32,7 +32,7 @@ export const TripMarkerCallout = (props: TripMarkerProps) => {
             />
           </Svg>
           <View style={$headerText}>
-            <Text preset="bold" size="xs" text={post.title} />
+            <Text preset="bold" size="sm" text={post.title} />
             <Text size="xxs" text={post.authorName} />
           </View>
         </View>
@@ -57,20 +57,21 @@ export const TripMarkerCallout = (props: TripMarkerProps) => {
     </>
   )
 }
-
 const $calloutContainerStyle: ViewStyle = {
   elevation: 5,
   shadowColor: "black",
   borderRadius: 15,
   backgroundColor: colors.palette.neutral300,
+  width: "100%",
 }
 const $calloutHeader: ViewStyle = {
   flexDirection: "row",
   margin: spacing.xs,
+  width: "100%",
 }
 const $headerText: ViewStyle = {
-  marginLeft: spacing.xxs,
-  flexWrap: "wrap",
+  paddingHorizontal: spacing.xxs,
+  width: "90%",
 }
 const $svgImageStyle: ImageStyle = {
   width: 36,
